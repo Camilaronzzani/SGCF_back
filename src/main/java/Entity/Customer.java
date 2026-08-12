@@ -1,6 +1,6 @@
 package Entity;
 
-import Entity.Enum.CountryCostumer;
+import Entity.Enum.CountryCustomer;
 import Entity.Enum.Language;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,10 @@ public class Customer {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "country_of_customer")
-    private CountryCostumer countryOfCostumer;
+    private CountryCustomer countryCustomer;
+
+    @Column(name = "user_email", nullable = false, length = 100, unique = true)
+    private String email;
 
     @Column(name = "Active")
     private boolean active ;

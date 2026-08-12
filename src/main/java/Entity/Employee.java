@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,10 @@ public class Employee {
     )
     @Column(name = "language")
     private List<Language> languagesSpoken = new ArrayList<>();
+
+    @Column(name = "day_of_birth")
+    private LocalDate dayOfBirth;
+
 
     @Column(name = "Active")
     private boolean active ;

@@ -1,6 +1,6 @@
 package Entity.Enum;
 
-public enum CountryCostumer {
+public enum CountryCustomer {
     Brazil,
     Paraguay,
     United_states,
