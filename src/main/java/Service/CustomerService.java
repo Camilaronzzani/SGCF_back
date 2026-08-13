@@ -3,6 +3,8 @@ package Service;
 import Controller.DTOs.CustomerDto;
 import Controller.DTOs.Request.CustomerRequest;
 import Entity.Customer;
+import Entity.Enum.CountryCustomer;
+import Entity.Enum.Language;
 import Repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,10 +47,11 @@ public class CustomerService {
         }
     }
 
-    public String salve(CustomerRequest customerRequest) {
+    public String save(CustomerRequest customerRequest) {
         try {
             Customer customer = toCustomer(customerRequest);
-            return "customer: " + customer.getName()+ " salve successful ";
+            customerRepository.save(customer);
+            return "customer: " + customer.getName()+ " save successful ";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -62,5 +66,82 @@ public class CustomerService {
         customer.setEmail(customerRequest.getEmail());
         customer.setActive(true);
         return customer;
+    }
+
+    public void changeDataByCustomer(Customer oldCustomer, Customer newCustomer){
+        oldCustomer.setCountryCustomer(newCustomer.getCountryCustomer());
+        oldCustomer.setCnpj(newCustomer.getCnpj());
+        oldCustomer.setCpf(newCustomer.getCpf());
+        oldCustomer.setName(newCustomer.getName());
+        oldCustomer.setEmail(newCustomer.getEmail());
+        oldCustomer.setLanguageSpeak(newCustomer.getLanguageSpeak());
+    }
+
+    public String update(CustomerRequest customerRequest, long id) {
+        try {
+            Customer customerNew = toCustomer(customerRequest);
+            Customer customerOld = Optional.of(customerRepository.findById(id).orElseThrow(()
+                            -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"))).get();
+            changeDataByCustomer(customerOld , customerNew);
+            customerRepository.save(customerOld);
+            return "customer: " + customerOld.getName() + " save successful ";
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public String delete(long id) {
+        try {
+            Customer customer = customerRepository.findById(id).orElseThrow(()
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
+            customer.setActive(false);
+            customerRepository.save(customer);
+            return "customer: " + customer.getName() + " delete successful ";
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String applyPartialUpdate(long id, Map<String, Object> customer) {
+        try {
+            Customer customer1 = customerRepository.findById(id).orElseThrow(()
+                        ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
+            customer.forEach((key , value) ->{
+                switch (key){
+                    case "cnpj" -> customer1.setCnpj((String) value);
+
+                    case "cpf" -> customer1.setCpf((String) value) ;
+
+                    case "name" -> customer1.setName((String) value);
+
+                    case "languageSpeak" -> customer1.setLanguageSpeak((List<Language>) value);
+
+                    case "countryCustomer" -> customer1.setCountryCustomer((CountryCustomer) value);
+
+                    case "email" -> customer1.setEmail((String) value);
+                }
+            });
+            customerRepository.save(customer1);
+            return "customer: " + customer1.getName() + " delete successful ";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<CustomerDto> findAllActive() {
+        try {
+            List<Customer> customerList = customerRepository.findByActiveTrue();
+            List<CustomerDto> customerDtoList = new ArrayList<>();
+            customerList.forEach(customer -> {
+               CustomerDto customerDto = CustomerDto.toDto(customer);
+               customerDtoList.add(customerDto);
+            });
+            return customerDtoList;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
