@@ -138,4 +138,17 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+
+    public String changePassword(long id, String newPassword) {
+        try {
+
+            User user = userRepository.findById(id).orElseThrow(()
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+            user.setUserPassword(newPassword);
+            userRepository.save(user);
+            return "Password change successful ";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

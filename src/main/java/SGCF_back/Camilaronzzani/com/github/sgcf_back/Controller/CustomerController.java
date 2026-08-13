@@ -23,7 +23,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.findAll());
         } catch (Exception e) {
-            return (ResponseEntity<List<CustomerDto>>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -32,7 +32,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.findById(id));
         } catch (Exception e) {
-            return (ResponseEntity<CustomerDto>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -41,7 +41,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.save(customerRequest));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -50,7 +50,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.update(customerRequest , id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -59,7 +59,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.delete(id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -71,7 +71,7 @@ public class CustomerController {
             return ResponseEntity.ok(message);
 
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -80,7 +80,7 @@ public class CustomerController {
         try {
             return ResponseEntity.ok(customerService.findAllActive());
         } catch (Exception e) {
-            return (ResponseEntity<List<CustomerDto>>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 }

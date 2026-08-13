@@ -21,7 +21,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.findAll());
         } catch (Exception e) {
-            return (ResponseEntity<List<TourDto>>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -30,7 +30,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.findById(id));
         } catch (Exception e) {
-            return (ResponseEntity<TourDto>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -39,7 +39,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.save(tourRequest));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -48,7 +48,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.update(tourRequest , id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -57,7 +57,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.delete(id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -69,7 +69,7 @@ public class TourController {
             return ResponseEntity.ok(message);
 
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -78,7 +78,7 @@ public class TourController {
         try {
             return ResponseEntity.ok(tourService.findAllActive());
         } catch (Exception e) {
-            return (ResponseEntity<List<TourDto>>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 }

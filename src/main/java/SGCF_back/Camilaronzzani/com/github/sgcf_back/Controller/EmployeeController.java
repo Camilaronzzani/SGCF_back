@@ -22,7 +22,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.findAll());
         } catch (Exception e) {
-            return (ResponseEntity<List<EmployeDto>>) ResponseEntity.badRequest();
+            return  ResponseEntity.badRequest().build();
         }
     }
 
@@ -31,7 +31,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.findById(id));
         } catch (Exception e) {
-            return (ResponseEntity<EmployeDto>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -40,7 +40,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.save(employeeRequest));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -49,7 +49,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.update(employeeRequest , id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -58,7 +58,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.delete(id));
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -70,7 +70,7 @@ public class EmployeeController {
             return ResponseEntity.ok(message);
 
         } catch (Exception e) {
-            return (ResponseEntity<String>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -79,7 +79,7 @@ public class EmployeeController {
         try {
             return ResponseEntity.ok(employeeService.findAllActive());
         } catch (Exception e) {
-            return (ResponseEntity<List<EmployeDto>>) ResponseEntity.badRequest();
+            return ResponseEntity.badRequest().build();
         }
     }
 }

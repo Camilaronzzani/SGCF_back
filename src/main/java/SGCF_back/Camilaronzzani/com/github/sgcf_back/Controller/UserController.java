@@ -88,4 +88,12 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PatchMapping("/change/password/{id}")
+    public ResponseEntity<String> changePassword(@PathVariable long id , @RequestBody String newPassword){
+        try {
+            return ResponseEntity.ok(userService.changePassword(id , newPassword));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

@@ -30,6 +30,4 @@ public class PasswordReset {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "Active")
-    private boolean active ;
 }
