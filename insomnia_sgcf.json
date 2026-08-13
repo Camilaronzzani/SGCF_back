@@ -1,0 +1,695 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-08-13T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_sgcf",
+      "_type": "workspace",
+      "name": "SGCF Back",
+      "scope": "collection",
+      "description": "CRUD do SGCF - Spring Boot"
+    },
+    {
+      "_id": "env_sgcf",
+      "_type": "environment",
+      "parentId": "wrk_sgcf",
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:8082/api"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "fld_1",
+      "_type": "request_group",
+      "parentId": "wrk_sgcf",
+      "name": "0 - PRIMEIRO: criar os dados base (nesta ordem)",
+      "metaSortKey": -100
+    },
+    {
+      "_id": "req_1",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "1. Criar Tour",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Tour/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"price\": 350.0,\n  \"countryTour\": \"Brazil\",\n  \"kmOftour\": 120,\n  \"nameOfTour\": \"Cataratas do Iguacu\",\n  \"locations\": \"Foz do Iguacu\"\n}"
+      }
+    },
+    {
+      "_id": "req_2",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "2. Criar Customer",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Customer/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 2,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cpf\": \"12345678901\",\n  \"name\": \"Maria Souza\",\n  \"languageSpeak\": [\n    \"Portuguese\"\n  ],\n  \"countryCustomer\": \"Brazil\",\n  \"email\": \"maria@teste.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_3",
+      "_type": "request",
+      "parentId": "fld_1",
+      "name": "3. Criar Employee",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Employee/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cpf\": \"98765432100\",\n  \"name\": \"Joao Lima\",\n  \"languagesSpoken\": [\n    \"Portuguese\",\n    \"Spanish\"\n  ],\n  \"dayOfBirth\": \"1995-04-10\"\n}"
+      }
+    },
+    {
+      "_id": "fld_2",
+      "_type": "request_group",
+      "parentId": "wrk_sgcf",
+      "name": "Reservation",
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_4",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "findAll",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Reservation/findAll",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "body": {}
+    },
+    {
+      "_id": "req_5",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "findAll active",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Reservation/findAll/active",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 2,
+      "body": {}
+    },
+    {
+      "_id": "req_6",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "findId 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Reservation/findId/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "body": {}
+    },
+    {
+      "_id": "req_7",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "save",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Reservation/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 4,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"date\": \"2026-08-20\",\n  \"tourId\": 1,\n  \"customerId\": 1,\n  \"employeeId\": 1,\n  \"value\": 350.0,\n  \"status\": \"Pending\"\n}"
+      }
+    },
+    {
+      "_id": "req_8",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "update 1 (troca tudo)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Reservation/update/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 5,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"date\": \"2026-09-15\",\n  \"tourId\": 1,\n  \"customerId\": 1,\n  \"employeeId\": 1,\n  \"value\": 420.0,\n  \"status\": \"Confirmed\"\n}"
+      }
+    },
+    {
+      "_id": "req_9",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "updatePatch 1 (so o status)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/Reservation/updatePatch/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 6,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"Confirmed\"\n}"
+      }
+    },
+    {
+      "_id": "req_10",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "delete 1 (soft delete)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/Reservation/delete/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 7,
+      "body": {}
+    },
+    {
+      "_id": "req_11",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "findByCustomer 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Reservation/findByCustomer/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 8,
+      "body": {}
+    },
+    {
+      "_id": "req_12",
+      "_type": "request",
+      "parentId": "fld_2",
+      "name": "findByStatus Confirmed",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Reservation/findByStatus/Confirmed",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 9,
+      "body": {}
+    },
+    {
+      "_id": "fld_3",
+      "_type": "request_group",
+      "parentId": "wrk_sgcf",
+      "name": "Payment",
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_13",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "findAll",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Payment/findAll",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "body": {}
+    },
+    {
+      "_id": "req_14",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "findAll active",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Payment/findAll/active",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 2,
+      "body": {}
+    },
+    {
+      "_id": "req_15",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "findId 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Payment/findId/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "body": {}
+    },
+    {
+      "_id": "req_16",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "save",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Payment/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 4,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"customerId\": 1,\n  \"status\": \"Pending\",\n  \"totalAccount\": 350.0\n}"
+      }
+    },
+    {
+      "_id": "req_17",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "update 1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Payment/update/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 5,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"customerId\": 1,\n  \"status\": \"Confirmed\",\n  \"totalAccount\": 420.0\n}"
+      }
+    },
+    {
+      "_id": "req_18",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "updatePatch 1 (so o status)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/Payment/updatePatch/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 6,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"Confirmed\"\n}"
+      }
+    },
+    {
+      "_id": "req_19",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "delete 1 (soft delete)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/Payment/delete/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 7,
+      "body": {}
+    },
+    {
+      "_id": "req_20",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "findByCustomer 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Payment/findByCustomer/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 8,
+      "body": {}
+    },
+    {
+      "_id": "req_21",
+      "_type": "request",
+      "parentId": "fld_3",
+      "name": "findByStatus Pending",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Payment/findByStatus/Pending",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 9,
+      "body": {}
+    },
+    {
+      "_id": "fld_4",
+      "_type": "request_group",
+      "parentId": "wrk_sgcf",
+      "name": "Quota",
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_22",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "findAll",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Quota/findAll",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "body": {}
+    },
+    {
+      "_id": "req_23",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "findAll active",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Quota/findAll/active",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 2,
+      "body": {}
+    },
+    {
+      "_id": "req_24",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "findId 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Quota/findId/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "body": {}
+    },
+    {
+      "_id": "req_25",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "save META DA EMPRESA (sem employeeId)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Quota/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 4,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"startDate\": \"2026-08-01\",\n  \"endDate\": \"2026-08-31\",\n  \"targetValue\": 50000.0\n}"
+      }
+    },
+    {
+      "_id": "req_26",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "save META DE FUNCIONARIO (com employeeId)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Quota/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 5,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"startDate\": \"2026-08-01\",\n  \"endDate\": \"2026-08-31\",\n  \"targetValue\": 8000.0,\n  \"employeeId\": 1\n}"
+      }
+    },
+    {
+      "_id": "req_27",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "update 1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/Quota/update/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 6,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"startDate\": \"2026-08-01\",\n  \"endDate\": \"2026-09-30\",\n  \"targetValue\": 60000.0\n}"
+      }
+    },
+    {
+      "_id": "req_28",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "updatePatch 1 (so o valor)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/Quota/updatePatch/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 7,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"targetValue\": 75000.0\n}"
+      }
+    },
+    {
+      "_id": "req_29",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "delete 1 (soft delete)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/Quota/delete/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 8,
+      "body": {}
+    },
+    {
+      "_id": "req_30",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "findByEmployee 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Quota/findByEmployee/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 9,
+      "body": {}
+    },
+    {
+      "_id": "req_31",
+      "_type": "request",
+      "parentId": "fld_4",
+      "name": "findAll company (metas da empresa)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/Quota/findAll/company",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 10,
+      "body": {}
+    },
+    {
+      "_id": "fld_5",
+      "_type": "request_group",
+      "parentId": "wrk_sgcf",
+      "name": "User",
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_32",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "findAll (senha nao aparece)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/User/findAll",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 1,
+      "body": {}
+    },
+    {
+      "_id": "req_33",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "findAll active",
+      "method": "GET",
+      "url": "{{ _.base_url }}/User/findAll/active",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 2,
+      "body": {}
+    },
+    {
+      "_id": "req_34",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "findId 1",
+      "method": "GET",
+      "url": "{{ _.base_url }}/User/findId/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 3,
+      "body": {}
+    },
+    {
+      "_id": "req_35",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "save",
+      "method": "POST",
+      "url": "{{ _.base_url }}/User/save",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 4,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userName\": \"camila\",\n  \"userPassword\": \"1234\",\n  \"permission\": \"Manager\",\n  \"email\": \"camila@teste.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_36",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "update 1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/User/update/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 5,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userName\": \"camila.ronzzani\",\n  \"userPassword\": \"5678\",\n  \"permission\": \"Manager\",\n  \"email\": \"camila@teste.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_37",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "updatePatch 1 (so o email)",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/User/updatePatch/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 6,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"novo@teste.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_38",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "delete 1 (soft delete)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/User/delete/1",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 7,
+      "body": {}
+    },
+    {
+      "_id": "req_39",
+      "_type": "request",
+      "parentId": "fld_5",
+      "name": "findByUserName camila",
+      "method": "GET",
+      "url": "{{ _.base_url }}/User/findByUserName/camila",
+      "headers": [],
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": 8,
+      "body": {}
+    }
+  ]
+}
