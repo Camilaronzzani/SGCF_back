@@ -6,6 +6,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class TourController {
     public ResponseEntity<List<TourDto>> findAll(){
         try {
             return ResponseEntity.ok(tourService.findAll());
-        } catch (Exception e) {
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -29,7 +30,9 @@ public class TourController {
     public ResponseEntity<TourDto> findById(@PathVariable long id){
         try {
             return ResponseEntity.ok(tourService.findById(id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            throw err;
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -38,7 +41,7 @@ public class TourController {
     public ResponseEntity<String> save(@RequestBody TourRequest tourRequest){
         try {
             return ResponseEntity.ok(tourService.save(tourRequest));
-        } catch (Exception e) {
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -47,7 +50,9 @@ public class TourController {
     public ResponseEntity<String> update(@RequestBody TourRequest tourRequest, @PathVariable long id){
         try {
             return ResponseEntity.ok(tourService.update(tourRequest , id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            throw err;
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -56,7 +61,9 @@ public class TourController {
     public ResponseEntity<String> delete(@PathVariable long id){
         try {
             return ResponseEntity.ok(tourService.delete(id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            throw err;
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -68,7 +75,7 @@ public class TourController {
             String message = tourService.applyPartialUpdate(id , tour);
             return ResponseEntity.ok(message);
 
-        } catch (Exception e) {
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -77,7 +84,7 @@ public class TourController {
     public ResponseEntity<List<TourDto>> findAllActive (){
         try {
             return ResponseEntity.ok(tourService.findAllActive());
-        } catch (Exception e) {
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }

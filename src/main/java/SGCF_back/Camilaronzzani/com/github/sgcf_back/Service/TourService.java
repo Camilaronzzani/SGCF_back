@@ -7,6 +7,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.CountryTour;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.ReservationRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.TourRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,12 +24,15 @@ public class TourService {
     @Autowired
     private TourRepository tourRepository;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     public List<TourDto> findAll() {
         try {
             List<Tour> tourList = tourRepository.findAll();
             List<TourDto> tourDtos = new ArrayList<>();
             tourList.forEach(tour -> {
-                TourDto tourDto = TourDto.toDto(tour);
+                TourDto tourDto = toDto(tour);
                 tourDtos.add(tourDto);
             });
             return tourDtos;
@@ -39,13 +43,9 @@ public class TourService {
     }
 
     public TourDto findById(long id) {
-        try {
-            Optional<Tour> tour = Optional.of(tourRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find")));
-            return TourDto.toDto(tour.get());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Tour tour = tourRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
+        return toDto(tour);
     }
 
     public String save(TourRequest tourRequest) {
@@ -77,31 +77,21 @@ public class TourService {
     }
 
     public String update(TourRequest tourRequest, long id) {
-        try {
-            Tour tour = toTour(tourRequest);
-            Tour tourOld = Optional.of(tourRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"))).get();
-            changeDataByTour(tourOld , tour);
-            tourRepository.save(tourOld);
-            return "tour: " + tourOld.getNameOfTour() + " save successful ";
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Tour tour = toTour(tourRequest);
+        Tour tourOld = tourRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
+        changeDataByTour(tourOld, tour);
+        tourRepository.save(tourOld);
+        return "tour: " + tourOld.getNameOfTour() + " save successful ";
     }
 
 
     public String delete(long id) {
-        try {
-            Tour tour = tourRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
-            tour.setActive(false);
-            tourRepository.save(tour);
-            return "Tour: " + tour.getNameOfTour() + " delete successful ";
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Tour tour = tourRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
+        tour.setActive(false);
+        tourRepository.save(tour);
+        return "Tour: " + tour.getNameOfTour() + " delete successful ";
     }
 
     public String applyPartialUpdate(long id, Map<String, Object> tour) {
@@ -129,12 +119,16 @@ public class TourService {
             List<Tour> tourList = tourRepository.findByActiveTrue();
             List<TourDto> tourDtoList = new ArrayList<>();
             tourList.forEach(tour -> {
-                TourDto tourDto = TourDto.toDto(tour);
+                TourDto tourDto = toDto(tour);
                 tourDtoList.add(tourDto);
             });
             return tourDtoList;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private TourDto toDto(Tour tour) {
+        return TourDto.toDto(tour, reservationRepository.countByTour_IdAndActiveTrue(tour.getId()));
     }
 }
