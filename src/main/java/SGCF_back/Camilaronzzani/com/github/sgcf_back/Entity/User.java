@@ -30,6 +30,10 @@ public class User {
     @Column(name = "user_email", nullable = false, length = 100, unique = true)
     private String email;
 
+    @OneToOne
+    @JoinColumn(name = "fk_employee_id")
+    private Employee employee;
+
     @Column(name = "Active")
     private boolean active ;
 }

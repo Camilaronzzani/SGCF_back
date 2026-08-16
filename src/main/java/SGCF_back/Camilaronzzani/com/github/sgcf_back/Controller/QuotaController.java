@@ -6,6 +6,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,9 @@ public class QuotaController {
     public ResponseEntity<List<QuotaDto>> findAll() {
         try {
             return ResponseEntity.ok(quotaService.findAll());
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -29,7 +32,9 @@ public class QuotaController {
     public ResponseEntity<QuotaDto> findById(@PathVariable long id) {
         try {
             return ResponseEntity.ok(quotaService.findById(id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -38,7 +43,9 @@ public class QuotaController {
     public ResponseEntity<String> save(@RequestBody QuotaRequest quotaRequest) {
         try {
             return ResponseEntity.ok(quotaService.save(quotaRequest));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -47,7 +54,9 @@ public class QuotaController {
     public ResponseEntity<String> update(@RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
         try {
             return ResponseEntity.ok(quotaService.update(quotaRequest, id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -56,7 +65,9 @@ public class QuotaController {
     public ResponseEntity<String> delete(@PathVariable long id) {
         try {
             return ResponseEntity.ok(quotaService.delete(id));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -66,7 +77,9 @@ public class QuotaController {
         try {
             String message = quotaService.applyPartialUpdate(id, quota);
             return ResponseEntity.ok(message);
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -75,7 +88,9 @@ public class QuotaController {
     public ResponseEntity<List<QuotaDto>> findAllActive() {
         try {
             return ResponseEntity.ok(quotaService.findAllActive());
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -84,7 +99,9 @@ public class QuotaController {
     public ResponseEntity<List<QuotaDto>> findByEmployee(@PathVariable long employeeId) {
         try {
             return ResponseEntity.ok(quotaService.findByEmployee(employeeId));
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -93,7 +110,20 @@ public class QuotaController {
     public ResponseEntity<List<QuotaDto>> findAllCompany() {
         try {
             return ResponseEntity.ok(quotaService.findAllCompany());
-        } catch (Exception e) {
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/findAll/progress")
+    public ResponseEntity<List<QuotaDto>> findAllProgress() {
+        try {
+            return ResponseEntity.ok(quotaService.findAllProgress());
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(err.getStatusCode()).build();
+        } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
