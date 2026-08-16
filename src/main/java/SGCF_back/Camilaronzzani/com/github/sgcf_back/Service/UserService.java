@@ -173,6 +173,12 @@ public class UserService {
         return AuthenticatedUserDto.toDto(user);
     }
 
+    public boolean confirmCredentials(String email, String password) {
+        return userRepository.findByEmail(email)
+                .filter(user -> user.isActive() && user.getUserPassword().equals(password))
+                .isPresent();
+    }
+
     private Employee findEmployee(Long employeeId) {
         return employeeRepository.findById(employeeId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));

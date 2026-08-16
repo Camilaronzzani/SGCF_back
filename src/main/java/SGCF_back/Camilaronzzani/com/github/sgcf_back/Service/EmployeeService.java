@@ -5,6 +5,8 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.Emp
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Language;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.ReservationRepository;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,15 @@ public class EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     public List<EmployeDto> findAll() {
         try {
             List<Employee> employees = employeeRepository.findAll();
             List<EmployeDto> employeDtos = new ArrayList<>();
             employees.forEach(employee -> {
-                EmployeDto employeDto = EmployeDto.toDto(employee);
+                EmployeDto employeDto = toSummaryDto(employee);
                 employeDtos.add(employeDto);
             });
             return employeDtos;
@@ -129,12 +133,18 @@ public class EmployeeService {
             List<Employee> employeeList = employeeRepository.findByActiveTrue();
             List<EmployeDto> customerDtoList = new ArrayList<>();
             employeeList.forEach(employee -> {
-                EmployeDto employeDto = EmployeDto.toDto(employee);
+                EmployeDto employeDto = toSummaryDto(employee);
                 customerDtoList.add(employeDto);
             });
             return customerDtoList;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private EmployeDto toSummaryDto(Employee employee) {
+        return new EmployeDto(employee.getId(), employee.getCpf(), employee.getName(), employee.getLanguagesSpoken(),
+                employee.getDayOfBirth(), employee.isActive(), reservationRepository.countByEmployeeIdAndActiveTrue(employee.getId()),
+                reservationRepository.sumValueByEmployeeAndStatus(employee.getId(), Status.Confirmed));
     }
 }
