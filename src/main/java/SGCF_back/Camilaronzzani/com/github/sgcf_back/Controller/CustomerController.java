@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customer")
+@CrossOrigin(origins = "http://localhost:4200")
 public class CustomerController {
 
     @Autowired
@@ -21,7 +22,7 @@ public class CustomerController {
     @GetMapping("/findAll")
     public ResponseEntity<List<CustomerDto>> findAll(){
         try {
-            return ResponseEntity.ok(customerService.findAllActive());
+            return ResponseEntity.ok(customerService.findAll());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

@@ -1,6 +1,5 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthenticatedUserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
@@ -8,56 +7,16 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/User")
+@RequestMapping("api/user")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     @Autowired
     private UserService userService;
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticatedUserDto> authenticate(
-            @RequestBody AuthenticateRequest request,
-            HttpServletRequest servletRequest,
-            HttpSession session
-    ) {
-        try {
-            AuthenticatedUserDto user = userService.authenticate(request.email(), request.password());
-            servletRequest.changeSessionId();
-            session.setAttribute("userId", user.id());
-            session.setAttribute("permission", user.permission());
-            session.setAttribute("employeeId", user.employeeId());
-            return ResponseEntity.ok(user);
-        } catch (Exception e) {
-            return ResponseEntity.status(401).build();
-        }
-    }
-
-    @GetMapping("/session")
-    public ResponseEntity<AuthenticatedUserDto> session(HttpSession session) {
-        Object userId = session.getAttribute("userId");
-        if (!(userId instanceof Long id)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        try {
-            return ResponseEntity.ok(AuthenticatedUserDto.toDto(userService.findEntityById(id)));
-        } catch (Exception e) {
-            session.invalidate();
-            return ResponseEntity.status(401).build();
-        }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
-        session.invalidate();
-        return ResponseEntity.noContent().build();
-    }
 
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
@@ -135,6 +94,14 @@ public class UserController {
     public ResponseEntity<String> changePassword(@PathVariable long id , @RequestBody String newPassword){
         try {
             return ResponseEntity.ok(userService.changePassword(id , newPassword));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/authenticate")
+    public ResponseEntity<Boolean> authenticate(@RequestBody AuthenticateRequest authenticateRequest){
+        try {
+            return ResponseEntity.ok(userService.authenticate(authenticateRequest));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 @Service
 public class PasswordResetService {
     @Autowired
@@ -31,11 +33,7 @@ public class PasswordResetService {
             passwordReset.setToken(code);
             passwordResetRepository.save(passwordReset);
 
-            if (passwordResetRequest.getEmail().isEmpty()){
-                emailService.sendEmail(passwordReset.getUser().getEmail(), code);
-            }else {
-                emailService.sendEmail(passwordResetRequest.getEmail(), code);
-            }
+            emailService.sendEmail(passwordResetRequest.getEmail(), code);
             return passwordReset.getId() ;
 
         } catch (Exception e) {
@@ -46,9 +44,9 @@ public class PasswordResetService {
         try {
 
             PasswordReset passwordReset = new PasswordReset();
-            passwordReset.setExpiration(passwordResetRequest.getStartTime().plusMinutes(10));
-            User user = userRepository.findById(passwordResetRequest.getUserId()).orElseThrow(()
-                            -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+            passwordReset.setExpiration(LocalDateTime.now().plusMinutes(10));
+            User user = userRepository.findByEmail(passwordResetRequest.getEmail()).orElseThrow(()
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
             passwordReset.setUser(user);
             return passwordReset;
         } catch (Exception e) {
