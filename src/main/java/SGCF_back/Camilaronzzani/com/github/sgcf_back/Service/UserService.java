@@ -1,5 +1,7 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
@@ -19,6 +21,10 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     public List<UserDto> findAll() {
         try {
@@ -47,6 +53,7 @@ public class UserService {
     public String save(UserRequest userRequest) {
         try {
             User user = toUser(userRequest);
+            user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
             userRepository.save(user);
             return "User: " + user.getUserName() + " save successful ";
         } catch (Exception e) {
@@ -147,6 +154,19 @@ public class UserService {
             user.setUserPassword(newPassword);
             userRepository.save(user);
             return "Password change successful ";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Boolean authenticate(AuthenticateRequest authenticateRequest) {
+        try {
+            User user = userRepository.findByEmail(authenticateRequest.getEmail()).orElseThrow(()
+                        -> new ResponseStatusException(HttpStatus.NOT_FOUND,"user no find" ));
+            return passwordEncoder.matches(
+                    authenticateRequest.getPassword(),
+                    user.getUserPassword()
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,5 +1,6 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
@@ -11,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/User")
+@RequestMapping("api/user")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -92,6 +94,14 @@ public class UserController {
     public ResponseEntity<String> changePassword(@PathVariable long id , @RequestBody String newPassword){
         try {
             return ResponseEntity.ok(userService.changePassword(id , newPassword));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @PostMapping("/authenticate")
+    public ResponseEntity<Boolean> authenticate(@RequestBody AuthenticateRequest authenticateRequest){
+        try {
+            return ResponseEntity.ok(userService.authenticate(authenticateRequest));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
