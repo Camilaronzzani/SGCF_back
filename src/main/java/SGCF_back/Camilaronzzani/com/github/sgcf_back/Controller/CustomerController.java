@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/Customer")
+@RequestMapping("/api/customer")
 public class CustomerController {
 
     @Autowired
@@ -21,7 +21,7 @@ public class CustomerController {
     @GetMapping("/findAll")
     public ResponseEntity<List<CustomerDto>> findAll(){
         try {
-            return ResponseEntity.ok(customerService.findAll());
+            return ResponseEntity.ok(customerService.findAllActive());
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
