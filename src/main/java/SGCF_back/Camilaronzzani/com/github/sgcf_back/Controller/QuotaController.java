@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Quota")
+@CrossOrigin(origins = "http://localhost:4200")
 public class QuotaController {
     @Autowired
     private QuotaService quotaService;

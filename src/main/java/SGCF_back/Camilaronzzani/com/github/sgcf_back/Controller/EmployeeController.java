@@ -16,6 +16,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 
 @RestController
 @RequestMapping("api/Employee")
+@CrossOrigin(origins = "http://localhost:4200")
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;

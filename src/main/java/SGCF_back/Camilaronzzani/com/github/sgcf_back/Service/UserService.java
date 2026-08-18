@@ -10,6 +10,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeReposi
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +25,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<UserDto> findAll() {
         try {
@@ -57,6 +60,7 @@ public class UserService {
     public String save(UserRequest userRequest) {
         try {
             User user = toUser(userRequest);
+            user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
             userRepository.save(user);
             return "User: " + user.getUserName() + " save successful ";
         } catch (Exception e) {
@@ -168,14 +172,16 @@ public class UserService {
 
     public AuthenticatedUserDto authenticate(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .filter(candidate -> candidate.isActive() && candidate.getUserPassword().equals(password))
+                .filter(candidate -> candidate.isActive()
+                        && passwordEncoder.matches(password, candidate.getUserPassword()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid credentials"));
         return AuthenticatedUserDto.toDto(user);
     }
 
     public boolean confirmCredentials(String email, String password) {
         return userRepository.findByEmail(email)
-                .filter(user -> user.isActive() && user.getUserPassword().equals(password))
+                .filter(user -> user.isActive()
+                        && passwordEncoder.matches(password, user.getUserPassword()))
                 .isPresent();
     }
 

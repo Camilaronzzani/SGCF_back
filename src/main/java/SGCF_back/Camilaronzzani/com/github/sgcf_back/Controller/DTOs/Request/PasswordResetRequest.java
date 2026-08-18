@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PasswordResetRequest {
-    private long userId;
-    private LocalDateTime StartTime;
     private String email;
 
 }
