@@ -1,14 +1,16 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthenticatedUserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,10 +23,10 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private EmployeeRepository employeeRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     public List<UserDto> findAll() {
         try {
@@ -50,6 +52,11 @@ public class UserService {
         }
     }
 
+    public User findEntityById(long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+    }
+
     public String save(UserRequest userRequest) {
         try {
             User user = toUser(userRequest);
@@ -67,6 +74,9 @@ public class UserService {
         user.setUserPassword(userRequest.getUserPassword());
         user.setPermission(userRequest.getPermission());
         user.setEmail(userRequest.getEmail());
+        user.setEmployee(userRequest.getEmployeeId() == null
+            ? null
+            : findEmployee(userRequest.getEmployeeId()));
         user.setActive(true);
         return user;
     }
@@ -76,6 +86,7 @@ public class UserService {
         userOld.setUserPassword(newUser.getUserPassword());
         userOld.setPermission(newUser.getPermission());
         userOld.setEmail(newUser.getEmail());
+        userOld.setEmployee(newUser.getEmployee());
     }
 
     public String update(UserRequest userRequest, long id) {
@@ -159,16 +170,23 @@ public class UserService {
         }
     }
 
-    public Boolean authenticate(AuthenticateRequest authenticateRequest) {
-        try {
-            User user = userRepository.findByEmail(authenticateRequest.getEmail()).orElseThrow(()
-                        -> new ResponseStatusException(HttpStatus.NOT_FOUND,"user no find" ));
-            return passwordEncoder.matches(
-                    authenticateRequest.getPassword(),
-                    user.getUserPassword()
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public AuthenticatedUserDto authenticate(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .filter(candidate -> candidate.isActive()
+                        && passwordEncoder.matches(password, candidate.getUserPassword()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid credentials"));
+        return AuthenticatedUserDto.toDto(user);
+    }
+
+    public boolean confirmCredentials(String email, String password) {
+        return userRepository.findByEmail(email)
+                .filter(user -> user.isActive()
+                        && passwordEncoder.matches(password, user.getUserPassword()))
+                .isPresent();
+    }
+
+    private Employee findEmployee(Long employeeId) {
+        return employeeRepository.findById(employeeId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
     }
 }
