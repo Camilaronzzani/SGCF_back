@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Payment")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;

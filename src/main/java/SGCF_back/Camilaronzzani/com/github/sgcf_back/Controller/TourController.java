@@ -15,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Tour")
+@CrossOrigin(origins = "http://localhost:4200")
 public class TourController {
     @Autowired
     private TourService tourService;
