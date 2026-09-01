@@ -2,10 +2,12 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.EmployeDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.EmployeeRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.EmployeeService;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +18,6 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 
 @RestController
 @RequestMapping("api/Employee")
-@CrossOrigin(origins = "http://localhost:4200")
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
@@ -37,10 +38,10 @@ public class EmployeeController {
     public ResponseEntity<String> deactivate(@PathVariable long id, @RequestBody DeactivationRequest request, HttpSession session) {
         try {
             requireManager(session);
-            if (!userService.confirmCredentials(request.email(), request.password())) {
+            if (!userService.authenticate(new AuthenticateRequest(request.email(), request.password()))) {
                 return ResponseEntity.status(401).build();
             }
-            return ResponseEntity.ok(employeeService.delete(id));
+            return new ResponseEntity<>(employeeService.delete(id), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -66,7 +67,7 @@ public class EmployeeController {
     @PostMapping("/save")
     public ResponseEntity<String> salve(@RequestBody EmployeeRequest employeeRequest){
         try {
-            return ResponseEntity.ok(employeeService.save(employeeRequest));
+            return new ResponseEntity<>(employeeService.save(employeeRequest), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -84,18 +85,18 @@ public class EmployeeController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id){
         try {
-            return ResponseEntity.ok(employeeService.delete(id));
+            return new ResponseEntity<>(employeeService.delete(id) , HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> employee){
         try {
 
             String message = employeeService.applyPartialUpdate(id , employee);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

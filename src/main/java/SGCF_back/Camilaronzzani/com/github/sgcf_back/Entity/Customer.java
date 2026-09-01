@@ -21,10 +21,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
 
-    @Column(name = "cnpj" , length = 15)
+    @Column(name = "cnpj" , length = 15, unique = true)
     private String cnpj;
 
-    @Column(name = "cpf" , length = 11 )
+    @Column(name = "cpf" , length = 11, unique = true )
     private String cpf;
 
     @Column(name = "name")

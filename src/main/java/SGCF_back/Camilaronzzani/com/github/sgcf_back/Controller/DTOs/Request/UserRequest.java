@@ -12,4 +12,5 @@ public class UserRequest {
     private Permission permission;
     private String email;
     private Long employeeId;
+
 }

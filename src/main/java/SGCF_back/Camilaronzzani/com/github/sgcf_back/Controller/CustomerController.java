@@ -5,6 +5,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.CustomerDto
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.CustomerRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customer")
-@CrossOrigin(origins = "http://localhost:4200")
 public class CustomerController {
 
     @Autowired
@@ -40,7 +40,7 @@ public class CustomerController {
     @PostMapping("/save")
     public ResponseEntity<String> salve(@RequestBody CustomerRequest customerRequest){
         try {
-            return ResponseEntity.ok(customerService.save(customerRequest));
+            return new ResponseEntity<>(customerService.save(customerRequest), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -49,27 +49,27 @@ public class CustomerController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody CustomerRequest customerRequest , @PathVariable long id){
         try {
-            return ResponseEntity.ok(customerService.update(customerRequest , id));
+            return new ResponseEntity<>(customerService.update(customerRequest , id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id){
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestParam long id){
         try {
-            return ResponseEntity.ok(customerService.delete(id));
+            return new ResponseEntity<>(customerService.delete(id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> customer){
         try {
 
             String message = customerService.applyPartialUpdate(id , customer);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message , HttpStatus.NO_CONTENT);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

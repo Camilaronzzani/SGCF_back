@@ -7,9 +7,11 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Payment;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.CustomerRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.PaymentRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class PaymentService {
     @Autowired
@@ -26,24 +29,26 @@ public class PaymentService {
 
     public List<PaymentDto> findAll() {
         try {
-            List<Payment> paymentList = paymentRepository.findAll();
-            List<PaymentDto> paymentDtos = new ArrayList<>();
-            paymentList.forEach(payment -> {
-                PaymentDto paymentDto = PaymentDto.toDto(payment);
-                paymentDtos.add(paymentDto);
-            });
-            return paymentDtos;
+            log.info("Payment list found successfully");
+            return paymentRepository.findAll()
+                    .stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
         } catch (RuntimeException e) {
+            log.error("Error in PaymentService.findAll",e);
             throw new RuntimeException(e);
         }
     }
 
     public PaymentDto findById(long id) {
         try {
-            Optional<Payment> payment = Optional.of(paymentRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find")));
-            return PaymentDto.toDto(payment.get());
+            Payment payment = paymentRepository.findById(id).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
+            log.info("Payment {} found successfully" , id);
+            return PaymentDto.toDto(payment);
+
         } catch (Exception e) {
+            log.error("Error in PaymentService.findById",e);
             throw new RuntimeException(e);
         }
     }
@@ -52,8 +57,12 @@ public class PaymentService {
         try {
             Payment payment = toPayment(paymentRequest);
             paymentRepository.save(payment);
-            return "Payment of customer: " + payment.getCustomer().getName() + " save successful ";
+
+            log.info("Payment saved successfully");
+            return "Payment of customer: " + payment.getCustomer().getName() + " saved successfully ";
+
         } catch (Exception e) {
+            log.error("Error in PaymentService.save ",e);
             throw new RuntimeException(e);
         }
     }
@@ -69,37 +78,47 @@ public class PaymentService {
         return payment;
     }
 
-    public void changeDataByPayment(Payment paymentOld, Payment newPayment) {
-        paymentOld.setCustomer(newPayment.getCustomer());
+    public Payment changeDataByPayment(long id, PaymentRequest newPayment) {
+        Payment paymentOld = paymentRepository.findById(id).orElseThrow(()
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
+
+        paymentOld.setCustomer(customerRepository.findById( newPayment.getCustomerId()).orElseThrow(()
+                                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found")));
         paymentOld.setTotalAccount(newPayment.getTotalAccount());
         paymentOld.setStatus(newPayment.getStatus());
+
+        return paymentOld ;
     }
 
+    @Transactional
     public String update(PaymentRequest paymentRequest, long id) {
         try {
-            Payment payment = toPayment(paymentRequest);
-            Payment paymentOld = Optional.of(paymentRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"))).get();
-            changeDataByPayment(paymentOld, payment);
-            paymentRepository.save(paymentOld);
-            return "Payment: " + paymentOld.getId() + " update successful ";
+            Payment payment = changeDataByPayment(id, paymentRequest);
+
+            log.info("Payment {} saved successfully", payment.getId());
+            return "Payment: " + payment.getId() + " updated successfully ";
         } catch (Exception e) {
+            log.error("Error in PaymentService.update ",e);
             throw new RuntimeException(e);
         }
     }
 
+    @Transactional
     public String delete(long id) {
         try {
             Payment payment = paymentRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
             payment.setActive(false);
-            paymentRepository.save(payment);
-            return "Payment: " + payment.getId() + " delete successful ";
+
+            log.info("Payment {} deleted successfully" , id);
+            return "Payment: " + payment.getId() + " deleted successfully ";
         } catch (Exception e) {
+            log.error("Error in PaymentService.delete ",e);
             throw new RuntimeException(e);
         }
     }
 
+    // to delete
     public String applyPartialUpdate(long id, Map<String, Object> payment) {
         try {
             Payment payment1 = paymentRepository.findById(id).orElseThrow(()
@@ -120,45 +139,56 @@ public class PaymentService {
 
     public List<PaymentDto> findAllActive() {
         try {
-            List<Payment> paymentList = paymentRepository.findByActiveTrue();
-            List<PaymentDto> paymentDtoList = new ArrayList<>();
-            paymentList.forEach(payment -> {
-                PaymentDto paymentDto = PaymentDto.toDto(payment);
-                paymentDtoList.add(paymentDto);
-            });
-            return paymentDtoList;
+            log.info("Payment list active found successfully");
+            return paymentRepository.findByActiveTrue()
+                    .stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
+
         } catch (Exception e) {
+            log.error("Error in PaymentService.findAllActive ",e);
             throw new RuntimeException(e);
         }
     }
 
     public List<PaymentDto> findByCustomer(long customerId) {
         try {
+            log.info("Fetched payments for customer {} " , customerId);
             return paymentRepository.findByCustomerId(customerId)
                     .stream()
                     .map(PaymentDto::toDto)
                     .toList();
         } catch (Exception e) {
+            log.error("Error in PaymentService.findByCustomer ",e);
             throw new RuntimeException(e);
         }
     }
 
     public List<PaymentDto> findByStatus(Status status) {
         try {
+            log.info("Fetched payments for status: {} " , status);
             return paymentRepository.findByStatus(status)
                     .stream()
                     .map(PaymentDto::toDto)
                     .toList();
         } catch (Exception e) {
+            log.error("Error in PaymentService.findByStatus ",e);
             throw new RuntimeException(e);
         }
     }
 
     private Customer findCustomer(Long customerId) {
-        if (customerId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "customerId is required");
+        try {
+            if (customerId == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "customerId is required");
+            }
+            log.info("Fetched  customer {} " , customerId);
+            return customerRepository.findById(customerId).orElseThrow(()
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
+
+        } catch (Exception e) {
+            log.error("Error in PaymentService.findCustomer ",e);
+            throw new RuntimeException(e);
         }
-        return customerRepository.findById(customerId).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
     }
 }

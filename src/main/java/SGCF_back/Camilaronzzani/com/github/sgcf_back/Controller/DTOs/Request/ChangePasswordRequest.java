@@ -1,15 +1,11 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class AuthenticateRequest {
+public class ChangePasswordRequest {
     private String email;
     private String password;
 }

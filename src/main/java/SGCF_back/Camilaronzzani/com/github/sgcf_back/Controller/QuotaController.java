@@ -4,6 +4,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.QuotaDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Quota")
-@CrossOrigin(origins = "http://localhost:4200")
 public class QuotaController {
     @Autowired
     private QuotaService quotaService;
@@ -43,7 +43,7 @@ public class QuotaController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody QuotaRequest quotaRequest) {
         try {
-            return ResponseEntity.ok(quotaService.save(quotaRequest));
+            return new ResponseEntity<>(quotaService.save(quotaRequest), HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -54,7 +54,7 @@ public class QuotaController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
         try {
-            return ResponseEntity.ok(quotaService.update(quotaRequest, id));
+            return new ResponseEntity<>(quotaService.update(quotaRequest, id),HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -65,7 +65,7 @@ public class QuotaController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(quotaService.delete(id));
+            return new ResponseEntity<>(quotaService.delete(id), HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -73,11 +73,11 @@ public class QuotaController {
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> quota) {
         try {
             String message = quotaService.applyPartialUpdate(id, quota);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -118,14 +118,5 @@ public class QuotaController {
         }
     }
 
-    @GetMapping("/findAll/progress")
-    public ResponseEntity<List<QuotaDto>> findAllProgress() {
-        try {
-            return ResponseEntity.ok(quotaService.findAllProgress());
-        } catch (ResponseStatusException err) {
-            return ResponseEntity.status(err.getStatusCode()).build();
-        } catch (Exception err) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
 }

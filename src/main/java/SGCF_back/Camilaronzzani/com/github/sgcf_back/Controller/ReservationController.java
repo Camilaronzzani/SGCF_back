@@ -5,6 +5,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Reservation
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Reservation")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ReservationController {
     @Autowired
     private ReservationService reservationService;
@@ -39,7 +39,7 @@ public class ReservationController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody ReservationRequest reservationRequest) {
         try {
-            return ResponseEntity.ok(reservationService.save(reservationRequest));
+            return new ResponseEntity<>(reservationService.save(reservationRequest), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -48,7 +48,7 @@ public class ReservationController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
         try {
-            return ResponseEntity.ok(reservationService.update(reservationRequest, id));
+            return new ResponseEntity<>(reservationService.update(reservationRequest, id), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -57,17 +57,17 @@ public class ReservationController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(reservationService.delete(id));
+            return new ResponseEntity<>(reservationService.delete(id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> reservation) {
         try {
             String message = reservationService.applyPartialUpdate(id, reservation);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
