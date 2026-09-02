@@ -29,13 +29,10 @@ public class TourService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    public List<TourDto> findAll() {
+    public List<Tour> findAll() {
         try {
             log.info("Fetches tour list");
-            return tourRepository.findAll()
-                    .stream()
-                    .map(TourDto :: toDto)
-                    .toList();
+            return tourRepository.findAll();
 
         } catch (RuntimeException e) {
             log.error("Error in TourService.findAll", e);
@@ -44,14 +41,14 @@ public class TourService {
 
     }
 
-    public TourDto findById(long id) {
+    public Tour findById(long id) {
         try {
 
             Tour tour = tourRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
 
             log.info("Tour {} found successfully", id);
-            return toDto(tour);
+            return tour;
 
         } catch (Exception e) {
             log.error("Error in TourService.findById", e);
@@ -147,13 +144,10 @@ public class TourService {
         }
     }
 
-    public List<TourDto> findAllActive() {
+    public List<Tour> findAllActive() {
         try {
             log.info("Fetches tour list active");
-            return tourRepository.findByActiveTrue()
-                    .stream()
-                    .map(TourDto ::toDto)
-                    .toList();
+            return tourRepository.findByActiveTrue();
 
         } catch (Exception e) {
             log.error("Error in TourService.findAllActive", e);
@@ -161,7 +155,5 @@ public class TourService {
         }
     }
 
-    private TourDto toDto(Tour tour) {
-        return TourDto.toDto(tour, reservationRepository.countByTour_IdAndActiveTrue(tour.getId()));
-    }
+
 }

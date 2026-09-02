@@ -27,25 +27,22 @@ public class PaymentService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public List<PaymentDto> findAll() {
+    public List<Payment> findAll() {
         try {
             log.info("Payment list found successfully");
-            return paymentRepository.findAll()
-                    .stream()
-                    .map(PaymentDto :: toDto)
-                    .toList();
+            return paymentRepository.findAll();
         } catch (RuntimeException e) {
             log.error("Error in PaymentService.findAll",e);
             throw new RuntimeException(e);
         }
     }
 
-    public PaymentDto findById(long id) {
+    public Payment findById(long id) {
         try {
             Payment payment = paymentRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
             log.info("Payment {} found successfully" , id);
-            return PaymentDto.toDto(payment);
+            return payment;
 
         } catch (Exception e) {
             log.error("Error in PaymentService.findById",e);
@@ -137,13 +134,10 @@ public class PaymentService {
         }
     }
 
-    public List<PaymentDto> findAllActive() {
+    public List<Payment> findAllActive() {
         try {
             log.info("Payment list active found successfully");
-            return paymentRepository.findByActiveTrue()
-                    .stream()
-                    .map(PaymentDto :: toDto)
-                    .toList();
+            return paymentRepository.findByActiveTrue();
 
         } catch (Exception e) {
             log.error("Error in PaymentService.findAllActive ",e);
@@ -151,26 +145,20 @@ public class PaymentService {
         }
     }
 
-    public List<PaymentDto> findByCustomer(long customerId) {
+    public List<Payment> findByCustomer(long customerId) {
         try {
             log.info("Fetched payments for customer {} " , customerId);
-            return paymentRepository.findByCustomerId(customerId)
-                    .stream()
-                    .map(PaymentDto::toDto)
-                    .toList();
+            return paymentRepository.findByCustomerId(customerId);
         } catch (Exception e) {
             log.error("Error in PaymentService.findByCustomer ",e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<PaymentDto> findByStatus(Status status) {
+    public List<Payment> findByStatus(Status status) {
         try {
             log.info("Fetched payments for status: {} " , status);
-            return paymentRepository.findByStatus(status)
-                    .stream()
-                    .map(PaymentDto::toDto)
-                    .toList();
+            return paymentRepository.findByStatus(status);
         } catch (Exception e) {
             log.error("Error in PaymentService.findByStatus ",e);
             throw new RuntimeException(e);

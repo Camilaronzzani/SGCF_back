@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.UserRepository;
@@ -33,13 +32,10 @@ public class UserService {
     private EmployeeRepository employeeRepository;
 
 
-    public List<UserDto> findAll() {
+    public List<User> findAll() {
         try {
             log.info("Fetches user list");
-            return userRepository.findAll()
-                    .stream()
-                    .map(UserDto :: toDto)
-                    .toList();
+            return userRepository.findAll();
 
         } catch (RuntimeException e) {
             log.error("Error in UserService.findAll", e);
@@ -47,13 +43,13 @@ public class UserService {
         }
     }
 
-    public UserDto findById(long id) {
+    public User findById(long id) {
         try {
             User user = userRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
 
             log.info("User {} found successfully" , id);
-            return UserDto.toDto(user);
+            return user;
         } catch (Exception e) {
             log.error("Error in UserService.findById", e);
             throw new RuntimeException(e);
@@ -149,13 +145,10 @@ public class UserService {
         }
     }
 
-    public List<UserDto> findAllActive() {
+    public List<User> findAllActive() {
         try {
             log.info("Fetch User list active");
-            return userRepository.findByActiveTrue()
-                    .stream()
-                    .map(UserDto ::toDto)
-                    .toList();
+            return userRepository.findByActiveTrue();
 
         } catch (Exception e) {
             log.error("Error in UserService.findAllActive", e);
@@ -163,13 +156,12 @@ public class UserService {
         }
     }
 
-    public UserDto findByUserName(String userName) {
+    public User findByUserName(String userName) {
         try {
             log.info("Fetch user for user name");
-            User user = userRepository.findByUserName(userName).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
 
-            return UserDto.toDto(user);
+            return userRepository.findByUserName(userName).orElseThrow(()
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
         } catch (Exception e) {
             log.error("Error in UserService.findByUserName", e);
             throw new RuntimeException(e);

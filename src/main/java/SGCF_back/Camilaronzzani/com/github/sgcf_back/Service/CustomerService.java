@@ -25,27 +25,24 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public List<CustomerDto> findAll() {
+    public List<Customer> findAll() {
         try {
-        List<CustomerDto> customerDtoList = customerRepository.findAll()
-                .stream()
-                .map(CustomerDto ::toDto)
-                .toList();
+        List<Customer> customerList = customerRepository.findAll();
 
         log.info("Customers listed successfully");
-        return customerDtoList;
+        return customerList;
         } catch (Exception e) {
             log.error("Error in CustomerService.findAll()", e);
             throw new RuntimeException(e);
         }
     }
 
-    public CustomerDto findById(long id) {
+    public Customer findById(long id) {
         try {
             Customer customer = customerRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
             log.info("Customer found successfully {}" , customer);
-            return CustomerDto.toDto(customer);
+            return customer;
         } catch (Exception e) {
             log.error("Error in CustomerService.findById()", e);
             throw new RuntimeException(e);
@@ -147,13 +144,10 @@ public class CustomerService {
         }
     }
 
-    public List<CustomerDto> findAllActive() {
+    public List<Customer> findAllActive() {
         try {
             log.info("Customers listed actived successfully");
-            return customerRepository.findByActiveTrue()
-                    .stream()
-                    .map(CustomerDto::toDto)
-                    .toList();
+            return customerRepository.findByActiveTrue();
 
         } catch (Exception e) {
             log.error("Error in CustomerService.findAllActive " , e );

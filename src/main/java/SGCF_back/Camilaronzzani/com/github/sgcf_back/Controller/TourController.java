@@ -3,6 +3,7 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TourRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,15 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto.toDto;
+
 @RestController
 @RequestMapping("api/Tour")
-@CrossOrigin(origins = "http://localhost:4200")
 public class TourController {
     @Autowired
     private TourService tourService;
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<TourDto>> findAll(){
+    public ResponseEntity<List<Tour>> findAll(){
         try {
             return ResponseEntity.ok(tourService.findAll());
         } catch (Exception err) {
@@ -32,7 +34,7 @@ public class TourController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<TourDto> findById(@PathVariable long id){
         try {
-            return ResponseEntity.ok(tourService.findById(id));
+            return ResponseEntity.ok(toDto(tourService.findById(id)));
         } catch (ResponseStatusException err) {
             throw err;
         } catch (Exception err) {
@@ -86,7 +88,11 @@ public class TourController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<TourDto>> findAllActive (){
         try {
-            return ResponseEntity.ok(tourService.findAllActive());
+            List<TourDto> tourDtos = tourService.findAllActive()
+                    .stream()
+                    .map(TourDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(tourDtos);
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }

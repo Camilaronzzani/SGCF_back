@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/Payment")
-@CrossOrigin(origins = "http://localhost:4200")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
@@ -22,7 +21,11 @@ public class PaymentController {
     @GetMapping("/findAll")
     public ResponseEntity<List<PaymentDto>> findAll() {
         try {
-            return ResponseEntity.ok(paymentService.findAll());
+            List<PaymentDto> paymentDtos = paymentService.findAll().
+                    stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(paymentDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -31,7 +34,7 @@ public class PaymentController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<PaymentDto> findById(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(paymentService.findById(id));
+            return ResponseEntity.ok(PaymentDto.toDto(paymentService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -77,7 +80,11 @@ public class PaymentController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<PaymentDto>> findAllActive() {
         try {
-            return ResponseEntity.ok(paymentService.findAllActive());
+            List<PaymentDto> paymentDtos = paymentService.findAllActive()
+                    .stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(paymentDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -86,7 +93,11 @@ public class PaymentController {
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<PaymentDto>> findByCustomer(@PathVariable long customerId) {
         try {
-            return ResponseEntity.ok(paymentService.findByCustomer(customerId));
+            List<PaymentDto> paymentDtos = paymentService.findByCustomer(customerId)
+                    .stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(paymentDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -95,7 +106,11 @@ public class PaymentController {
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<PaymentDto>> findByStatus(@PathVariable Status status) {
         try {
-            return ResponseEntity.ok(paymentService.findByStatus(status));
+            List<PaymentDto> paymentDtos = paymentService.findByStatus(status)
+                    .stream()
+                    .map(PaymentDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(paymentDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

@@ -37,17 +37,13 @@ public class QuotaService {
     @Autowired
     private HttpSession session;
 
-    public List<QuotaDto> findAll() {
+    public List<Quota> findAll() {
         try {
             List<Quota> quotaList = quotaRepository.findAll();
-            List<QuotaDto> quotaDtos = new ArrayList<>();
-            quotaList.forEach(quota -> {
-                QuotaDto quotaDto = toDto(quota);
-                quotaDtos.add(quotaDto);
-            });
+
 
             log.info("Quota list found successfully");
-            return quotaDtos;
+            return quotaList;
 
         } catch (RuntimeException e) {
             log.error("Error in QuotaService.findAll ", e);
@@ -55,13 +51,13 @@ public class QuotaService {
         }
     }
 
-    public QuotaDto findById(long id) {
+    public Quota findById(long id) {
         try {
             Quota quota = quotaRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "quota not found"));
 
             log.info("Quota {} found successfully " , id );
-            return toDto(quota);
+            return quota;
 
         } catch (Exception e) {
             log.error("Error in QuotaService.findById ", e);
@@ -213,43 +209,32 @@ public class QuotaService {
         }
     }
 
-    public List<QuotaDto> findAllActive() {
+    public List<Quota> findAllActive() {
         try {
             List<Quota> quotaList = quotaRepository.findByActiveTrue();
-            List<QuotaDto> quotaDtoList = new ArrayList<>();
-            quotaList.forEach(quota -> {
-                QuotaDto quotaDto = toDto(quota);
-                quotaDtoList.add(quotaDto);
-            });
 
             log.info("Quota list active found successfully");
-            return quotaDtoList;
+            return quotaList;
         } catch (Exception e) {
             log.error("Error in QuotaService.findAllActive ", e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<QuotaDto> findByEmployee(long employeeId) {
+    public List<Quota> findByEmployee(long employeeId) {
         try {
             log.info("Fetches employee ");
-            return quotaRepository.findByEmployeeId(employeeId)
-                    .stream()
-                    .map(this::toDto)
-                    .toList();
+            return quotaRepository.findByEmployeeId(employeeId);
         } catch (Exception e) {
             log.error("Error in QuotaService.findByEmployee ", e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<QuotaDto> findAllCompany() {
+    public List<Quota> findAllCompany() {
         try {
             log.info("Fetches company ");
-            return quotaRepository.findByEmployeeIsNull()
-                    .stream()
-                    .map(this::toDto)
-                    .toList();
+            return quotaRepository.findByEmployeeIsNull();
         } catch (Exception e) {
             log.error("Error in QuotaService.findAllCompany ", e);
             throw new RuntimeException(e);
@@ -257,7 +242,7 @@ public class QuotaService {
     }
 
 
-    private QuotaDto toDto(Quota quota) {
+    public QuotaDto toDto(Quota quota) {
         if (quota.getStartDate() == null || quota.getEndDate() == null) {
             return QuotaDto.toDto(quota, 0);
         }

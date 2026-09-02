@@ -17,8 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 
 @RestController
-@RequestMapping("api/Employee")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("api/employee")
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
@@ -29,7 +28,11 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeDto>> findAll(HttpSession session){
         try {
             requireManager(session);
-            return ResponseEntity.ok(employeeService.findAll());
+            List<EmployeDto> employeDtos = employeeService.findAll()
+                    .stream()
+                    .map(EmployeDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(employeDtos);
         } catch (Exception e) {
             return  ResponseEntity.badRequest().build();
         }
@@ -59,7 +62,7 @@ public class EmployeeController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<EmployeDto> findById(@PathVariable long id){
         try {
-            return ResponseEntity.ok(employeeService.findById(id));
+            return ResponseEntity.ok(EmployeDto.toDto(employeeService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -107,7 +110,11 @@ public class EmployeeController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<EmployeDto>> findAllActive (){
         try {
-            return ResponseEntity.ok(employeeService.findAllActive());
+            List<EmployeDto> employeDtos = employeeService.findAllActive()
+                    .stream()
+                    .map(EmployeDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(employeDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

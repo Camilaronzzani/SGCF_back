@@ -29,13 +29,10 @@ public class EmployeeService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    public List<EmployeDto> findAll() {
+    public List<Employee> findAll() {
         try {
-            log.info("Employee list successfully");
-            return employeeRepository.findAll()
-                    .stream()
-                    .map(EmployeDto :: toDto)
-                    .toList();
+            log.info("Fetches employee list ");
+            return employeeRepository.findAll();
         } catch (RuntimeException e) {
             log.error("Error in employeeService.findAll" , e );
             throw new RuntimeException(e);
@@ -43,13 +40,13 @@ public class EmployeeService {
 
     }
 
-    public EmployeDto findById(long id) {
+    public Employee findById(long id) {
         try {
             Employee employee = employeeRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
 
             log.info("Employee {} found successfully" , employee.getName());
-            return EmployeDto.toDto(employee);
+            return employee;
         } catch (Exception e) {
 
             log.error("Error in employeeService.findById" , e );
@@ -146,13 +143,10 @@ public class EmployeeService {
         }
     }
 
-    public List<EmployeDto> findAllActive() {
+    public List<Employee> findAllActive() {
         try {
             log.info("Employee list found successfully");
-            return employeeRepository.findByActiveTrue()
-                    .stream()
-                    .map(EmployeDto :: toDto)
-                    .toList();
+            return employeeRepository.findByActiveTrue();
 
         } catch (Exception e) {
             log.error("Error in employeeService.findAllActivate" , e );

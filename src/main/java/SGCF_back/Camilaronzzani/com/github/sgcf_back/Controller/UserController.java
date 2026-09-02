@@ -22,7 +22,11 @@ public class UserController {
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
         try {
-            return ResponseEntity.ok(userService.findAll());
+            List<UserDto> userDtos = userService.findAll()
+                    .stream()
+                    .map(UserDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(userDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -31,7 +35,7 @@ public class UserController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(userService.findById(id));
+            return ResponseEntity.ok(UserDto.toDto(userService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -77,7 +81,11 @@ public class UserController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<UserDto>> findAllActive() {
         try {
-            return ResponseEntity.ok(userService.findAllActive());
+            List<UserDto> userDtos = userService.findAllActive()
+                    .stream()
+                    .map(UserDto ::toDto)
+                    .toList();
+            return ResponseEntity.ok(userDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -86,7 +94,7 @@ public class UserController {
     @GetMapping("/findByUserName/{userName}")
     public ResponseEntity<UserDto> findByUserName(@PathVariable String userName) {
         try {
-            return ResponseEntity.ok(userService.findByUserName(userName));
+            return ResponseEntity.ok(UserDto.toDto(userService.findByUserName(userName)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

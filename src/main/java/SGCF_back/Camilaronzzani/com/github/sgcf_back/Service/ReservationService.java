@@ -36,13 +36,10 @@ public class ReservationService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public List<ReservationDto> findAll() {
+    public List<Reservation> findAll() {
         try {
             log.info("Reservations list found successfully");
-            return reservationRepository.findAll()
-                    .stream()
-                    .map(ReservationDto ::toDto)
-                    .toList();
+            return reservationRepository.findAll();
 
         } catch (RuntimeException e) {
             log.error("Error in ReservationService.findAll", e);
@@ -50,13 +47,13 @@ public class ReservationService {
         }
     }
 
-    public ReservationDto findById(long id) {
+    public Reservation findById(long id) {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
 
             log.info("Reservations {} found successful ", id);
-            return ReservationDto.toDto(reservation);
+            return reservation;
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findById" , e);
@@ -166,26 +163,20 @@ public class ReservationService {
     }
 
 
-    public List<ReservationDto> findAllActive() {
+    public List<Reservation> findAllActive() {
         try {
             log.info("Fetches reservations list active");
-            return reservationRepository.findByActiveTrue()
-                    .stream()
-                    .map(ReservationDto :: toDto)
-                    .toList();
+            return reservationRepository.findByActiveTrue();
         } catch (Exception e) {
             log.error("Error in ReservationService.findAllActive" , e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<ReservationDto> findByCustomer(long customerId) {
+    public List<Reservation> findByCustomer(long customerId) {
         try {
             log.info("Fetches reservations for customer");
-            return reservationRepository.findByCustomerId(customerId)
-                    .stream()
-                    .map(ReservationDto::toDto)
-                    .toList();
+            return reservationRepository.findByCustomerId(customerId);
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findByCustomer" , e);
@@ -193,13 +184,10 @@ public class ReservationService {
         }
     }
 
-    public List<ReservationDto> findByStatus(Status status) {
+    public List<Reservation> findByStatus(Status status) {
         try {
             log.info("Fetches status");
-            return reservationRepository.findByStatus(status)
-                    .stream()
-                    .map(ReservationDto::toDto)
-                    .toList();
+            return reservationRepository.findByStatus(status);
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findByStatus" , e);

@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/Customer")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/customer")
 public class CustomerController {
 
     @Autowired
@@ -23,16 +22,20 @@ public class CustomerController {
     @GetMapping("/findAll")
     public ResponseEntity<List<CustomerDto>> findAll(){
         try {
-            return ResponseEntity.ok(customerService.findAll());
+            List<CustomerDto> customerDtoList = customerService.findAll()
+                    .stream()
+                    .map(CustomerDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(customerDtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @GetMapping("/findId/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<CustomerDto> findById(@PathVariable long id){
         try {
-            return ResponseEntity.ok(customerService.findById(id));
+            return ResponseEntity.ok(CustomerDto.toDto(customerService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -56,8 +59,8 @@ public class CustomerController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestParam long id){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable long id){
         try {
             return new ResponseEntity<>(customerService.delete(id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
@@ -80,7 +83,11 @@ public class CustomerController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<CustomerDto>> findAllActive (){
         try {
-            return ResponseEntity.ok(customerService.findAllActive());
+            List<CustomerDto> customerDtoList = customerService.findAllActive()
+                    .stream()
+                    .map(CustomerDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(customerDtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

@@ -2,6 +2,7 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.QuotaDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Quota;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("api/Quota")
-@CrossOrigin(origins = "http://localhost:4200")
 public class QuotaController {
     @Autowired
     private QuotaService quotaService;
@@ -22,7 +23,14 @@ public class QuotaController {
     @GetMapping("/findAll")
     public ResponseEntity<List<QuotaDto>> findAll() {
         try {
-            return ResponseEntity.ok(quotaService.findAll());
+            List<Quota> quotaList = quotaService.findAll();
+            List<QuotaDto> quotaDtos = new ArrayList<>();
+            quotaList.forEach(quota -> {
+                QuotaDto quotaDto = quotaService.toDto(quota);
+                quotaDtos.add(quotaDto);
+            });
+            return ResponseEntity.ok(quotaDtos);
+
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).build();
         } catch (Exception err) {
@@ -33,7 +41,7 @@ public class QuotaController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<QuotaDto> findById(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(quotaService.findById(id));
+            return ResponseEntity.ok(quotaService.toDto(quotaService.findById(id)));
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).build();
         } catch (Exception err) {
@@ -89,7 +97,14 @@ public class QuotaController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<QuotaDto>> findAllActive() {
         try {
-            return ResponseEntity.ok(quotaService.findAllActive());
+
+            List<Quota> quotaList = quotaService.findAllActive();
+            List<QuotaDto> quotaDtos = new ArrayList<>();
+            quotaList.forEach(quota -> {
+                QuotaDto quotaDto = quotaService.toDto(quota);
+                quotaDtos.add(quotaDto);
+            });
+            return ResponseEntity.ok(quotaDtos);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).build();
         } catch (Exception err) {
@@ -100,7 +115,13 @@ public class QuotaController {
     @GetMapping("/findByEmployee/{employeeId}")
     public ResponseEntity<List<QuotaDto>> findByEmployee(@PathVariable long employeeId) {
         try {
-            return ResponseEntity.ok(quotaService.findByEmployee(employeeId));
+            List<Quota> quotaList =quotaService.findByEmployee(employeeId);
+            List<QuotaDto> quotaDtos = new ArrayList<>();
+            quotaList.forEach(quota -> {
+                QuotaDto quotaDto = quotaService.toDto(quota);
+                quotaDtos.add(quotaDto);
+            });
+            return ResponseEntity.ok(quotaDtos);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).build();
         } catch (Exception err) {
@@ -111,7 +132,14 @@ public class QuotaController {
     @GetMapping("/findAll/company")
     public ResponseEntity<List<QuotaDto>> findAllCompany() {
         try {
-            return ResponseEntity.ok(quotaService.findAllCompany());
+            List<Quota> quotaList =quotaService.findAllCompany();
+            List<QuotaDto> quotaDtos = new ArrayList<>();
+            quotaList.forEach(quota -> {
+                QuotaDto quotaDto = quotaService.toDto(quota);
+                quotaDtos.add(quotaDto);
+            });
+
+            return ResponseEntity.ok(quotaDtos);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).build();
         } catch (Exception err) {
