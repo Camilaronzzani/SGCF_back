@@ -5,9 +5,13 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.Emp
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Language;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.ReservationRepository;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -16,33 +20,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
-    public List<EmployeDto> findAll() {
+    public List<Employee> findAll() {
         try {
-            List<Employee> employees = employeeRepository.findAll();
-            List<EmployeDto> employeDtos = new ArrayList<>();
-            employees.forEach(employee -> {
-                EmployeDto employeDto = EmployeDto.toDto(employee);
-                employeDtos.add(employeDto);
-            });
-            return employeDtos;
+            log.info("Fetches employee list ");
+            return employeeRepository.findAll();
         } catch (RuntimeException e) {
+            log.error("Error in employeeService.findAll" , e );
             throw new RuntimeException(e);
         }
 
     }
 
-    public EmployeDto findById(long id) {
+    public Employee findById(long id) {
         try {
-            Optional<Employee> employee = Optional.of(employeeRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find")));
-            return EmployeDto.toDto(employee.get());
+            Employee employee = employeeRepository.findById(id).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+
+            log.info("Employee {} found successfully" , employee.getName());
+            return employee;
         } catch (Exception e) {
+
+            log.error("Error in employeeService.findById" , e );
             throw new RuntimeException(e);
         }
     }
@@ -51,8 +58,12 @@ public class EmployeeService {
         try {
             Employee employee = toEmployee(employeeRequest);
             employeeRepository.save(employee);
-            return "employee: " + employee.getName()+ " save successful ";
+
+            log.info("Employee {} saved successfully" , employee.getName());
+            return "Employee: " + employee.getName()+ " saved successfully ";
+
         } catch (Exception e) {
+            log.error("Error in employeeService.findById" , e );
             throw new RuntimeException(e);
         }
     }
@@ -66,43 +77,51 @@ public class EmployeeService {
         return employee;
     }
 
-    public void changeDataByEmpoloyee(Employee employeeOld, Employee newEmployee){
+    public Employee changeDataByEmpoloyee(long id, EmployeeRequest newEmployee){
+
+        Employee employeeOld = employeeRepository.findById(id).orElseThrow(()
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
 
         employeeOld.setCpf(newEmployee.getCpf());
         employeeOld.setName(newEmployee.getName());
         employeeOld.setDayOfBirth(newEmployee.getDayOfBirth());
         employeeOld.setLanguagesSpoken(newEmployee.getLanguagesSpoken());
 
+        return employeeOld;
+
     }
 
+    @Transactional
     public String update(EmployeeRequest employeeRequest, long id) {
         try {
-            Employee employeeNew = toEmployee(employeeRequest);
-            Employee employeeOld = Optional.of(employeeRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"))).get();
-            changeDataByEmpoloyee(employeeOld , employeeNew);
-            employeeRepository.save(employeeOld);
-            return "employee: " + employeeOld.getName() + " save successful ";
+            Employee employee = changeDataByEmpoloyee(id , employeeRequest);
+
+            log.info("Employee {} updated successfully" , employee.getName());
+            return "Employee: " + employee.getName() + " saved successfully ";
 
         } catch (Exception e) {
+            log.error("Error in employeeService.update" , e );
             throw new RuntimeException(e);
         }
     }
 
-
+    @Transactional
     public String delete(long id) {
         try {
             Employee employee = employeeRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
             employee.setActive(false);
-            employeeRepository.save(employee);
-            return "employee: " + employee.getName() + " delete successful ";
+
+            log.info("Employee {} deactivated successfully" , employee.getName());
+            return "Employee: " + employee.getName() + " delete successfully ";
 
         } catch (Exception e) {
+            log.error("Error in employeeService.delete" , e );
             throw new RuntimeException(e);
         }
     }
 
+    // speak with the teacher to delete
     public String applyPartialUpdate(long id, Map<String, Object> employee) {
         try {
             Employee employee1 = employeeRepository.findById(id).orElseThrow(()
@@ -124,17 +143,20 @@ public class EmployeeService {
         }
     }
 
-    public List<EmployeDto> findAllActive() {
+    public List<Employee> findAllActive() {
         try {
-            List<Employee> employeeList = employeeRepository.findByActiveTrue();
-            List<EmployeDto> customerDtoList = new ArrayList<>();
-            employeeList.forEach(employee -> {
-                EmployeDto employeDto = EmployeDto.toDto(employee);
-                customerDtoList.add(employeDto);
-            });
-            return customerDtoList;
+            log.info("Employee list found successfully");
+            return employeeRepository.findByActiveTrue();
+
         } catch (Exception e) {
+            log.error("Error in employeeService.findAllActivate" , e );
             throw new RuntimeException(e);
         }
+    }
+
+    private EmployeDto toSummaryDto(Employee employee) {
+        return new EmployeDto(employee.getId(), employee.getCpf(), employee.getName(), employee.getLanguagesSpoken(),
+                employee.getDayOfBirth(), employee.isActive(), reservationRepository.countByEmployeeIdAndActiveTrue(employee.getId()),
+                reservationRepository.sumValueByEmployeeAndStatus(employee.getId(), Status.Confirmed));
     }
 }

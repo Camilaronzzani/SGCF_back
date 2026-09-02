@@ -1,10 +1,12 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ChangePasswordRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/user")
-@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -21,7 +22,11 @@ public class UserController {
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
         try {
-            return ResponseEntity.ok(userService.findAll());
+            List<UserDto> userDtos = userService.findAll()
+                    .stream()
+                    .map(UserDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(userDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -30,7 +35,7 @@ public class UserController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(userService.findById(id));
+            return ResponseEntity.ok(UserDto.toDto(userService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -39,7 +44,7 @@ public class UserController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody UserRequest userRequest) {
         try {
-            return ResponseEntity.ok(userService.save(userRequest));
+            return new ResponseEntity<>(userService.save(userRequest), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -48,7 +53,7 @@ public class UserController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody UserRequest userRequest, @PathVariable long id) {
         try {
-            return ResponseEntity.ok(userService.update(userRequest, id));
+            return new ResponseEntity<>(userService.update(userRequest, id), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -57,17 +62,17 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(userService.delete(id));
+            return new ResponseEntity<>(userService.delete(id), HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> user) {
         try {
             String message = userService.applyPartialUpdate(id, user);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -76,7 +81,11 @@ public class UserController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<UserDto>> findAllActive() {
         try {
-            return ResponseEntity.ok(userService.findAllActive());
+            List<UserDto> userDtos = userService.findAllActive()
+                    .stream()
+                    .map(UserDto ::toDto)
+                    .toList();
+            return ResponseEntity.ok(userDtos);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -85,25 +94,26 @@ public class UserController {
     @GetMapping("/findByUserName/{userName}")
     public ResponseEntity<UserDto> findByUserName(@PathVariable String userName) {
         try {
-            return ResponseEntity.ok(userService.findByUserName(userName));
+            return ResponseEntity.ok(UserDto.toDto(userService.findByUserName(userName)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
-    @PatchMapping("/change/password/{id}")
-    public ResponseEntity<String> changePassword(@PathVariable long id , @RequestBody String newPassword){
+    @PatchMapping("/change")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
         try {
-            return ResponseEntity.ok(userService.changePassword(id , newPassword));
+            return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<Boolean> authenticate(@RequestBody AuthenticateRequest authenticateRequest){
-        try {
-            return ResponseEntity.ok(userService.authenticate(authenticateRequest));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Boolean> authenticate(@RequestBody AuthenticateRequest authenticateRequest) {
+
+        boolean isAuthenticated = userService.authenticate(authenticateRequest);
+        if (!isAuthenticated) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
         }
+        return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
     }
 }

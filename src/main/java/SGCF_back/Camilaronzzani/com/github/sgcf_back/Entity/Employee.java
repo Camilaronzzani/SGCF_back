@@ -21,7 +21,7 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cpf", nullable = false , length = 11)
+    @Column(name = "cpf", nullable = false , length = 11, unique = true)
     private String cpf;
 
     @Column(name = "name", nullable = false)

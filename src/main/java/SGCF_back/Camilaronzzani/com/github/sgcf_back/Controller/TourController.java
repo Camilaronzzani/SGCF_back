@@ -3,8 +3,10 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TourRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.TourService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto.toDto;
+
 @RestController
 @RequestMapping("api/Tour")
-@CrossOrigin(origins = "http://localhost:4200")
 public class TourController {
     @Autowired
     private TourService tourService;
+
     @GetMapping("/findAll")
-    public ResponseEntity<List<TourDto>> findAll(){
+    public ResponseEntity<List<Tour>> findAll(){
         try {
             return ResponseEntity.ok(tourService.findAll());
         } catch (Exception err) {
@@ -30,7 +34,7 @@ public class TourController {
     @GetMapping("/findId/{id}")
     public ResponseEntity<TourDto> findById(@PathVariable long id){
         try {
-            return ResponseEntity.ok(tourService.findById(id));
+            return ResponseEntity.ok(toDto(tourService.findById(id)));
         } catch (ResponseStatusException err) {
             throw err;
         } catch (Exception err) {
@@ -41,7 +45,7 @@ public class TourController {
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody TourRequest tourRequest){
         try {
-            return ResponseEntity.ok(tourService.save(tourRequest));
+            return new ResponseEntity<>(tourService.save(tourRequest), HttpStatus.NO_CONTENT);
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
@@ -50,7 +54,7 @@ public class TourController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody TourRequest tourRequest, @PathVariable long id){
         try {
-            return ResponseEntity.ok(tourService.update(tourRequest , id));
+            return new ResponseEntity<>(tourService.update(tourRequest , id),HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             throw err;
         } catch (Exception err) {
@@ -61,7 +65,7 @@ public class TourController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id){
         try {
-            return ResponseEntity.ok(tourService.delete(id));
+            return new ResponseEntity<>(tourService.delete(id), HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             throw err;
         } catch (Exception err) {
@@ -69,12 +73,12 @@ public class TourController {
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> tour){
         try {
 
             String message = tourService.applyPartialUpdate(id , tour);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message,HttpStatus.NO_CONTENT);
 
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
@@ -84,7 +88,11 @@ public class TourController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<TourDto>> findAllActive (){
         try {
-            return ResponseEntity.ok(tourService.findAllActive());
+            List<TourDto> tourDtos = tourService.findAllActive()
+                    .stream()
+                    .map(TourDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(tourDtos);
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }

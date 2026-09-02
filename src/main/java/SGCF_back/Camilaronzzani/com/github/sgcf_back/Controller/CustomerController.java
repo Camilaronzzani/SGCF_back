@@ -5,6 +5,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.CustomerDto
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.CustomerRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/Customer")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/customer")
 public class CustomerController {
 
     @Autowired
@@ -22,16 +22,20 @@ public class CustomerController {
     @GetMapping("/findAll")
     public ResponseEntity<List<CustomerDto>> findAll(){
         try {
-            return ResponseEntity.ok(customerService.findAll());
+            List<CustomerDto> customerDtoList = customerService.findAll()
+                    .stream()
+                    .map(CustomerDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(customerDtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @GetMapping("/findId/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<CustomerDto> findById(@PathVariable long id){
         try {
-            return ResponseEntity.ok(customerService.findById(id));
+            return ResponseEntity.ok(CustomerDto.toDto(customerService.findById(id)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -40,7 +44,7 @@ public class CustomerController {
     @PostMapping("/save")
     public ResponseEntity<String> salve(@RequestBody CustomerRequest customerRequest){
         try {
-            return ResponseEntity.ok(customerService.save(customerRequest));
+            return new ResponseEntity<>(customerService.save(customerRequest), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -49,7 +53,7 @@ public class CustomerController {
     @PostMapping("/update/{id}")
     public ResponseEntity<String> update(@RequestBody CustomerRequest customerRequest , @PathVariable long id){
         try {
-            return ResponseEntity.ok(customerService.update(customerRequest , id));
+            return new ResponseEntity<>(customerService.update(customerRequest , id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -58,18 +62,18 @@ public class CustomerController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable long id){
         try {
-            return ResponseEntity.ok(customerService.delete(id));
+            return new ResponseEntity<>(customerService.delete(id),HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/updatePatch/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> customer){
         try {
 
             String message = customerService.applyPartialUpdate(id , customer);
-            return ResponseEntity.ok(message);
+            return new ResponseEntity<>(message , HttpStatus.NO_CONTENT);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -79,7 +83,11 @@ public class CustomerController {
     @GetMapping("/findAll/active")
     public ResponseEntity<List<CustomerDto>> findAllActive (){
         try {
-            return ResponseEntity.ok(customerService.findAllActive());
+            List<CustomerDto> customerDtoList = customerService.findAllActive()
+                    .stream()
+                    .map(CustomerDto :: toDto)
+                    .toList();
+            return ResponseEntity.ok(customerDtoList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

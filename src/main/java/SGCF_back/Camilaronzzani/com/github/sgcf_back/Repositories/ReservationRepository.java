@@ -18,6 +18,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByEmployeeId(Long employeeId);
 
+    long countByEmployeeIdAndActiveTrue(Long employeeId);
+
+    @Query("select coalesce(sum(r.value), 0) from Reservation r where r.employee.id = :employeeId "
+        + "and r.active = true and r.status = :status")
+    double sumValueByEmployeeAndStatus(@Param("employeeId") Long employeeId, @Param("status") Status status);
+
     List<Reservation> findByStatus(Status status);
 
         @Query("select coalesce(sum(r.value), 0) from Reservation r "

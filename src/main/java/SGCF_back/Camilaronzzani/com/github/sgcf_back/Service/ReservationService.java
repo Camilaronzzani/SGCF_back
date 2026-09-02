@@ -11,9 +11,11 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.CustomerReposi
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.ReservationRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.TourRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class ReservationService {
     @Autowired
@@ -33,26 +36,27 @@ public class ReservationService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public List<ReservationDto> findAll() {
+    public List<Reservation> findAll() {
         try {
-            List<Reservation> reservationList = reservationRepository.findAll();
-            List<ReservationDto> reservationDtos = new ArrayList<>();
-            reservationList.forEach(reservation -> {
-                ReservationDto reservationDto = ReservationDto.toDto(reservation);
-                reservationDtos.add(reservationDto);
-            });
-            return reservationDtos;
+            log.info("Reservations list found successfully");
+            return reservationRepository.findAll();
+
         } catch (RuntimeException e) {
+            log.error("Error in ReservationService.findAll", e);
             throw new RuntimeException(e);
         }
     }
 
-    public ReservationDto findById(long id) {
+    public Reservation findById(long id) {
         try {
-            Optional<Reservation> reservation = Optional.of(reservationRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation no find")));
-            return ReservationDto.toDto(reservation.get());
+            Reservation reservation = reservationRepository.findById(id).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+
+            log.info("Reservations {} found successful ", id);
+            return reservation;
+
         } catch (Exception e) {
+            log.error("Error in ReservationService.findById" , e);
             throw new RuntimeException(e);
         }
     }
@@ -61,60 +65,82 @@ public class ReservationService {
         try {
             Reservation reservation = toReservation(reservationRequest);
             reservationRepository.save(reservation);
-            return "Reservation of customer: " + reservation.getCustomer().getName() + " save successful ";
+
+            log.info("Reservations for customer {} saved successfully", reservation.getCustomer().getName());
+            return "Reservation for customer: " + reservation.getCustomer().getName() + " saved successfully ";
+
         } catch (Exception e) {
+            log.error("Error in ReservationService.save" , e);
             throw new RuntimeException(e);
         }
     }
 
     public Reservation toReservation(ReservationRequest reservationRequest) {
         Reservation reservation = new Reservation();
+
         reservation.setDate(reservationRequest.getDate());
+
         reservation.setTour(findTour(reservationRequest.getTourId()));
+
         reservation.setCustomer(findCustomer(reservationRequest.getCustomerId()));
+
         reservation.setEmployee(findEmployee(reservationRequest.getEmployeeId()));
+
         reservation.setValue(reservationRequest.getValue());
+
         reservation.setStatus(reservationRequest.getStatus() == null
                 ? Status.Pending
                 : reservationRequest.getStatus());
+
         reservation.setActive(true);
         return reservation;
     }
 
-    public void changeDataByReservation(Reservation reservationOld, Reservation newReservation) {
+    public Reservation changeDataByReservation(long id, ReservationRequest reservationRequesteservation) {
+        Reservation newReservation = toReservation(reservationRequesteservation);
+        Reservation reservationOld = reservationRepository.findById(id).orElseThrow(()
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+
         reservationOld.setDate(newReservation.getDate());
         reservationOld.setTour(newReservation.getTour());
         reservationOld.setCustomer(newReservation.getCustomer());
         reservationOld.setEmployee(newReservation.getEmployee());
         reservationOld.setValue(newReservation.getValue());
         reservationOld.setStatus(newReservation.getStatus());
+
+        return reservationOld;
     }
 
+    @Transactional
     public String update(ReservationRequest reservationRequest, long id) {
         try {
-            Reservation reservation = toReservation(reservationRequest);
-            Reservation reservationOld = Optional.of(reservationRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation no find"))).get();
-            changeDataByReservation(reservationOld, reservation);
-            reservationRepository.save(reservationOld);
-            return "Reservation: " + reservationOld.getId() + " update successful ";
+            Reservation reservation = changeDataByReservation(id , reservationRequest);
+
+            log.info("Reservations {} updated successfully ", id);
+            return "Reservation: " + reservation.getId() + " updated successfully ";
         } catch (Exception e) {
+            log.error("Error in ReservationService.update" , e);
             throw new RuntimeException(e);
         }
     }
 
+    @Transactional
     public String delete(long id) {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation no find"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
             reservation.setActive(false);
-            reservationRepository.save(reservation);
-            return "Reservation: " + reservation.getId() + " delete successful ";
+
+            log.info("Reservation {} deactivate successfully", id);
+            return "Reservation: " + reservation.getId() + " deleted successfully ";
+
         } catch (Exception e) {
+            log.error("Error in ReservationService.update" , e);
             throw new RuntimeException(e);
         }
     }
 
+    //delete
     public String applyPartialUpdate(long id, Map<String, Object> reservation) {
         try {
             Reservation reservation1 = reservationRepository.findById(id).orElseThrow(()
@@ -136,54 +162,55 @@ public class ReservationService {
         }
     }
 
-    public List<ReservationDto> findAllActive() {
+
+    public List<Reservation> findAllActive() {
         try {
-            List<Reservation> reservationList = reservationRepository.findByActiveTrue();
-            List<ReservationDto> reservationDtoList = new ArrayList<>();
-            reservationList.forEach(reservation -> {
-                ReservationDto reservationDto = ReservationDto.toDto(reservation);
-                reservationDtoList.add(reservationDto);
-            });
-            return reservationDtoList;
+            log.info("Fetches reservations list active");
+            return reservationRepository.findByActiveTrue();
         } catch (Exception e) {
+            log.error("Error in ReservationService.findAllActive" , e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<ReservationDto> findByCustomer(long customerId) {
+    public List<Reservation> findByCustomer(long customerId) {
         try {
-            return reservationRepository.findByCustomerId(customerId)
-                    .stream()
-                    .map(ReservationDto::toDto)
-                    .toList();
+            log.info("Fetches reservations for customer");
+            return reservationRepository.findByCustomerId(customerId);
+
         } catch (Exception e) {
+            log.error("Error in ReservationService.findByCustomer" , e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<ReservationDto> findByStatus(Status status) {
+    public List<Reservation> findByStatus(Status status) {
         try {
-            return reservationRepository.findByStatus(status)
-                    .stream()
-                    .map(ReservationDto::toDto)
-                    .toList();
+            log.info("Fetches status");
+            return reservationRepository.findByStatus(status);
+
         } catch (Exception e) {
+            log.error("Error in ReservationService.findByStatus" , e);
             throw new RuntimeException(e);
         }
     }
 
     private Tour findTour(Long tourId) {
         if (tourId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tourId is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tour Id is required");
         }
+
+        log.info("Fetches tour");
         return tourRepository.findById(tourId).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
     }
 
     private Customer findCustomer(Long customerId) {
         if (customerId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "customerId is required");
         }
+
+        log.info("Fetches customer");
         return customerRepository.findById(customerId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
     }
@@ -192,6 +219,7 @@ public class ReservationService {
         if (employeeId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required");
         }
+        log.info("Fetches employee");
         return employeeRepository.findById(employeeId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
     }

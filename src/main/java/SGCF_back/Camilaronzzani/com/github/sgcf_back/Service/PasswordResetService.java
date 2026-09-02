@@ -7,6 +7,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.PasswordReset;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.PasswordResetRepository;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class PasswordResetService {
     @Autowired
@@ -34,9 +36,12 @@ public class PasswordResetService {
             passwordResetRepository.save(passwordReset);
 
             emailService.sendEmail(passwordResetRequest.getEmail(), code);
+
+            log.info("Request Password does successfully");
             return passwordReset.getId() ;
 
         } catch (Exception e) {
+            log.error("Erro in PasswordResetService.requestPasswordReset" , e);
             throw new RuntimeException(e);
         }
     }
@@ -49,7 +54,9 @@ public class PasswordResetService {
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
             passwordReset.setUser(user);
             return passwordReset;
+
         } catch (Exception e) {
+            log.error("Erro in PasswordResetService.toPasswordReset" , e);
             throw new RuntimeException(e);
         }
     }
@@ -58,11 +65,10 @@ public class PasswordResetService {
         try {
             PasswordReset passwordReset = passwordResetRepository.findById(tokenRequest.getIdPasswordReset()).orElseThrow(()
                                 ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
-            if (passwordReset.getToken().equals(tokenRequest.getToken())){
-                return true;
-            }
-            return false;
+            return passwordReset.getToken().equals(tokenRequest.getToken());
+
         } catch (Exception e) {
+            log.error("Erro in PasswordResetService.compareToken" , e);
             throw new RuntimeException(e);
         }
     }
