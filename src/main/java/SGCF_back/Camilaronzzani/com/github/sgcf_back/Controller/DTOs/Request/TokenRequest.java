@@ -1,5 +1,6 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -15,5 +16,6 @@ public class TokenRequest {
 
     @NotEmpty
     @NotBlank
-    private long idPasswordReset;
+    @Email
+    private String email;
 }

@@ -1,8 +1,11 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthenticatedUserDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ChangePasswordRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
+import jakarta.validation.constraints.Email;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
@@ -169,15 +172,25 @@ public class UserService {
     }
 
     @Transactional
-    public String changePassword(ChangePasswordRequest changePasswordRequest) {
+    public BooleanRequest changePassword(ChangePasswordRequest changePasswordRequest) {
         try {
+
+            BooleanRequest booleanRequest = new BooleanRequest();
 
             User user = userRepository.findByEmail(changePasswordRequest.getEmail()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
-            user.setUserPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+
+            if (passwordEncoder.matches(user.getUserPassword(), changePasswordRequest.getPassword())){
+                booleanRequest.setBool(false);
+                booleanRequest.setMessage("erro com a senha");
+            }else {
+                user.setUserPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+                booleanRequest.setBool(true);
+                booleanRequest.setMessage("Senha redefinida com sucesso");
+            }
 
             log.info("Password change successful ");
-            return "Password change successful ";
+            return booleanRequest;
 
         } catch (Exception e) {
             log.error("Error in UserService.changePassword", e);
@@ -192,9 +205,21 @@ public class UserService {
             User user = userRepository.findByEmail(authenticateRequest.getEmail()).orElseThrow(()
                     ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
             log.info("authenticating user");
-            return passwordEncoder.matches(authenticateRequest.getPassword(), user.getUserPassword());
+            boolean boo = passwordEncoder.matches(authenticateRequest.getPassword(), user.getUserPassword());
+            return boo;
         } catch (Exception e) {
             log.error("Error in UserService.authenticate", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public User findByEmail(String email) {
+        try {
+            log.info("Fetching user");
+            return userRepository.findByEmail(email).orElseThrow(()
+                    ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+        } catch (Exception e) {
+            log.error("Error in UserService.findByEmail", e);
             throw new RuntimeException(e);
         }
     }

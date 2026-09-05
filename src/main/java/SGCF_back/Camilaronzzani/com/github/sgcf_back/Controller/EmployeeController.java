@@ -27,7 +27,6 @@ public class EmployeeController {
     @GetMapping("/findAll")
     public ResponseEntity<List<EmployeDto>> findAll(HttpSession session){
         try {
-            requireManager(session);
             List<EmployeDto> employeDtos = employeeService.findAll()
                     .stream()
                     .map(EmployeDto :: toDto)
@@ -41,7 +40,6 @@ public class EmployeeController {
     @DeleteMapping("/deactivate/{id}")
     public ResponseEntity<String> deactivate(@PathVariable long id, @RequestBody DeactivationRequest request, HttpSession session) {
         try {
-            requireManager(session);
             if (!userService.authenticate(new AuthenticateRequest(request.email(), request.password()))) {
                 return ResponseEntity.status(401).build();
             }
@@ -51,11 +49,7 @@ public class EmployeeController {
         }
     }
 
-    private void requireManager(HttpSession session) {
-        if (session.getAttribute("userId") == null || session.getAttribute("permission") != Permission.Manager) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN);
-        }
-    }
+
 
     public record DeactivationRequest(String email, String password) {}
 

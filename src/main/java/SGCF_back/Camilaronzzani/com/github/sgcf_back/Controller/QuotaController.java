@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/Quota")
+@RequestMapping("api/quota")
 public class QuotaController {
     @Autowired
     private QuotaService quotaService;

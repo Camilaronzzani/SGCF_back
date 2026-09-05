@@ -17,7 +17,7 @@ import java.util.Map;
 import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto.toDto;
 
 @RestController
-@RequestMapping("api/Tour")
+@RequestMapping("api/tour")
 public class TourController {
     @Autowired
     private TourService tourService;

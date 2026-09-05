@@ -1,5 +1,7 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthResponse;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PasswordResetRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TokenRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PasswordResetService;
@@ -9,25 +11,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/Password/Reset")
+@RequestMapping("/api/password/reset")
 public class PasswordResetController {
     @Autowired
     private PasswordResetService passwordResetService;
 
     @PostMapping("/request")
-    public ResponseEntity<Long> requestPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest){
+    public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest){
         try {
-            return ResponseEntity.ok(passwordResetService.requestPasswordReset(passwordResetRequest));
+            String mensagem = passwordResetService.requestPasswordReset(passwordResetRequest);
+            String jsonResponse = "{\"message\": \"" + mensagem + "\"}";
+            return ResponseEntity.ok(jsonResponse);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
     @PostMapping("/compareToken")
-    public ResponseEntity<Boolean> compareToken(@RequestBody TokenRequest tokenRequest){
+    public ResponseEntity<BooleanRequest> compareToken(@RequestBody TokenRequest tokenRequest){
         try {
-            return new ResponseEntity<>(passwordResetService.compareToken(tokenRequest) , HttpStatus.NO_CONTENT);
+
+            return ResponseEntity.ok(passwordResetService.compareToken(tokenRequest));
+
         } catch (Exception e) {
-            return  ResponseEntity.badRequest().build();
+             return ResponseEntity.badRequest().build();
         }
     }
 }
