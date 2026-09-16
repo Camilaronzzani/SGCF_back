@@ -1,10 +1,7 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.CustomerDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.CustomerRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.CountryCustomer;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Language;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.CustomerRequest.toCustomer;
 
 @Slf4j
 @Service
@@ -49,50 +45,39 @@ public class CustomerService {
         }
     }
 
-    public String save(CustomerRequest customerRequest) {
+    public void save(CustomerRequest customerRequest) {
         try {
             Customer customer = toCustomer(customerRequest);
             customerRepository.save(customer);
             log.info("Customer saved  successfully: {}" , customer);
-            return "Customer: " + customer.getName()+ " saved successfully ";
         } catch (Exception e) {
             log.error("Error in CustomerService.save()", e);
             throw new RuntimeException(e);
         }
     }
-    public Customer toCustomer(CustomerRequest customerRequest){
-        Customer customer = new Customer();
-        customer.setCountryCustomer(customerRequest.getCountryCustomer());
-        customer.setCnpj(customerRequest.getCnpj());
-        customer.setCpf(customerRequest.getCpf());
-        customer.setName(customerRequest.getName());
-        customer.setLanguageSpeak(customerRequest.getLanguageSpeak());
-        customer.setEmail(customerRequest.getEmail());
-        customer.setActive(true);
-        return customer;
-    }
+
 
     public Customer changeDataByCustomer(long id, CustomerRequest newCustomer){
         Customer customerOld = customerRepository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
 
-        customerOld.setCountryCustomer(newCustomer.getCountryCustomer());
-        customerOld.setCnpj(newCustomer.getCnpj());
-        customerOld.setCpf(newCustomer.getCpf());
-        customerOld.setName(newCustomer.getName());
-        customerOld.setEmail(newCustomer.getEmail());
-        customerOld.setLanguageSpeak(newCustomer.getLanguageSpeak());
+        customerOld.setCountryCustomer(newCustomer.countryCustomer());
+        customerOld.setCnpj(newCustomer.cnpj());
+        customerOld.setCpf(newCustomer.cpf());
+        customerOld.setName(newCustomer.name());
+        customerOld.setEmail(newCustomer.email());
+        customerOld.setLanguageSpeak(newCustomer.languageSpeak());
 
         return customerOld ;
     }
 
     @Transactional
-    public String update(CustomerRequest customerRequest, long id) {
+    public Customer update(CustomerRequest customerRequest, long id) {
         try {
             Customer customer = changeDataByCustomer( id , customerRequest);
 
             log.info("Customer {} saved successfully ", customer.getName());
-            return "Customer: " + customer.getName() + " saved successfully ";
+            return customer;
 
         } catch (Exception e) {
             log.error("Error in CustomerService.update()", e);
@@ -101,7 +86,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
             Customer customer = customerRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
@@ -109,7 +94,6 @@ public class CustomerService {
             customer.setActive(false);
 
             log.info("Customer {} deactivated successfully" , customer.getName());
-            return "Customer: " + customer.getName() + " deactivated successful ";
 
         } catch (Exception e) {
             log.error("Error in CustomerService.delete " , e );
@@ -117,34 +101,7 @@ public class CustomerService {
         }
     }
 
-    //speak with the  teacher to delete this
-    public String applyPartialUpdate(long id, Map<String, Object> customer) {
-        try {
-            Customer customer1 = customerRepository.findById(id).orElseThrow(()
-                        ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
-            customer.forEach((key , value) ->{
-                switch (key){
-                    case "cnpj" -> customer1.setCnpj((String) value);
-
-                    case "cpf" -> customer1.setCpf((String) value) ;
-
-                    case "name" -> customer1.setName((String) value);
-
-                    case "languageSpeak" -> customer1.setLanguageSpeak((List<Language>) value);
-
-                    case "countryCustomer" -> customer1.setCountryCustomer((CountryCustomer) value);
-
-                    case "email" -> customer1.setEmail((String) value);
-                }
-            });
-            customerRepository.save(customer1);
-            return "customer: " + customer1.getName() + " delete successful ";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Customer> findAllActive() {
+       public List<Customer> findAllActive() {
         try {
             log.info("Customers listed actived successfully");
             return customerRepository.findByActiveTrue();

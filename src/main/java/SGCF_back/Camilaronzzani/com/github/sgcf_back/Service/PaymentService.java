@@ -1,6 +1,5 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.PaymentDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PaymentRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
@@ -13,11 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 
 @Slf4j
 @Service
@@ -50,13 +46,12 @@ public class PaymentService {
         }
     }
 
-    public String save(PaymentRequest paymentRequest) {
+    public void save(PaymentRequest paymentRequest) {
         try {
             Payment payment = toPayment(paymentRequest);
             paymentRepository.save(payment);
 
             log.info("Payment saved successfully");
-            return "Payment of customer: " + payment.getCustomer().getName() + " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in PaymentService.save ",e);
@@ -66,11 +61,11 @@ public class PaymentService {
 
     public Payment toPayment(PaymentRequest paymentRequest) {
         Payment payment = new Payment();
-        payment.setCustomer(findCustomer(paymentRequest.getCustomerId()));
-        payment.setTotalAccount(paymentRequest.getTotalAccount());
-        payment.setStatus(paymentRequest.getStatus() == null
+        payment.setCustomer(findCustomer(paymentRequest.customerId()));
+        payment.setTotalAccount(paymentRequest.totalAccount());
+        payment.setStatus(paymentRequest.status() == null
                 ? Status.Pending
-                : paymentRequest.getStatus());
+                : paymentRequest.status());
         payment.setActive(true);
         return payment;
     }
@@ -79,21 +74,21 @@ public class PaymentService {
         Payment paymentOld = paymentRepository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
 
-        paymentOld.setCustomer(customerRepository.findById( newPayment.getCustomerId()).orElseThrow(()
+        paymentOld.setCustomer(customerRepository.findById( newPayment.customerId()).orElseThrow(()
                                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found")));
-        paymentOld.setTotalAccount(newPayment.getTotalAccount());
-        paymentOld.setStatus(newPayment.getStatus());
+        paymentOld.setTotalAccount(newPayment.totalAccount());
+        paymentOld.setStatus(newPayment.status());
 
         return paymentOld ;
     }
 
     @Transactional
-    public String update(PaymentRequest paymentRequest, long id) {
+    public Payment update(PaymentRequest paymentRequest, long id) {
         try {
             Payment payment = changeDataByPayment(id, paymentRequest);
 
             log.info("Payment {} saved successfully", payment.getId());
-            return "Payment: " + payment.getId() + " updated successfully ";
+            return payment;
         } catch (Exception e) {
             log.error("Error in PaymentService.update ",e);
             throw new RuntimeException(e);
@@ -101,35 +96,15 @@ public class PaymentService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
             Payment payment = paymentRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
             payment.setActive(false);
 
             log.info("Payment {} deleted successfully" , id);
-            return "Payment: " + payment.getId() + " deleted successfully ";
         } catch (Exception e) {
             log.error("Error in PaymentService.delete ",e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    // to delete
-    public String applyPartialUpdate(long id, Map<String, Object> payment) {
-        try {
-            Payment payment1 = paymentRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "payment no find"));
-            payment.forEach((key, value) -> {
-                switch (key) {
-                    case "totalAccount" -> payment1.setTotalAccount(Double.parseDouble(value.toString()));
-                    case "status" -> payment1.setStatus(Status.valueOf(value.toString()));
-                    case "customerId" -> payment1.setCustomer(findCustomer(Long.parseLong(value.toString())));
-                }
-            });
-            paymentRepository.save(payment1);
-            return "Payment: " + payment1.getId() + " update successful ";
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -165,7 +140,7 @@ public class PaymentService {
         }
     }
 
-    private Customer findCustomer(Long customerId) {
+    public Customer findCustomer(Long customerId) {
         try {
             if (customerId == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "customerId is required");

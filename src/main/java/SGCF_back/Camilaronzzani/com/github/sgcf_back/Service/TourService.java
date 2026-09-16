@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TourRequest.toTour;
+
 @Slf4j
 @Service
 public class TourService {
@@ -56,50 +58,40 @@ public class TourService {
         }
     }
 
-    public String save(TourRequest tourRequest) {
+    public void save(TourRequest tourRequest) {
         try {
             Tour tour = toTour(tourRequest);
             tourRepository.save(tour);
 
             log.info("Tour {} saved successfully", tour.getNameOfTour());
-            return "Tour: " + tour.getNameOfTour()+ " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in TourService.save", e);
             throw new RuntimeException(e);
         }
     }
-    public Tour toTour(TourRequest tourRequest){
-        Tour tour = new Tour();
-        tour.setCountryTour(tourRequest.getCountryTour());
-        tour.setNameOfTour(tourRequest.getNameOfTour());
-        tour.setLocations(tourRequest.getLocations());
-        tour.setKmOftour(tourRequest.getKmOftour());
-        tour.setPrice(tourRequest.getPrice());
-        tour.setActive(true);
-        return tour;
-    }
+
 
     public Tour changeDataByTour(long id, TourRequest newTour){
         Tour tourOld = tourRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
 
-        tourOld.setCountryTour(newTour.getCountryTour());
-        tourOld.setNameOfTour(newTour.getNameOfTour());
-        tourOld.setLocations(newTour.getLocations());
-        tourOld.setKmOftour(newTour.getKmOftour());
-        tourOld.setPrice(newTour.getPrice());
+        tourOld.setCountryTour(newTour.countryTour());
+        tourOld.setNameOfTour(newTour.nameOfTour());
+        tourOld.setLocations(newTour.locations());
+        tourOld.setKmOftour(newTour.kmOftour());
+        tourOld.setPrice(newTour.price());
         return tourOld;
     }
 
     @Transactional
-    public String update(TourRequest tourRequest, long id) {
+    public Tour update(TourRequest tourRequest, long id) {
         try {
 
             Tour tour = changeDataByTour(id, tourRequest);
 
             log.info("Tour {} update successfully" , tour.getNameOfTour());
-            return "tour: " + tour.getNameOfTour() + " save successful ";
+            return tour;
 
         } catch (Exception e) {
             log.error("Error in TourService.update", e);
@@ -108,7 +100,7 @@ public class TourService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
 
             Tour tour = tourRepository.findById(id).orElseThrow(
@@ -116,30 +108,8 @@ public class TourService {
             tour.setActive(false);
 
             log.info("Tour {} deactivated successfully", tour.getNameOfTour());
-            return "Tour: " + tour.getNameOfTour() + " deleted successfully ";
-
         } catch (Exception e) {
             log.error("Error in TourService.delete", e);
-            throw new RuntimeException(e);
-        }
-    }
-    //delete
-    public String applyPartialUpdate(long id, Map<String, Object> tour) {
-        try {
-            Tour tour1 = tourRepository.findById(id).orElseThrow(()
-                    ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "tour no find"));
-            tour.forEach((key , value) ->{
-                switch (key){
-                    case "price" -> tour1.setPrice((double) value) ;
-                    case "countryTour" -> tour1.setCountryTour((CountryTour) value);
-                    case "kmOftour" -> tour1.setKmOftour((Long) value);
-                    case "nameOfTour" -> tour1.setNameOfTour((String) value);
-                    case "locations" -> tour1.setLocations((String) value);
-                }
-            });
-            tourRepository.save(tour1);
-            return "tour: " + tour1.getNameOfTour() + " delete successful ";
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

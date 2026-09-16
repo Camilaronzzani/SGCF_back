@@ -5,8 +5,8 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequ
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PasswordResetRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TokenRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PasswordResetService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ public class PasswordResetController {
     private PasswordResetService passwordResetService;
 
     @PostMapping("/request")
-    public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest){
+    public ResponseEntity<String> requestPasswordReset(@Valid @RequestBody PasswordResetRequest passwordResetRequest){
         try {
             String mensagem = passwordResetService.requestPasswordReset(passwordResetRequest);
             String jsonResponse = "{\"message\": \"" + mensagem + "\"}";
@@ -27,7 +27,7 @@ public class PasswordResetController {
         }
     }
     @PostMapping("/compareToken")
-    public ResponseEntity<BooleanRequest> compareToken(@RequestBody TokenRequest tokenRequest){
+    public ResponseEntity<BooleanRequest> compareToken(@Valid @RequestBody TokenRequest tokenRequest){
         try {
 
             return ResponseEntity.ok(passwordResetService.compareToken(tokenRequest));

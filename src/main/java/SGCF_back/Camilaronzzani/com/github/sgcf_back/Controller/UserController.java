@@ -10,6 +10,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,37 +48,30 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<String> save(@Valid @RequestBody UserRequest userRequest) {
         try {
-            return new ResponseEntity<>(userService.save(userRequest), HttpStatus.NO_CONTENT);
+            userService.save(userRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody UserRequest userRequest, @PathVariable long id) {
+    public ResponseEntity<UserDto> update(@Valid @RequestBody UserRequest userRequest, @PathVariable long id) {
         try {
-            return new ResponseEntity<>(userService.update(userRequest, id), HttpStatus.NO_CONTENT);
+            UserDto userDto = UserDto.toDto(userService.update(userRequest, id));
+            return new ResponseEntity<>(userDto,HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
+    public ResponseEntity delete(@PathVariable long id) {
         try {
-            return new ResponseEntity<>(userService.delete(id), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> user) {
-        try {
-            String message = userService.applyPartialUpdate(id, user);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
+            userService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -105,7 +99,7 @@ public class UserController {
         }
     }
     @PatchMapping("/change")
-    public ResponseEntity<BooleanRequest> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+    public ResponseEntity<BooleanRequest> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
         try {
             return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.OK);
         } catch (Exception e) {
@@ -113,7 +107,7 @@ public class UserController {
         }
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthenticateRequest authenticateRequest) {
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest) {
         boolean isAuthenticated = userService.authenticate(authenticateRequest);
 
         if (!isAuthenticated) {
@@ -124,8 +118,8 @@ public class UserController {
     }
 
     @PostMapping("is-manager")
-    public ResponseEntity<UserDto> isManager(@RequestBody PasswordResetRequest email){
-        User user = userService.findByEmail(email.getEmail());
+    public ResponseEntity<UserDto> isManager(@Valid @RequestBody PasswordResetRequest email){
+        User user = userService.findByEmail(email.email());
         if (user.getPermission() == Permission.Manager){
             return ResponseEntity.ok(UserDto.toDto(user));
         }

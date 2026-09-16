@@ -4,6 +4,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.QuotaDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Quota;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,9 +51,10 @@ public class QuotaController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody QuotaRequest quotaRequest) {
+    public ResponseEntity save(@Valid @RequestBody QuotaRequest quotaRequest) {
         try {
-            return new ResponseEntity<>(quotaService.save(quotaRequest), HttpStatus.NO_CONTENT);
+            quotaService.save(quotaRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -61,9 +63,10 @@ public class QuotaController {
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
+    public ResponseEntity<String> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
         try {
-            return new ResponseEntity<>(quotaService.update(quotaRequest, id),HttpStatus.NO_CONTENT);
+            QuotaDto quotaDto = quotaService.toDto(quotaService.update(quotaRequest, id));
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -72,9 +75,10 @@ public class QuotaController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
+    public ResponseEntity delete(@PathVariable long id) {
         try {
-            return new ResponseEntity<>(quotaService.delete(id), HttpStatus.NO_CONTENT);
+            quotaService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
         } catch (Exception err) {
@@ -82,17 +86,7 @@ public class QuotaController {
         }
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> quota) {
-        try {
-            String message = quotaService.applyPartialUpdate(id, quota);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-        } catch (ResponseStatusException err) {
-            return ResponseEntity.status(err.getStatusCode()).body(err.getReason());
-        } catch (Exception err) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<QuotaDto>> findAllActive() {

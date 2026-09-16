@@ -1,9 +1,11 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.ReservationDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,41 +43,39 @@ public class ReservationController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody ReservationRequest reservationRequest) {
+    public ResponseEntity<String> save(@Valid @RequestBody ReservationRequest reservationRequest) {
         try {
-            return new ResponseEntity<>(reservationService.save(reservationRequest), HttpStatus.NO_CONTENT);
+            BooleanRequest booleanRequest = reservationService.save(reservationRequest);
+            if (booleanRequest.bool()){
+
+                return new ResponseEntity<>(booleanRequest.message(), HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(booleanRequest.message(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
+    public ResponseEntity<ReservationDto> update(@Valid @RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
         try {
-            return new ResponseEntity<>(reservationService.update(reservationRequest, id), HttpStatus.NO_CONTENT);
+            ReservationDto reservationDto = ReservationDto.toDto(reservationService.update(reservationRequest, id));
+            return new ResponseEntity<>(reservationDto,HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
+    public ResponseEntity delete(@PathVariable long id) {
         try {
-            return new ResponseEntity<>(reservationService.delete(id),HttpStatus.NO_CONTENT);
+            reservationService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> reservation) {
-        try {
-            String message = reservationService.applyPartialUpdate(id, reservation);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<ReservationDto>> findAllActive() {

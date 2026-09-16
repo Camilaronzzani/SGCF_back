@@ -5,6 +5,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.Tou
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.TourDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.TourService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,18 +44,20 @@ public class TourController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody TourRequest tourRequest){
+    public ResponseEntity save(@Valid @RequestBody TourRequest tourRequest){
         try {
-            return new ResponseEntity<>(tourService.save(tourRequest), HttpStatus.NO_CONTENT);
+            tourService.save(tourRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody TourRequest tourRequest, @PathVariable long id){
+    public ResponseEntity<TourDto> update(@Valid @RequestBody TourRequest tourRequest, @PathVariable long id){
         try {
-            return new ResponseEntity<>(tourService.update(tourRequest , id),HttpStatus.NO_CONTENT);
+            TourDto tourDto = TourDto.toDto(tourService.update(tourRequest , id));
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             throw err;
         } catch (Exception err) {
@@ -63,23 +66,12 @@ public class TourController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id){
+    public ResponseEntity delete(@PathVariable long id){
         try {
-            return new ResponseEntity<>(tourService.delete(id), HttpStatus.NO_CONTENT);
+            tourService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ResponseStatusException err) {
             throw err;
-        } catch (Exception err) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> tour){
-        try {
-
-            String message = tourService.applyPartialUpdate(id , tour);
-            return new ResponseEntity<>(message,HttpStatus.NO_CONTENT);
-
         } catch (Exception err) {
             return ResponseEntity.badRequest().build();
         }

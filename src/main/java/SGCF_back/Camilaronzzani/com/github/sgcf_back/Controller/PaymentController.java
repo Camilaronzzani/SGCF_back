@@ -4,6 +4,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.PaymentDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PaymentRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,41 +42,35 @@ public class PaymentController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity save(@Valid @RequestBody PaymentRequest paymentRequest) {
         try {
-            return new ResponseEntity<>(paymentService.save(paymentRequest), HttpStatus.NO_CONTENT);
+            paymentService.save(paymentRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody PaymentRequest paymentRequest, @PathVariable long id) {
+    public ResponseEntity<PaymentDto> update(@Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long id) {
         try {
-            return new ResponseEntity<>(paymentService.update(paymentRequest, id), HttpStatus.NO_CONTENT);
+            PaymentDto paymentDto = PaymentDto.toDto(paymentService.update(paymentRequest, id));
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
+    public ResponseEntity delete(@PathVariable long id) {
         try {
-            return new ResponseEntity<>(paymentService.delete(id), HttpStatus.NO_CONTENT);
+            paymentService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> payment) {
-        try {
-            String message = paymentService.applyPartialUpdate(id, payment);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<PaymentDto>> findAllActive() {

@@ -1,24 +1,38 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Payment;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Getter
-@Setter
-public class PaymentRequest {
+
+public record PaymentRequest (
 
     @NotEmpty
     @NotBlank
-    private Long customerId;
+     Long customerId,
 
     @NotEmpty
     @NotBlank
-    private Status status;
+     Status status,
 
     @NotEmpty
     @NotBlank
-    private double totalAccount;
+     double totalAccount
+){
+    @Autowired
+    private static PaymentService paymentService;
+
+    public static Payment toPayment(PaymentRequest paymentRequest) {
+        Payment payment = new Payment();
+        payment.setCustomer(paymentService.findCustomer(paymentRequest.customerId()));
+        payment.setTotalAccount(paymentRequest.totalAccount());
+        payment.setStatus(paymentRequest.status() == null
+                ? Status.Pending
+                : paymentRequest.status());
+        payment.setActive(true);
+        return payment;
+    }
 }

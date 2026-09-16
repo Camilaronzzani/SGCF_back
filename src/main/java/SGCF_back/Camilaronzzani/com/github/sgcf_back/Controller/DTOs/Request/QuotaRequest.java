@@ -1,29 +1,58 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Quota;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-public class QuotaRequest {
+
+public record QuotaRequest (
 
     @NotEmpty
     @NotBlank
-    private LocalDate startDate;
+    LocalDate startDate,
 
     @NotEmpty
     @NotBlank
-    private LocalDate endDate;
+     LocalDate endDate,
 
     @NotEmpty
     @NotBlank
-    private double targetValue;
+     double targetValue,
 
     @NotEmpty
     @NotBlank
-    private Long employeeId;
+     Long employeeId
+){
+    @Autowired
+    private static QuotaService quotaService;
+
+    public static Quota toQuota(QuotaRequest quotaRequest) {
+        Quota quota = new Quota();
+        quota.setStartDate(quotaRequest.startDate());
+        quota.setEndDate(quotaRequest.endDate());
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(quotaRequest.employeeId() == null
+                ? null
+                : quotaService.findEmployee(quotaRequest.employeeId()));
+        quota.setActive(true);
+        return quota;
+    }
+
+    public static Quota toEmployeeQuota(QuotaRequest quotaRequest) {
+        Employee employee = quotaService.findEmployee(quotaRequest.employeeId());
+        LocalDate startDate = LocalDate.now();
+        Quota quota = new Quota();
+        quota.setStartDate(startDate);
+        quota.setEndDate(startDate.plusDays(30));
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(employee);
+        quota.setActive(true);
+        return quota;
+    }
 }

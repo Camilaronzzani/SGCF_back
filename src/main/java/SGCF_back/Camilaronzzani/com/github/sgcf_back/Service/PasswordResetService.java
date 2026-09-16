@@ -34,17 +34,17 @@ public class PasswordResetService {
         try {
             String code = GenerateCode.generateCode();
 
-            log.info("[{}]",passwordResetRequest.getEmail());
+            log.info("[{}]",passwordResetRequest.email());
 
             PasswordReset passwordReset = toPasswordReset(passwordResetRequest);
             passwordReset.setToken(code);
 
-            emailService.sendEmail(passwordResetRequest.getEmail(), code);
+            emailService.sendEmail(passwordResetRequest.email(), code);
 
             passwordResetRepository.save(passwordReset);
 
             log.info("Request Password does successfully");
-            return "Email enviado com sucesso ao email: " + passwordResetRequest.getEmail() ;
+            return "Email enviado com sucesso ao email: " + passwordResetRequest.email() ;
 
         } catch (Exception e) {
             log.error("Erro in PasswordResetService.requestPasswordReset" , e);
@@ -57,7 +57,7 @@ public class PasswordResetService {
             PasswordReset passwordReset = new PasswordReset();
             passwordReset.setExpiration(LocalDateTime.now().plusMinutes(10));
 
-            User user = userRepository.findByEmail(passwordResetRequest.getEmail()).orElseThrow(()
+            User user = userRepository.findByEmail(passwordResetRequest.email()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
             passwordReset.setUser(user);
             return passwordReset;
@@ -70,23 +70,26 @@ public class PasswordResetService {
 
     public BooleanRequest compareToken(TokenRequest tokenRequest) {
         try {
-            BooleanRequest booleanRequest = new BooleanRequest();
+            String message = "";
 
-            User user = userRepository.findByEmail(tokenRequest.getEmail()).orElseThrow(()
+
+            User user = userRepository.findByEmail(tokenRequest.email()).orElseThrow(()
                     ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
 
             PasswordReset passwordReset = passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(user.getId())
                     .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found") );
 
-            if (!passwordReset.getToken().equals(tokenRequest.getToken())){
-                booleanRequest.setMessage("Token incorreto");
+            if (!passwordReset.getToken().equals(tokenRequest.token())){
+               message = "Token incorreto";
             }else if (!passwordReset.getExpiration().isAfter(LocalDateTime.now())){
-                booleanRequest.setMessage("Tempo expirado");
+               message = "Tempo expirado" ;
             }
 
-            booleanRequest.setBool(passwordReset.getToken().equals(tokenRequest.getToken().trim()) && passwordReset.getExpiration().isAfter(LocalDateTime.now()));
-            log.info("Validação do token para {}: {}", tokenRequest.getEmail(), booleanRequest.getBool());
-            return booleanRequest;
+            boolean  boo= (passwordReset.getToken().equals(tokenRequest.token().trim()) && passwordReset.getExpiration().isAfter(LocalDateTime.now()));
+            log.info("Validação do token para {}: {}", tokenRequest.email(), boo);
+
+            BooleanRequest booleanRequest = new BooleanRequest(boo, message);
+            return  booleanRequest;
 
         } catch (Exception e) {
             log.error("Erro in PasswordResetService.compareToken" , e);

@@ -1,16 +1,13 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthenticatedUserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ChangePasswordRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
-import jakarta.validation.constraints.Email;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
-import java.util.Map;
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest.toUser;
 
 @Slf4j
 @Service
@@ -59,10 +55,10 @@ public class UserService {
         }
     }
 
-    public String save(UserRequest userRequest) {
+    public void save(UserRequest userRequest) {
         try {
             User user = toUser(userRequest);
-            Employee employee = employeeRepository.findById(userRequest.getEmployeeId()).orElseThrow(()
+            Employee employee = employeeRepository.findById(userRequest.employeeId()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
 
             user.setEmployee(employee);
@@ -70,7 +66,6 @@ public class UserService {
             userRepository.save(user);
 
             log.info("User {} saved successfully", user.getUserName());
-            return "User: " + user.getUserName() + " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in UserService.save", e);
@@ -78,36 +73,28 @@ public class UserService {
         }
     }
 
-    public User toUser(UserRequest userRequest) {
-        User user = new User();
-        user.setUserName(userRequest.getUserName());
-        user.setUserPassword(userRequest.getUserPassword());
-        user.setPermission(userRequest.getPermission());
-        user.setEmail(userRequest.getEmail());
-        user.setActive(true);
-        return user;
-    }
+
 
     public User changeDataByUser(long id, UserRequest newUser) {
 
         User userOld = userRepository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
 
-        userOld.setUserName(newUser.getUserName());
-        userOld.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
-        userOld.setPermission(newUser.getPermission());
-        userOld.setEmail(newUser.getEmail());
+        userOld.setUserName(newUser.userName());
+        userOld.setUserPassword(passwordEncoder.encode(newUser.userPassword()));
+        userOld.setPermission(newUser.permission());
+        userOld.setEmail(newUser.email());
 
         return userOld;
     }
 
     @Transactional
-    public String update(UserRequest userRequest, long id) {
+    public User update(UserRequest userRequest, long id) {
         try {
             User user = changeDataByUser(id, userRequest);
 
             log.info("User {} updated successfully", user.getUserName());
-            return "User: " + user.getUserName() + " updated successfully ";
+            return user;
         } catch (Exception e) {
             log.error("Error in UserService.update", e);
             throw new RuntimeException(e);
@@ -115,35 +102,15 @@ public class UserService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
             User user = userRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
             user.setActive(false);
 
             log.info("User {} deactivated successfully", user.getUserName());
-            return "User: " + user.getUserName() + " deactivated successfully ";
         } catch (Exception e) {
             log.error("Error in UserService.delete", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    //delete
-    public String applyPartialUpdate(long id, Map<String, Object> user) {
-        try {
-            User user1 = userRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
-            user.forEach((key, value) -> {
-                switch (key) {
-                    case "userName" -> user1.setUserName(value.toString());
-                    case "permission" -> user1.setPermission(Permission.valueOf(value.toString()));
-                    case "email" -> user1.setEmail(value.toString());
-                }
-            });
-            userRepository.save(user1);
-            return "User: " + user1.getUserName() + " updated successfully ";
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -174,23 +141,24 @@ public class UserService {
     @Transactional
     public BooleanRequest changePassword(ChangePasswordRequest changePasswordRequest) {
         try {
+            boolean boo;
+            String message = "";
 
-            BooleanRequest booleanRequest = new BooleanRequest();
 
-            User user = userRepository.findByEmail(changePasswordRequest.getEmail()).orElseThrow(()
+            User user = userRepository.findByEmail(changePasswordRequest.email()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
 
-            if (passwordEncoder.matches(user.getUserPassword(), changePasswordRequest.getPassword())){
-                booleanRequest.setBool(false);
-                booleanRequest.setMessage("erro com a senha");
+            if (passwordEncoder.matches(user.getUserPassword(), changePasswordRequest.password())){
+                boo = false;
+                message = "erro com a senha";
             }else {
-                user.setUserPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
-                booleanRequest.setBool(true);
-                booleanRequest.setMessage("Senha redefinida com sucesso");
+                user.setUserPassword(passwordEncoder.encode(changePasswordRequest.password()));
+                boo = true;
+               message = "Senha redefinida com sucesso";
             }
 
             log.info("Password change successful ");
-            return booleanRequest;
+            return new BooleanRequest(boo , message);
 
         } catch (Exception e) {
             log.error("Error in UserService.changePassword", e);
@@ -202,10 +170,10 @@ public class UserService {
     public Boolean authenticate(AuthenticateRequest authenticateRequest) {
         try {
 
-            User user = userRepository.findByEmail(authenticateRequest.getEmail()).orElseThrow(()
+            User user = userRepository.findByEmail(authenticateRequest.email()).orElseThrow(()
                     ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
             log.info("authenticating user");
-            boolean boo = passwordEncoder.matches(authenticateRequest.getPassword(), user.getUserPassword());
+            boolean boo = passwordEncoder.matches(authenticateRequest.password(), user.getUserPassword());
             return boo;
         } catch (Exception e) {
             log.error("Error in UserService.authenticate", e);
