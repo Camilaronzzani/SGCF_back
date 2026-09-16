@@ -4,9 +4,10 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Reservation;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record ReservationDto(Long id, LocalDate date, TourDto tour, CustomerDto customer,
-                             EmployeDto employee, double value, Status status) {
+                             EmployeDto employee, double value, Status status, List<CustomerDto>customerNotPaying) {
     public static ReservationDto toDto(Reservation reservation) {
         return new ReservationDto(
                 reservation.getId(),
@@ -15,7 +16,8 @@ public record ReservationDto(Long id, LocalDate date, TourDto tour, CustomerDto 
                 reservation.getCustomer() == null ? null : CustomerDto.toDto(reservation.getCustomer()),
                 reservation.getEmployee() == null ? null : EmployeDto.toDto(reservation.getEmployee()),
                 reservation.getValue(),
-                reservation.getStatus()
+                reservation.getStatus(),
+                reservation.getCustomersNotPaying().stream().map(CustomerDto ::toDto).toList()
         );
     }
 }

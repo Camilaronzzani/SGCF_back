@@ -1,7 +1,6 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.ReservationDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
@@ -20,12 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest.toReservation;
+
 
 @Slf4j
 @Service
@@ -158,7 +154,7 @@ public class ReservationService {
         }
     }
 
-    public Tour findTour(Long tourId) {
+    private Tour findTour(Long tourId) {
         if (tourId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tour Id is required");
         }
@@ -168,7 +164,7 @@ public class ReservationService {
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
     }
 
-    public Customer findCustomer(Long customerId) {
+    private Customer findCustomer(Long customerId) {
         if (customerId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "customerId is required");
         }
@@ -178,12 +174,27 @@ public class ReservationService {
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer no find"));
     }
 
-    public Employee findEmployee(Long employeeId) {
+    private Employee findEmployee(Long employeeId) {
         if (employeeId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required");
         }
         log.info("Fetches employee");
         return employeeRepository.findById(employeeId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+    }
+    public  Reservation toReservation(ReservationRequest reservationRequest) {
+
+        Reservation reservation = new Reservation();
+        reservation.setDate(reservationRequest.date());
+        reservation.setTour(findTour(reservationRequest.tourId()));
+        reservation.setCustomer(findCustomer(reservationRequest.customerId()));
+        reservation.setEmployee(findEmployee(reservationRequest.employeeId()));
+        reservation.setValue(reservationRequest.value());
+        reservation.setStatus(reservationRequest.status() == null
+                ? Status.Pending
+                : reservationRequest.status());
+        reservation.setCustomersNotPaying(reservationRequest.customerNotPaying().stream().map(this::findCustomer).toList());
+        reservation.setActive(true);
+        return reservation;
     }
 }

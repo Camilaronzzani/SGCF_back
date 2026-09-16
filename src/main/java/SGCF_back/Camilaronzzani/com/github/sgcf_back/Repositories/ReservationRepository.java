@@ -12,11 +12,9 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findByActiveTrue();
 
-    long countByTour_IdAndActiveTrue(Long tourId);
 
     List<Reservation> findByCustomerId(Long customerId);
 
-    List<Reservation> findByEmployeeId(Long employeeId);
 
     long countByEmployeeIdAndActiveTrue(Long employeeId);
 
