@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -193,7 +194,9 @@ public class ReservationService {
         reservation.setStatus(reservationRequest.status() == null
                 ? Status.Pending
                 : reservationRequest.status());
-        reservation.setCustomersNotPaying(reservationRequest.customerNotPaying().stream().map(this::findCustomer).toList());
+        reservation.setCustomersNotPaying(reservationRequest.customerNotPaying() == null
+                ? new ArrayList<>()
+                : reservationRequest.customerNotPaying().stream().map(this::findCustomer).toList());
         reservation.setActive(true);
         return reservation;
     }

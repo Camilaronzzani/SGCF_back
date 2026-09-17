@@ -21,6 +21,7 @@ public class PaymentController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<PaymentDto>> findAll() {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<PaymentDto> paymentDtos = paymentService.findAll().
                     stream()
@@ -34,6 +35,7 @@ public class PaymentController {
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<PaymentDto> findById(@PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             return ResponseEntity.ok(PaymentDto.toDto(paymentService.findById(id)));
         } catch (Exception e) {
@@ -43,6 +45,7 @@ public class PaymentController {
 
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody PaymentRequest paymentRequest) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             paymentService.save(paymentRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -51,11 +54,12 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<PaymentDto> update(@Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             PaymentDto paymentDto = PaymentDto.toDto(paymentService.update(paymentRequest, id));
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.ok(paymentDto);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -63,6 +67,7 @@ public class PaymentController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             paymentService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -74,6 +79,7 @@ public class PaymentController {
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<PaymentDto>> findAllActive() {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<PaymentDto> paymentDtos = paymentService.findAllActive()
                     .stream()
@@ -87,6 +93,7 @@ public class PaymentController {
 
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<PaymentDto>> findByCustomer(@PathVariable long customerId) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<PaymentDto> paymentDtos = paymentService.findByCustomer(customerId)
                     .stream()
@@ -100,6 +107,7 @@ public class PaymentController {
 
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<PaymentDto>> findByStatus(@PathVariable Status status) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<PaymentDto> paymentDtos = paymentService.findByStatus(status)
                     .stream()

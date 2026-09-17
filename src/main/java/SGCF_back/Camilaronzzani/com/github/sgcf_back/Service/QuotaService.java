@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
-import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest.toEmployeeQuota;
-import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest.toQuota;
 
 @Slf4j
 @Service
@@ -236,5 +234,29 @@ public class QuotaService {
         }
         return employeeRepository.findById(employeeId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+    }
+
+    public Quota toQuota(QuotaRequest quotaRequest) {
+        Quota quota = new Quota();
+        quota.setStartDate(quotaRequest.startDate());
+        quota.setEndDate(quotaRequest.endDate());
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(quotaRequest.employeeId() == null  ? null
+                : findEmployee(quotaRequest.employeeId()));
+        quota.setActive(true);
+        return quota;
+    }
+
+    public Quota toEmployeeQuota(QuotaRequest quotaRequest) {
+        Employee employee = findEmployee(quotaRequest.employeeId());
+        LocalDate startDate = LocalDate.now();
+
+        Quota quota = new Quota();
+        quota.setStartDate(startDate);
+        quota.setEndDate(startDate.plusDays(30));
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(employee);
+        quota.setActive(true);
+        return quota;
     }
 }

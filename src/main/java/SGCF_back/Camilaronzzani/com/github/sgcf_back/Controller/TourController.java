@@ -25,6 +25,7 @@ public class TourController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Tour>> findAll(){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             return ResponseEntity.ok(tourService.findAll());
         } catch (Exception err) {
@@ -32,19 +33,15 @@ public class TourController {
         }
     }
 
+    // EXEMPLO ControllerAdvice: sem try/catch o erro sobe e o ApiExceptionHandler responde o status certo
     @GetMapping("/findId/{id}")
     public ResponseEntity<TourDto> findById(@PathVariable long id){
-        try {
-            return ResponseEntity.ok(toDto(tourService.findById(id)));
-        } catch (ResponseStatusException err) {
-            throw err;
-        } catch (Exception err) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(toDto(tourService.findById(id)));
     }
 
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody TourRequest tourRequest){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             tourService.save(tourRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -53,8 +50,9 @@ public class TourController {
         }
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<TourDto> update(@Valid @RequestBody TourRequest tourRequest, @PathVariable long id){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             TourDto tourDto = TourDto.toDto(tourService.update(tourRequest , id));
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -67,6 +65,7 @@ public class TourController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             tourService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -79,6 +78,7 @@ public class TourController {
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<TourDto>> findAllActive (){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<TourDto> tourDtos = tourService.findAllActive()
                     .stream()

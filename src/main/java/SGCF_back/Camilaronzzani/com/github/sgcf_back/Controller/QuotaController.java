@@ -23,6 +23,7 @@ public class QuotaController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<QuotaDto>> findAll() {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<Quota> quotaList = quotaService.findAll();
             List<QuotaDto> quotaDtos = new ArrayList<>();
@@ -41,6 +42,7 @@ public class QuotaController {
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<QuotaDto> findById(@PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             return ResponseEntity.ok(quotaService.toDto(quotaService.findById(id)));
         } catch (ResponseStatusException err) {
@@ -52,6 +54,7 @@ public class QuotaController {
 
     @PostMapping("/save")
     public ResponseEntity save(@Valid @RequestBody QuotaRequest quotaRequest) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             quotaService.save(quotaRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -62,8 +65,9 @@ public class QuotaController {
         }
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<String> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             QuotaDto quotaDto = quotaService.toDto(quotaService.update(quotaRequest, id));
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -76,6 +80,7 @@ public class QuotaController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             quotaService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -90,6 +95,7 @@ public class QuotaController {
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<QuotaDto>> findAllActive() {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
 
             List<Quota> quotaList = quotaService.findAllActive();
@@ -108,6 +114,7 @@ public class QuotaController {
 
     @GetMapping("/findByEmployee/{employeeId}")
     public ResponseEntity<List<QuotaDto>> findByEmployee(@PathVariable long employeeId) {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<Quota> quotaList =quotaService.findByEmployee(employeeId);
             List<QuotaDto> quotaDtos = new ArrayList<>();
@@ -125,6 +132,7 @@ public class QuotaController {
 
     @GetMapping("/findAll/company")
     public ResponseEntity<List<QuotaDto>> findAllCompany() {
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             List<Quota> quotaList =quotaService.findAllCompany();
             List<QuotaDto> quotaDtos = new ArrayList<>();

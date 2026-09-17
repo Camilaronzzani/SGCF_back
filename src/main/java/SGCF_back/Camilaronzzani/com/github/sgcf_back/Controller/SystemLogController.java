@@ -65,7 +65,7 @@ public class SystemLogController {
     public ResponseEntity<String> deleteAll(HttpSession session) {
         try {
             requireManager(session);
-            return new ResponseEntity<>(systemLogService.deleteAll(), HttpStatus.NO_CONTENT);
+            return ResponseEntity.ok(systemLogService.deleteAll());
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch (Exception e) {

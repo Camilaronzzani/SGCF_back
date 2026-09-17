@@ -18,6 +18,7 @@ public class PasswordResetController {
 
     @PostMapping("/request")
     public ResponseEntity<String> requestPasswordReset(@Valid @RequestBody PasswordResetRequest passwordResetRequest){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
             String mensagem = passwordResetService.requestPasswordReset(passwordResetRequest);
             String jsonResponse = "{\"message\": \"" + mensagem + "\"}";
@@ -28,6 +29,7 @@ public class PasswordResetController {
     }
     @PostMapping("/compareToken")
     public ResponseEntity<BooleanRequest> compareToken(@Valid @RequestBody TokenRequest tokenRequest){
+        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
         try {
 
             return ResponseEntity.ok(passwordResetService.compareToken(tokenRequest));
