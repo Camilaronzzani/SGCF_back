@@ -44,7 +44,7 @@ public class Customer {
     @Column(name = "user_email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @ManyToMany(mappedBy = "customer" )
+    @OneToMany(mappedBy = "customer")
     private List<Reservation> reservations = new ArrayList<>() ;
 
     @Column(name = "Active")
