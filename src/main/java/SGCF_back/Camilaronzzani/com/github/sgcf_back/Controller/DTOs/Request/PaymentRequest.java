@@ -5,21 +5,18 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Payment;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
 public record PaymentRequest (
 
-    @NotEmpty
-    @NotBlank
+    @Positive
      Long customerId,
 
-    @NotEmpty
-    @NotBlank
      Status status,
 
-    @NotEmpty
-    @NotBlank
+    @Positive
      double totalAccount
 ){
     @Autowired

@@ -25,7 +25,7 @@ public record CustomerRequest (
 
     List<Language> languageSpeak ,
 
-    @NotBlank
+
      CountryCustomer countryCustomer ,
 
     @NotBlank(message = "can't be blank")

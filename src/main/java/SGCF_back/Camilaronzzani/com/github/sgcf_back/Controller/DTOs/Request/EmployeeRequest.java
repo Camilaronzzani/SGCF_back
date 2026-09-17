@@ -19,11 +19,10 @@ public record EmployeeRequest (
     @NotBlank
      String name,
 
-    @NotBlank
+    
     @NotEmpty
      List<Language> languagesSpoken ,
 
-    @NotBlank
      LocalDate dayOfBirth
 ){
     public static Employee toEmployee(EmployeeRequest employeeRequest){

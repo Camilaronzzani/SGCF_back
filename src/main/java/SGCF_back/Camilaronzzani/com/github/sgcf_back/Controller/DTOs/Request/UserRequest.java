@@ -5,6 +5,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 
 public record UserRequest (
 
@@ -16,17 +17,14 @@ public record UserRequest (
     @NotBlank
      String userPassword,
 
-    @NotEmpty
-    @NotBlank
+
      Permission permission,
 
     @NotEmpty
-    @NotBlank
     @Email
      String email,
 
-    @NotEmpty
-    @NotBlank
+    @Positive
      Long employeeId
 ){
     public static User toUser(UserRequest userRequest) {

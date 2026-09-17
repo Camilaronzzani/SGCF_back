@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 public record PasswordResetRequest (
-    @NotBlank
-    @NotEmpty
+
     @Email
      String email
 ){}

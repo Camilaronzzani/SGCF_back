@@ -6,6 +6,8 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.QuotaService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
@@ -13,20 +15,14 @@ import java.time.LocalDate;
 
 public record QuotaRequest (
 
-    @NotEmpty
-    @NotBlank
     LocalDate startDate,
 
-    @NotEmpty
-    @NotBlank
      LocalDate endDate,
 
-    @NotEmpty
-    @NotBlank
+    @Positive
      double targetValue,
 
-    @NotEmpty
-    @NotBlank
+    @Positive
      Long employeeId
 ){
     @Autowired
