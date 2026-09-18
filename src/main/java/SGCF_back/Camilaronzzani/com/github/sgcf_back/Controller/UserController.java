@@ -10,6 +10,7 @@ import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -115,12 +116,18 @@ public class UserController {
         }
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest) {
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest,
+                                                     HttpSession session) {
         boolean isAuthenticated = userService.authenticate(authenticateRequest);
 
         if (!isAuthenticated) {
             return new ResponseEntity<>(new AuthResponse(false), HttpStatus.UNAUTHORIZED);
         }
+
+        User user = userService.findByEmail(authenticateRequest.email());
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("permission", user.getPermission());
+        session.setAttribute("employeeId", user.getEmployee() == null ? null : user.getEmployee().getId());
 
         return ResponseEntity.ok(new AuthResponse(true));
     }
