@@ -58,6 +58,7 @@ public class TourService {
         }
     }
 
+    @Transactional
     public void save(TourRequest tourRequest) {
         try {
             Tour tour = toTour(tourRequest);
@@ -124,6 +125,4 @@ public class TourService {
             throw new RuntimeException(e);
         }
     }
-
-
 }

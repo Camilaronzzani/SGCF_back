@@ -61,17 +61,13 @@ public class ReservationService {
         }
     }
 
-    public BooleanRequest save(ReservationRequest reservationRequest) {
+    @Transactional
+    public void save(ReservationRequest reservationRequest) {
         try {
             Reservation reservation = toReservation(reservationRequest);
-            reservationRepository.save(reservation);
-            if (reservation.getDate().isBefore(LocalDate.now())){
-                log.warn("the reservations date  can't be before today");
-                return new BooleanRequest(false,"the date is before at today ");
-            }
 
+            calculatePrice(reservation);
             log.info("Reservations for customer {} saved successfully", reservation.getCustomer().getName());
-            return new BooleanRequest(true,"Reservation for customer: " + reservation.getCustomer().getName() + " saved successfully ");
 
         } catch (Exception e) {
             log.error("Error in ReservationService.save" , e);
@@ -99,6 +95,8 @@ public class ReservationService {
     public Reservation update(ReservationRequest reservationRequest, long id) {
         try {
             Reservation reservation = changeDataByReservation(id , reservationRequest);
+
+            calculatePrice(reservation);
 
             log.info("Reservations {} updated successfully ", id);
             return reservation;
@@ -190,7 +188,6 @@ public class ReservationService {
         reservation.setTour(findTour(reservationRequest.tourId()));
         reservation.setCustomer(findCustomer(reservationRequest.customerId()));
         reservation.setEmployee(findEmployee(reservationRequest.employeeId()));
-        reservation.setValue(reservationRequest.value());
         reservation.setStatus(reservationRequest.status() == null
                 ? Status.Pending
                 : reservationRequest.status());
@@ -199,5 +196,12 @@ public class ReservationService {
                 : reservationRequest.customerNotPaying().stream().map(this::findCustomer).toList());
         reservation.setActive(true);
         return reservation;
+    }
+
+    private void calculatePrice(Reservation reservation){
+
+        double price = reservation.getTour().getPrice();
+        int numberCustomer = reservation.getCustomersNotPaying().size();
+        reservation.setValue(price * (numberCustomer + 1));
     }
 }

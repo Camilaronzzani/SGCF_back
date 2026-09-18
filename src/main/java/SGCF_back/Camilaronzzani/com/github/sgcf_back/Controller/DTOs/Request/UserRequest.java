@@ -17,7 +17,6 @@ public record UserRequest (
     @NotBlank
      String userPassword,
 
-
      Permission permission,
 
     @NotEmpty

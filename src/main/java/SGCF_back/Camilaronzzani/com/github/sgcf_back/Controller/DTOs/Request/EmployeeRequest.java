@@ -19,8 +19,6 @@ public record EmployeeRequest (
     @NotBlank
      String name,
 
-    
-    @NotEmpty
      List<Language> languagesSpoken ,
 
      LocalDate dayOfBirth

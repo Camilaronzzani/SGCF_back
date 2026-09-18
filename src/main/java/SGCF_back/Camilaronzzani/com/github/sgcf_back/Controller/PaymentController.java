@@ -3,6 +3,7 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.PaymentDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PaymentRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.CurrencyService;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ import java.util.Map;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private CurrencyService currencyService;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<PaymentDto>> findAll() {
@@ -77,5 +81,11 @@ public class PaymentController {
                     .map(PaymentDto :: toDto)
                     .toList();
             return ResponseEntity.ok(paymentDtos);
-        }
+    }
+
+    @GetMapping("/quotations")
+    public ResponseEntity<Double> getQuotations(){
+        return new ResponseEntity<>(currencyService.getQuotation("USD"), HttpStatus.OK);
+    }
+
     }

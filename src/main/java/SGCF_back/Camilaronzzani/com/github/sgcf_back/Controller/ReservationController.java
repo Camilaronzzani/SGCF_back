@@ -35,13 +35,10 @@ public class ReservationController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@Valid @RequestBody ReservationRequest reservationRequest) {
-            BooleanRequest booleanRequest = reservationService.save(reservationRequest);
-            if (booleanRequest.bool()){
+    public ResponseEntity save(@Valid @RequestBody ReservationRequest reservationRequest) {
+            reservationService.save(reservationRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
 
-                return new ResponseEntity<>(booleanRequest.message(), HttpStatus.CREATED);
-            }
-            return new ResponseEntity<>(booleanRequest.message(), HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/update/{id}")

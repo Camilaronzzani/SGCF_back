@@ -3,7 +3,8 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.CountryTour;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 
 public record TourRequest (
@@ -11,17 +12,17 @@ public record TourRequest (
     @Positive
      double price,
 
-    @NotNull
      CountryTour countryTour,
 
-    @NotNull
     @Positive
      Long kmOftour,
 
+    @NotEmpty
     @NotBlank
       String nameOfTour,
 
-    @NotBlank
+    @NotEmpty
+
       String locations
 ){
     public static Tour toTour(TourRequest tourRequest){

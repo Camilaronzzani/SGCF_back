@@ -42,7 +42,7 @@ public class TourController {
     @PutMapping("/update/{id}")
     public ResponseEntity<TourDto> update(@Valid @RequestBody TourRequest tourRequest, @PathVariable long id){
             TourDto tourDto = TourDto.toDto(tourService.update(tourRequest , id));
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(tourDto,HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/delete/{id}")
