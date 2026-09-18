@@ -23,54 +23,30 @@ public class SystemLogController {
     @GetMapping("/findAll")
     public ResponseEntity<List<SystemLogDto>> findAll(@RequestParam(required = false) String level,
                                                       HttpSession session) {
-        try {
             requireManager(session);
             List<SystemLogDto> systemLogDtos = systemLogService.findAll(level)
                     .stream()
                     .map(SystemLogDto :: toDto)
                     .toList();
             return ResponseEntity.ok(systemLogDtos);
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<SystemLogDto> findById(@PathVariable long id, HttpSession session) {
-        try {
             requireManager(session);
             return ResponseEntity.ok(SystemLogDto.toDto(systemLogService.findById(id)));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Long>> summary(HttpSession session) {
-        try {
             requireManager(session);
             return ResponseEntity.ok(systemLogService.summary());
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @DeleteMapping("/deleteAll")
     public ResponseEntity<String> deleteAll(HttpSession session) {
-        try {
             requireManager(session);
             return ResponseEntity.ok(systemLogService.deleteAll());
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     private void requireManager(HttpSession session) {

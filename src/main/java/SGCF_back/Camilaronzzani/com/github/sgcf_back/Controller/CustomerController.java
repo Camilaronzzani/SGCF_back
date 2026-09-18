@@ -22,74 +22,42 @@ public class CustomerController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<CustomerDto>> findAll(){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<CustomerDto> customerDtoList = customerService.findAll()
                     .stream()
                     .map(CustomerDto :: toDto)
                     .toList();
             return ResponseEntity.ok(customerDtoList);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findById/{id}")
     public ResponseEntity<CustomerDto> findById(@PathVariable long id){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             return ResponseEntity.ok(CustomerDto.toDto(customerService.findById(id)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/save")
     public ResponseEntity  salve(@Valid @RequestBody CustomerRequest customerRequest){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             customerService.save(customerRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<CustomerDto> update(@Valid @RequestBody CustomerRequest customerRequest , @PathVariable long id){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             CustomerDto customerDto = CustomerDto.toDto(customerService.update(customerRequest , id));
             return ResponseEntity.ok(customerDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             customerService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
-
-
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<CustomerDto>> findAllActive (){
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<CustomerDto> customerDtoList = customerService.findAllActive()
                     .stream()
                     .map(CustomerDto :: toDto)
                     .toList();
             return ResponseEntity.ok(customerDtoList);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 }

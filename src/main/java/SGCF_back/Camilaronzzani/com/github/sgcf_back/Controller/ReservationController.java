@@ -22,104 +22,65 @@ public class ReservationController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<ReservationDto>> findAll() {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<ReservationDto> reservationDtos = reservationService.findAll()
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<ReservationDto> findById(@PathVariable long id) {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             return ResponseEntity.ok(ReservationDto.toDto(reservationService.findById(id)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/save")
     public ResponseEntity<String> save(@Valid @RequestBody ReservationRequest reservationRequest) {
-        try {
             BooleanRequest booleanRequest = reservationService.save(reservationRequest);
             if (booleanRequest.bool()){
 
                 return new ResponseEntity<>(booleanRequest.message(), HttpStatus.CREATED);
             }
             return new ResponseEntity<>(booleanRequest.message(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ReservationDto> update(@Valid @RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             ReservationDto reservationDto = ReservationDto.toDto(reservationService.update(reservationRequest, id));
             return ResponseEntity.ok(reservationDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id) {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             reservationService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<ReservationDto>> findAllActive() {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<ReservationDto> reservationDtos = reservationService.findAllActive()
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<ReservationDto>> findByCustomer(@PathVariable long customerId) {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<ReservationDto> reservationDtos = reservationService.findByCustomer(customerId)
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<ReservationDto>> findByStatus(@PathVariable Status status) {
-        // mudar aqui: tirar o try/catch, o ApiExceptionHandler ja trata (exemplo em TourController.findById)
-        try {
             List<ReservationDto> reservationDtos = reservationService.findByStatus(status)
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 }
