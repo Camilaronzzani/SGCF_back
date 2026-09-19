@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +42,14 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = Status.Pending;
+
+    @ManyToMany
+    @JoinTable(
+            name = "reservations_customer",
+            joinColumns = @JoinColumn(name = "reservations_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    private List<Customer> customersNotPaying = new ArrayList<>();
 
     @Column(name = "Active")
     private boolean active;

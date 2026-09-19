@@ -1,24 +1,17 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Positive;
 
-@Getter
-@Setter
-public class PaymentRequest {
 
-    @NotEmpty
-    @NotBlank
-    private Long customerId;
+public record PaymentRequest (
 
-    @NotEmpty
-    @NotBlank
-    private Status status;
+    @Positive
+     Long customerId,
 
-    @NotEmpty
-    @NotBlank
-    private double totalAccount;
+     Status status,
+
+    @Positive
+     double totalAccount
+){
 }

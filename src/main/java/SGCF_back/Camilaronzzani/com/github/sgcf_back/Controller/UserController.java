@@ -1,10 +1,17 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.AuthResponse;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ChangePasswordRequest;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PasswordResetRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.UserDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,99 +28,76 @@ public class UserController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
-        try {
             List<UserDto> userDtos = userService.findAll()
                     .stream()
                     .map(UserDto :: toDto)
                     .toList();
             return ResponseEntity.ok(userDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable long id) {
-        try {
             return ResponseEntity.ok(UserDto.toDto(userService.findById(id)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody UserRequest userRequest) {
-        try {
-            return new ResponseEntity<>(userService.save(userRequest), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<String> save(@Valid @RequestBody UserRequest userRequest) {
+            userService.save(userRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody UserRequest userRequest, @PathVariable long id) {
-        try {
-            return new ResponseEntity<>(userService.update(userRequest, id), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UserDto> update(@Valid @RequestBody UserRequest userRequest, @PathVariable long id) {
+            UserDto userDto = UserDto.toDto(userService.update(userRequest, id));
+            return ResponseEntity.ok(userDto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        try {
-            return new ResponseEntity<>(userService.delete(id), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> user) {
-        try {
-            String message = userService.applyPartialUpdate(id, user);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity delete(@PathVariable long id) {
+            userService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<UserDto>> findAllActive() {
-        try {
             List<UserDto> userDtos = userService.findAllActive()
                     .stream()
                     .map(UserDto ::toDto)
                     .toList();
             return ResponseEntity.ok(userDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findByUserName/{userName}")
     public ResponseEntity<UserDto> findByUserName(@PathVariable String userName) {
-        try {
             return ResponseEntity.ok(UserDto.toDto(userService.findByUserName(userName)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
     @PatchMapping("/change")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
-        try {
-            return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<BooleanRequest> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
+            return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.OK);
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<Boolean> authenticate(@RequestBody AuthenticateRequest authenticateRequest) {
-
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest,
+                                                     HttpSession session) {
         boolean isAuthenticated = userService.authenticate(authenticateRequest);
+
         if (!isAuthenticated) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+            return new ResponseEntity<>(new AuthResponse(false), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+
+        User user = userService.findByEmail(authenticateRequest.email());
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("permission", user.getPermission());
+        session.setAttribute("employeeId", user.getEmployee() == null ? null : user.getEmployee().getId());
+
+        return ResponseEntity.ok(new AuthResponse(true));
+    }
+
+    @PostMapping("is-manager")
+    public ResponseEntity<UserDto> isManager(@Valid @RequestBody PasswordResetRequest email){
+        User user = userService.findByEmail(email.email());
+        if (user.getPermission() == Permission.Manager){
+            return ResponseEntity.ok(UserDto.toDto(user));
+        }
+        return new ResponseEntity<>(UserDto.toDto(user), HttpStatus.UNAUTHORIZED);
     }
 }

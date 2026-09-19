@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.EmployeeRequest.toEmployee;
+
 @Slf4j
 @Service
 public class EmployeeService {
@@ -54,50 +56,41 @@ public class EmployeeService {
         }
     }
 
-    public String save(EmployeeRequest employeeRequest) {
+    public void save(EmployeeRequest employeeRequest) {
         try {
             Employee employee = toEmployee(employeeRequest);
             employeeRepository.save(employee);
 
             log.info("Employee {} saved successfully" , employee.getName());
-            return "Employee: " + employee.getName()+ " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in employeeService.findById" , e );
             throw new RuntimeException(e);
         }
     }
-    public Employee toEmployee(EmployeeRequest employeeRequest){
-        Employee employee = new Employee();
-        employee.setLanguagesSpoken(employeeRequest.getLanguagesSpoken());
-        employee.setCpf(employeeRequest.getCpf());
-        employee.setName(employeeRequest.getName());
-        employee.setDayOfBirth(employeeRequest.getDayOfBirth());
-        employee.setActive(true);
-        return employee;
-    }
+
 
     public Employee changeDataByEmpoloyee(long id, EmployeeRequest newEmployee){
 
         Employee employeeOld = employeeRepository.findById(id).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
 
-        employeeOld.setCpf(newEmployee.getCpf());
-        employeeOld.setName(newEmployee.getName());
-        employeeOld.setDayOfBirth(newEmployee.getDayOfBirth());
-        employeeOld.setLanguagesSpoken(newEmployee.getLanguagesSpoken());
+        employeeOld.setCpf(newEmployee.cpf());
+        employeeOld.setName(newEmployee.name());
+        employeeOld.setDayOfBirth(newEmployee.dayOfBirth());
+        employeeOld.setLanguagesSpoken(newEmployee.languagesSpoken());
 
         return employeeOld;
 
     }
 
     @Transactional
-    public String update(EmployeeRequest employeeRequest, long id) {
+    public Employee update(EmployeeRequest employeeRequest, long id) {
         try {
             Employee employee = changeDataByEmpoloyee(id , employeeRequest);
 
             log.info("Employee {} updated successfully" , employee.getName());
-            return "Employee: " + employee.getName() + " saved successfully ";
+            return employee;
 
         } catch (Exception e) {
             log.error("Error in employeeService.update" , e );
@@ -106,39 +99,16 @@ public class EmployeeService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
             Employee employee = employeeRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
             employee.setActive(false);
 
             log.info("Employee {} deactivated successfully" , employee.getName());
-            return "Employee: " + employee.getName() + " delete successfully ";
 
         } catch (Exception e) {
             log.error("Error in employeeService.delete" , e );
-            throw new RuntimeException(e);
-        }
-    }
-
-    // speak with the teacher to delete
-    public String applyPartialUpdate(long id, Map<String, Object> employee) {
-        try {
-            Employee employee1 = employeeRepository.findById(id).orElseThrow(()
-                    ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
-            employee.forEach((key , value) ->{
-                switch (key){
-                    case "cpf" -> employee1.setCpf((String) value) ;
-                    case "name" -> employee1.setName((String) value);
-                    case "languagesSpoken" -> employee1.setLanguagesSpoken((List<Language>) value);
-                    case "dayOfBirth" -> employee1.setDayOfBirth((LocalDate) value);
-
-
-                }
-            });
-            employeeRepository.save(employee1);
-            return "employee: " + employee1.getName() + " delete successful ";
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

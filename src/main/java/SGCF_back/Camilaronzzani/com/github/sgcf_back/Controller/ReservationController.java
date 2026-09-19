@@ -1,9 +1,11 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.ReservationDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,106 +15,69 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/Reservation")
+@RequestMapping("api/reservation")
 public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<ReservationDto>> findAll() {
-        try {
             List<ReservationDto> reservationDtos = reservationService.findAll()
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<ReservationDto> findById(@PathVariable long id) {
-        try {
             return ResponseEntity.ok(ReservationDto.toDto(reservationService.findById(id)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody ReservationRequest reservationRequest) {
-        try {
-            return new ResponseEntity<>(reservationService.save(reservationRequest), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity save(@Valid @RequestBody ReservationRequest reservationRequest) {
+            reservationService.save(reservationRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+
     }
 
-    @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
-        try {
-            return new ResponseEntity<>(reservationService.update(reservationRequest, id), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ReservationDto> update(@Valid @RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
+            ReservationDto reservationDto = ReservationDto.toDto(reservationService.update(reservationRequest, id));
+            return ResponseEntity.ok(reservationDto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        try {
-            return new ResponseEntity<>(reservationService.delete(id),HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity delete(@PathVariable long id) {
+            reservationService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id, @RequestBody Map<String, Object> reservation) {
-        try {
-            String message = reservationService.applyPartialUpdate(id, reservation);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<ReservationDto>> findAllActive() {
-        try {
             List<ReservationDto> reservationDtos = reservationService.findAllActive()
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<ReservationDto>> findByCustomer(@PathVariable long customerId) {
-        try {
             List<ReservationDto> reservationDtos = reservationService.findByCustomer(customerId)
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<ReservationDto>> findByStatus(@PathVariable Status status) {
-        try {
             List<ReservationDto> reservationDtos = reservationService.findByStatus(status)
                     .stream()
                     .map(ReservationDto :: toDto)
                     .toList();
             return ResponseEntity.ok(reservationDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 }

@@ -3,7 +3,6 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.QuotaDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.QuotaRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Quota;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
@@ -16,14 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -65,45 +58,18 @@ public class QuotaService {
         }
     }
 
-    public String save(QuotaRequest quotaRequest) {
+    public void save(QuotaRequest quotaRequest) {
         try {
-            validateEmployeeQuota(quotaRequest);
-            requireEmployeeAccess(quotaRequest.getEmployeeId());
             Quota quota = toEmployeeQuota(quotaRequest);
 
             quotaRepository.save(quota);
 
             log.info("Quota {} saved successfully" , quota.getId());
-            return "Quota of target " + quota.getTargetValue() + " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in QuotaService.save ", e);
             throw new RuntimeException(e);
         }
-    }
-
-    public Quota toQuota(QuotaRequest quotaRequest) {
-        Quota quota = new Quota();
-        quota.setStartDate(quotaRequest.getStartDate());
-        quota.setEndDate(quotaRequest.getEndDate());
-        quota.setTargetValue(quotaRequest.getTargetValue());
-        quota.setEmployee(quotaRequest.getEmployeeId() == null
-                ? null
-                : findEmployee(quotaRequest.getEmployeeId()));
-        quota.setActive(true);
-        return quota;
-    }
-
-    public Quota toEmployeeQuota(QuotaRequest quotaRequest) {
-        Employee employee = findEmployee(quotaRequest.getEmployeeId());
-        LocalDate startDate = LocalDate.now();
-        Quota quota = new Quota();
-        quota.setStartDate(startDate);
-        quota.setEndDate(startDate.plusDays(30));
-        quota.setTargetValue(quotaRequest.getTargetValue());
-        quota.setEmployee(employee);
-        quota.setActive(true);
-        return quota;
     }
 
     public void changeDataByQuota(Quota quotaOld, Quota newQuota) {
@@ -118,25 +84,24 @@ public class QuotaService {
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quota not found"));
 
         if (isCompanyQuota(quotaOld)) {
-            validateCompanyTarget(quotaRequest.getTargetValue());
-            quotaOld.setTargetValue(quotaRequest.getTargetValue());
+            validateCompanyTarget(quotaRequest.targetValue());
+            quotaOld.setTargetValue(quotaRequest.targetValue());
 
         } else {
 
             validateEmployeeQuota(quotaRequest);
-            validateQuotaDates(quotaRequest.getStartDate(), quotaRequest.getEndDate());
+            validateQuotaDates(quotaRequest.startDate(), quotaRequest.endDate());
             changeDataByQuota(quotaOld, toQuota(quotaRequest));
         }
         return quotaOld ;
     }
     @Transactional
-    public String update(QuotaRequest quotaRequest, long id) {
+    public Quota update(QuotaRequest quotaRequest, long id) {
         try {
-            requireManager();
-            Quota quotaOld = processQuotaUpdate(quotaRequest,id);
+            Quota quota = processQuotaUpdate(quotaRequest,id);
 
             log.info("Quota updated successfully");
-            return "Quota: " + quotaOld.getId() + " updated successfully ";
+            return quota;
 
         } catch (Exception e) {
             log.error("Error in QuotaService.update ", e);
@@ -145,9 +110,8 @@ public class QuotaService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
-            requireManager();
             Quota quota = quotaRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "quota not found"));
 
@@ -158,53 +122,9 @@ public class QuotaService {
             quota.setActive(false);
 
             log.info("Quota {} deleted successfully", id);
-            return "Quota: " + quota.getId() + " deleted successfully ";
 
         } catch (Exception e) {
             log.error("Error in QuotaService.delete ", e);
-            throw new RuntimeException(e);
-        }
-    }
-    //delete
-    public String applyPartialUpdate(long id, Map<String, Object> quota) {
-        try {
-            Quota quota1 = quotaRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "quota no find"));
-
-            if (isCompanyQuota(quota1)) {
-                requireManager();
-                if (!quota.keySet().equals(Set.of("targetValue"))) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "only the company quota value can be changed");
-                }
-                validateCompanyTarget(quota.get("targetValue"));
-            } else {
-                requireManager();
-                if (!quota.keySet().stream().allMatch(Set.of("startDate", "endDate", "targetValue", "employeeId")::contains)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "unsupported quota field");
-                }
-                if (quota.containsKey("employeeId") && quota.get("employeeId") == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employee quota requires an employee");
-                }
-            }
-            quota.forEach((key, value) -> {
-                switch (key) {
-                    case "startDate" -> quota1.setStartDate(LocalDate.parse(value.toString()));
-                    case "endDate" -> quota1.setEndDate(LocalDate.parse(value.toString()));
-                    case "targetValue" -> quota1.setTargetValue(Double.parseDouble(value.toString()));
-                    case "employeeId" -> quota1.setEmployee(value == null
-                            ? null
-                            : findEmployee(Long.parseLong(value.toString())));
-                }
-            });
-            if (!isCompanyQuota(quota1)) {
-                validateEmployeeTarget(quota1.getTargetValue());
-                validateQuotaDates(quota1.getStartDate(), quota1.getEndDate());
-            }
-            quotaRepository.save(quota1);
-            return "Quota: " + quota1.getId() + " update successful ";
-        } catch (ResponseStatusException exception) {
-            throw exception;
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -263,17 +183,15 @@ public class QuotaService {
         return QuotaDto.toDto(quota, achievedValue);
     }
 
-
-
     private boolean isCompanyQuota(Quota quota) {
         return quota.getEmployee() == null;
     }
 
     private void validateEmployeeQuota(QuotaRequest quotaRequest) {
-        if (quotaRequest.getEmployeeId() == null) {
+        if (quotaRequest.employeeId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required");
         }
-        validateEmployeeTarget(quotaRequest.getTargetValue());
+        validateEmployeeTarget(quotaRequest.targetValue());
     }
 
     private void validateCompanyTarget(Object value) {
@@ -309,44 +227,36 @@ public class QuotaService {
         }
     }
 
-    private void requireManager() {
-        if (!isManager()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "only managers can change the company quota");
-        }
-    }
 
-    private void requireAuthenticated() {
-        if (!(session.getAttribute("userId") instanceof Long)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "authentication is required");
-        }
-    }
-
-    private boolean isManager() {
-        return Permission.Manager.equals(session.getAttribute("permission"));
-    }
-
-    private void requireEmployeeAccess(Long employeeId) {
-        requireAuthenticated();
-        if (isManager()) {
-            return;
-        }
-        Object sessionEmployeeId = session.getAttribute("employeeId");
-        if (!(sessionEmployeeId instanceof Number number) || number.longValue() != employeeId.longValue()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "employees can only create their own quota");
-        }
-    }
-
-    private boolean isCurrentEmployeeQuota(Quota quota, Object sessionEmployeeId) {
-        return quota.getEmployee() != null
-                && sessionEmployeeId instanceof Number number
-                && quota.getEmployee().getId().equals(number.longValue());
-    }
-
-    private Employee findEmployee(Long employeeId) {
+    public Employee findEmployee(Long employeeId) {
         if (employeeId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required");
         }
         return employeeRepository.findById(employeeId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+    }
+
+    public Quota toQuota(QuotaRequest quotaRequest) {
+        Quota quota = new Quota();
+        quota.setStartDate(quotaRequest.startDate());
+        quota.setEndDate(quotaRequest.endDate());
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(quotaRequest.employeeId() == null  ? null
+                : findEmployee(quotaRequest.employeeId()));
+        quota.setActive(true);
+        return quota;
+    }
+
+    public Quota toEmployeeQuota(QuotaRequest quotaRequest) {
+        Employee employee = findEmployee(quotaRequest.employeeId());
+        LocalDate startDate = LocalDate.now();
+
+        Quota quota = new Quota();
+        quota.setStartDate(startDate);
+        quota.setEndDate(startDate.plusDays(30));
+        quota.setTargetValue(quotaRequest.targetValue());
+        quota.setEmployee(employee);
+        quota.setActive(true);
+        return quota;
     }
 }

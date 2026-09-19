@@ -1,38 +1,35 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Reservation;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.CustomerService;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Positive;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.List;
 
-@Getter
-@Setter
-public class ReservationRequest {
 
-    @NotEmpty
-    @NotBlank
-    private LocalDate date;
+public record ReservationRequest (
 
-    @NotEmpty
-    @NotBlank
-    private Long tourId;
+    @FutureOrPresent
+     LocalDate date,
 
-    @NotEmpty
-    @NotBlank
-    private Long customerId;
+    @Positive
+     Long tourId,
 
-    @NotEmpty
-    @NotBlank
-    private Long employeeId;
+    @Positive
+     Long customerId,
 
-    @NotEmpty
-    @NotBlank
-    private double value;
+    @Positive
+     Long employeeId,
 
-    @NotEmpty
-    @NotBlank
-    private Status status;
+     Status status,
+
+    List<Long> customerNotPaying
+){
 }

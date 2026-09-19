@@ -1,5 +1,5 @@
 create table "customer" (
-                            "id" bigint ,
+                            "id" serial ,
                             "active" boolean,
                             "cnpj" varchar(15),
                             "country_of_customer" varchar(255)
@@ -26,7 +26,7 @@ create table "customer" (
 );
 
 create table "employee" (
-                            "id" bigint ,
+                            "id" serial ,
                             "active" boolean,
                             "cpf" varchar(11) not null,
                             "day_of_birth" date,
@@ -39,7 +39,7 @@ create table "employee" (
 );
 
 create table "tour" (
-                        "id" bigint ,
+                        "id" serial ,
                         "active" boolean,
                         "country_of_tour" varchar(255)
                             check ("country_of_tour" in (
@@ -56,7 +56,7 @@ create table "tour" (
 );
 
 create table "payment" (
-                           "id" bigint ,
+                           "id" serial ,
                            "active" boolean,
                            "status" varchar(255) not null
                                check ("status" in (
@@ -75,7 +75,7 @@ create table "payment" (
 );
 
 create table "reservation" (
-                               "id" bigint ,
+                               "id" serial ,
                                "active" boolean,
                                "date" date,
                                "status" varchar(255) not null
@@ -105,7 +105,7 @@ create table "reservation" (
 );
 
 create table "quota" (
-                         "id" bigint ,
+                         "id" serial ,
                          "active" boolean,
                          "end_date" date,
                          "start_date" date,
@@ -120,7 +120,7 @@ create table "quota" (
 );
 
 create table "user" (
-                        "id" bigint ,
+                        "id" serial ,
                         "active" boolean,
                         "user_email" varchar(100) not null,
                         "permission" varchar(255) not null
@@ -149,7 +149,7 @@ create table "user" (
 );
 
 create table "password_reset" (
-                                  "id" bigint ,
+                                  "id" serial ,
                                   "expiration" timestamp(6) not null,
                                   "token" varchar(255) not null,
                                   "used" boolean not null,

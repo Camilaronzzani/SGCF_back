@@ -2,24 +2,27 @@ spring.application.name=sgcf_back
 
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=frantonytest@gmail.com
-spring.mail.password=${EMAIL_PASSWORD:inserir_password_aqui}
+spring.mail.username=seu-email@gmail.com
+spring.mail.password=SUA_SENHA_DE_APP_AQUI
 
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 
 spring.jpa.properties.hibernate.format_sql=true
 spring.datasource.url=jdbc:postgresql://localhost:5432/bdsgcf
-spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.username=SEU_USUARIO_AQUI
+spring.datasource.password=SUA_SENHA_AQUI
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 spring.security.user.name=admin
-spring.security.user.password=123456
+spring.security.user.password=SUA_SENHA_AQUI
 
-spring.jpa.hibernate.ddl-auto= validate
+#spring.jpa.hibernate.ddl-auto=none
+
+
 spring.jpa.show-sql=true
+server.port=8082
 spring.flyway.enabled=true
 spring.flyway.locations=classpath:DB/Migration
 
-server.port=8082
+

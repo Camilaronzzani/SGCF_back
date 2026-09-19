@@ -3,9 +3,11 @@ package SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.EmployeDto;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.DeactivationRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.EmployeeRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.EmployeeService;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,98 +27,47 @@ public class EmployeeController {
     private UserService userService;
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<EmployeDto>> findAll(HttpSession session){
-        try {
-            requireManager(session);
+    public ResponseEntity<List<EmployeDto>> findAll(){
             List<EmployeDto> employeDtos = employeeService.findAll()
                     .stream()
                     .map(EmployeDto :: toDto)
                     .toList();
             return ResponseEntity.ok(employeDtos);
-        } catch (Exception e) {
-            return  ResponseEntity.badRequest().build();
-        }
     }
 
     @DeleteMapping("/deactivate/{id}")
-    public ResponseEntity<String> deactivate(@PathVariable long id, @RequestBody DeactivationRequest request, HttpSession session) {
-        try {
-            requireManager(session);
+    public ResponseEntity deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
             if (!userService.authenticate(new AuthenticateRequest(request.email(), request.password()))) {
                 return ResponseEntity.status(401).build();
             }
-            return new ResponseEntity<>(employeeService.delete(id), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+            employeeService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private void requireManager(HttpSession session) {
-        if (session.getAttribute("userId") == null || session.getAttribute("permission") != Permission.Manager) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN);
-        }
-    }
-
-    public record DeactivationRequest(String email, String password) {}
 
     @GetMapping("/findId/{id}")
     public ResponseEntity<EmployeDto> findById(@PathVariable long id){
-        try {
             return ResponseEntity.ok(EmployeDto.toDto(employeeService.findById(id)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> salve(@RequestBody EmployeeRequest employeeRequest){
-        try {
-            return new ResponseEntity<>(employeeService.save(employeeRequest), HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity salve(@Valid @RequestBody EmployeeRequest employeeRequest){
+            employeeService.save(employeeRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody EmployeeRequest employeeRequest, @PathVariable long id){
-        try {
-            return ResponseEntity.ok(employeeService.update(employeeRequest , id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id){
-        try {
-            return new ResponseEntity<>(employeeService.delete(id) , HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updatePartial(@PathVariable long id , @RequestBody Map<String , Object> employee){
-        try {
-
-            String message = employeeService.applyPartialUpdate(id , employee);
-            return new ResponseEntity<>(message, HttpStatus.NO_CONTENT);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<EmployeDto> update(@Valid @RequestBody EmployeeRequest employeeRequest, @PathVariable long id){
+            EmployeDto employeDto = EmployeDto.toDto(employeeService.update(employeeRequest , id));
+            return ResponseEntity.ok(employeDto);
     }
 
     @GetMapping("/findAll/active")
     public ResponseEntity<List<EmployeDto>> findAllActive (){
-        try {
             List<EmployeDto> employeDtos = employeeService.findAllActive()
                     .stream()
                     .map(EmployeDto :: toDto)
                     .toList();
             return ResponseEntity.ok(employeDtos);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
 }

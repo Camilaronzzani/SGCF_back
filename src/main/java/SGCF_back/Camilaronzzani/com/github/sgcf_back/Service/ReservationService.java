@@ -1,6 +1,6 @@
 package SGCF_back.Camilaronzzani.com.github.sgcf_back.Service;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.ReservationDto;
+import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
@@ -21,8 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+
 
 @Slf4j
 @Service
@@ -61,13 +61,13 @@ public class ReservationService {
         }
     }
 
-    public String save(ReservationRequest reservationRequest) {
+    @Transactional
+    public void save(ReservationRequest reservationRequest) {
         try {
             Reservation reservation = toReservation(reservationRequest);
-            reservationRepository.save(reservation);
 
+            calculatePrice(reservation);
             log.info("Reservations for customer {} saved successfully", reservation.getCustomer().getName());
-            return "Reservation for customer: " + reservation.getCustomer().getName() + " saved successfully ";
 
         } catch (Exception e) {
             log.error("Error in ReservationService.save" , e);
@@ -75,26 +75,6 @@ public class ReservationService {
         }
     }
 
-    public Reservation toReservation(ReservationRequest reservationRequest) {
-        Reservation reservation = new Reservation();
-
-        reservation.setDate(reservationRequest.getDate());
-
-        reservation.setTour(findTour(reservationRequest.getTourId()));
-
-        reservation.setCustomer(findCustomer(reservationRequest.getCustomerId()));
-
-        reservation.setEmployee(findEmployee(reservationRequest.getEmployeeId()));
-
-        reservation.setValue(reservationRequest.getValue());
-
-        reservation.setStatus(reservationRequest.getStatus() == null
-                ? Status.Pending
-                : reservationRequest.getStatus());
-
-        reservation.setActive(true);
-        return reservation;
-    }
 
     public Reservation changeDataByReservation(long id, ReservationRequest reservationRequesteservation) {
         Reservation newReservation = toReservation(reservationRequesteservation);
@@ -112,12 +92,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public String update(ReservationRequest reservationRequest, long id) {
+    public Reservation update(ReservationRequest reservationRequest, long id) {
         try {
             Reservation reservation = changeDataByReservation(id , reservationRequest);
 
+            calculatePrice(reservation);
+
             log.info("Reservations {} updated successfully ", id);
-            return "Reservation: " + reservation.getId() + " updated successfully ";
+            return reservation;
         } catch (Exception e) {
             log.error("Error in ReservationService.update" , e);
             throw new RuntimeException(e);
@@ -125,43 +107,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public void delete(long id) {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
             reservation.setActive(false);
 
             log.info("Reservation {} deactivate successfully", id);
-            return "Reservation: " + reservation.getId() + " deleted successfully ";
 
         } catch (Exception e) {
             log.error("Error in ReservationService.update" , e);
             throw new RuntimeException(e);
         }
     }
-
-    //delete
-    public String applyPartialUpdate(long id, Map<String, Object> reservation) {
-        try {
-            Reservation reservation1 = reservationRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation no find"));
-            reservation.forEach((key, value) -> {
-                switch (key) {
-                    case "date" -> reservation1.setDate(LocalDate.parse(value.toString()));
-                    case "value" -> reservation1.setValue(Double.parseDouble(value.toString()));
-                    case "status" -> reservation1.setStatus(Status.valueOf(value.toString()));
-                    case "tourId" -> reservation1.setTour(findTour(Long.parseLong(value.toString())));
-                    case "customerId" -> reservation1.setCustomer(findCustomer(Long.parseLong(value.toString())));
-                    case "employeeId" -> reservation1.setEmployee(findEmployee(Long.parseLong(value.toString())));
-                }
-            });
-            reservationRepository.save(reservation1);
-            return "Reservation: " + reservation1.getId() + " update successful ";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     public List<Reservation> findAllActive() {
         try {
@@ -222,5 +180,28 @@ public class ReservationService {
         log.info("Fetches employee");
         return employeeRepository.findById(employeeId).orElseThrow(()
                 -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+    }
+    public  Reservation toReservation(ReservationRequest reservationRequest) {
+
+        Reservation reservation = new Reservation();
+        reservation.setDate(reservationRequest.date());
+        reservation.setTour(findTour(reservationRequest.tourId()));
+        reservation.setCustomer(findCustomer(reservationRequest.customerId()));
+        reservation.setEmployee(findEmployee(reservationRequest.employeeId()));
+        reservation.setStatus(reservationRequest.status() == null
+                ? Status.Pending
+                : reservationRequest.status());
+        reservation.setCustomersNotPaying(reservationRequest.customerNotPaying() == null
+                ? new ArrayList<>()
+                : reservationRequest.customerNotPaying().stream().map(this::findCustomer).toList());
+        reservation.setActive(true);
+        return reservation;
+    }
+
+    private void calculatePrice(Reservation reservation){
+
+        double price = reservation.getTour().getPrice();
+        int numberCustomer = reservation.getCustomersNotPaying().size();
+        reservation.setValue(price * (numberCustomer + 1));
     }
 }
