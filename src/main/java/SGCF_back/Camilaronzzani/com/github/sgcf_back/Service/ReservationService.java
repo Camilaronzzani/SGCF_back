@@ -67,7 +67,8 @@ public class ReservationService {
             Reservation reservation = toReservation(reservationRequest);
 
             calculatePrice(reservation);
-            log.info("Reservations for customer {} saved successfully", reservation.getCustomer().getName());
+            Reservation savedReservation = reservationRepository.saveAndFlush(reservation);
+            log.info("Reservation {} for customer {} saved successfully", savedReservation.getId(), savedReservation.getCustomer().getName());
 
         } catch (Exception e) {
             log.error("Error in ReservationService.save" , e);
@@ -104,6 +105,18 @@ public class ReservationService {
             log.error("Error in ReservationService.update" , e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Transactional
+    public Reservation updateStatus(long id, Status status) {
+        if (status == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status is required");
+        }
+
+        Reservation reservation = reservationRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+        reservation.setStatus(status);
+        return reservation;
     }
 
     @Transactional

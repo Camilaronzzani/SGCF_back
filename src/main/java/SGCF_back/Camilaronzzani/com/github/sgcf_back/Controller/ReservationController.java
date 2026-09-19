@@ -47,6 +47,13 @@ public class ReservationController {
             return ResponseEntity.ok(reservationDto);
     }
 
+    @PatchMapping("/updateStatus/{id}")
+    public ResponseEntity<ReservationDto> updateStatus(@PathVariable long id, @RequestBody Map<String, Status> request) {
+        ReservationDto reservationDto = ReservationDto.toDto(
+                reservationService.updateStatus(id, request.get("status")));
+        return ResponseEntity.ok(reservationDto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable long id) {
             reservationService.delete(id);
