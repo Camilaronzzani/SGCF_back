@@ -56,10 +56,21 @@ public class UserService {
     }
 
     public void save(UserRequest userRequest) {
+            if (userRequest.permission() == SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission.Employee
+                    && userRequest.employeeId() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required for employee accounts");
+            }
+
         try {
             User user = toUser(userRequest);
-            Employee employee = employeeRepository.findById(userRequest.employeeId()).orElseThrow(()
+                Employee employee = userRequest.employeeId() == null
+                        ? null
+                        : employeeRepository.findById(userRequest.employeeId()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
+
+                if (employee != null && userRepository.findByEmployeeId(employee.getId()).isPresent()) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "employee already has an account");
+                }
 
             user.setEmployee(employee);
             user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
@@ -67,6 +78,8 @@ public class UserService {
 
             log.info("User {} saved successfully", user.getUserName());
 
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error in UserService.save", e);
             throw new RuntimeException(e);
