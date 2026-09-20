@@ -65,6 +65,7 @@ public class ReservationService {
     public void save(ReservationRequest reservationRequest) {
         try {
             Reservation reservation = toReservation(reservationRequest);
+            reservation.setStatus(Status.Pending);
 
             calculatePrice(reservation);
             Reservation savedReservation = reservationRepository.saveAndFlush(reservation);

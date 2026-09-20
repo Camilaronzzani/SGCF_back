@@ -124,7 +124,7 @@ public class EmployeeService {
         }
     }
 
-    private EmployeDto toSummaryDto(Employee employee) {
+    public EmployeDto toSummaryDto(Employee employee) {
         return new EmployeDto(employee.getId(), employee.getCpf(), employee.getName(), employee.getLanguagesSpoken(),
                 employee.getDayOfBirth(), employee.isActive(), reservationRepository.countByEmployeeIdAndActiveTrue(employee.getId()),
                 reservationRepository.sumValueByEmployeeAndStatus(employee.getId(), Status.Confirmed));

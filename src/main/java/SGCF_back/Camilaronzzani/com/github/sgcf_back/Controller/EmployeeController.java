@@ -30,7 +30,7 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeDto>> findAll(){
             List<EmployeDto> employeDtos = employeeService.findAll()
                     .stream()
-                    .map(EmployeDto :: toDto)
+                    .map(employeeService :: toSummaryDto)
                     .toList();
             return ResponseEntity.ok(employeDtos);
     }
@@ -66,7 +66,7 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeDto>> findAllActive (){
             List<EmployeDto> employeDtos = employeeService.findAllActive()
                     .stream()
-                    .map(EmployeDto :: toDto)
+                    .map(employeeService :: toSummaryDto)
                     .toList();
             return ResponseEntity.ok(employeDtos);
     }
