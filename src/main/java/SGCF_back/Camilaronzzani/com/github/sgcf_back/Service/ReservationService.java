@@ -89,6 +89,7 @@ public class ReservationService {
         reservationOld.setEmployee(newReservation.getEmployee());
         reservationOld.setValue(newReservation.getValue());
         reservationOld.setStatus(newReservation.getStatus());
+        reservationOld.setCustomersNotPaying(newReservation.getCustomersNotPaying());
 
         return reservationOld;
     }
