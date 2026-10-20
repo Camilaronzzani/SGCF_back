@@ -4,9 +4,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <appender name="DATABASE"
-              class="SGCF_back.Camilaronzzani.com.github.sgcf_back.Config.DatabaseLogAppender"/>
-
+    <appender name="DATABASE" class="sgcf_back.camilaronzzani.com.github.sgcf_back.config.DatabaseLogAppender"/>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="DATABASE"/>

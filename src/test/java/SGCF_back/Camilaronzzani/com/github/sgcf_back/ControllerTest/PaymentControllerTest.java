@@ -1,4 +1,4 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
 public class PaymentControllerTest {
 }

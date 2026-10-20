@@ -1,13 +1,13 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.ReservationController;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Reservation;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.ReservationController;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ReservationRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Reservation;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Tour;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.ReservationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;

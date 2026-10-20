@@ -1,4 +1,4 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
 
 public class CurrencyServiceTest {
 }

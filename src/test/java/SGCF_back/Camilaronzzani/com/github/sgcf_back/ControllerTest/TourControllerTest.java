@@ -1,10 +1,9 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.TourController;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.TourRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.CountryTour;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.TourService;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.TourController;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.TourRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Tour;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.TourService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

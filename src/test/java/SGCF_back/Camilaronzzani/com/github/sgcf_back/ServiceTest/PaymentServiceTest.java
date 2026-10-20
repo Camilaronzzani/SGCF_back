@@ -1,4 +1,4 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
 
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PaymentRequest;
 import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;

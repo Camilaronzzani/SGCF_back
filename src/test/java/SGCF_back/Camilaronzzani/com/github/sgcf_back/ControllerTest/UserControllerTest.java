@@ -1,15 +1,15 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.UserController;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.BooleanRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.AuthenticateRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ChangePasswordRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PasswordResetRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.UserRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.User;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.UserService;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.UserController;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PasswordResetRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.UserRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
