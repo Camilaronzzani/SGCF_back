@@ -1,9 +1,9 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.SystemLogController;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Permission;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.SystemLog;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.SystemLogService;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.SystemLogController;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.SystemLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

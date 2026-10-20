@@ -1,4 +1,4 @@
-package SGCF_back.Camilaronzzani.com.github.sgcf_back;
+package sgcf_back.camilaronzzani.com.github.sgcf_back;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
