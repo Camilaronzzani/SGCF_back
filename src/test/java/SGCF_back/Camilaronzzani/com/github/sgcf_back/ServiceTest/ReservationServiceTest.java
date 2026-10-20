@@ -1,16 +1,5 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.ReservationRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Employee;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Reservation;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Tour;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.CustomerRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.EmployeeRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.ReservationRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.TourRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.ReservationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +7,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ReservationRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Reservation;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Tour;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.CustomerRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.EmployeeRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.ReservationRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.TourRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.ReservationService;
 
 import java.time.LocalDate;
 import java.util.List;

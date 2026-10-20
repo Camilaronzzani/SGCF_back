@@ -1,4 +1,4 @@
-package Functions;
+package functions;
 
 import java.security.SecureRandom;
 

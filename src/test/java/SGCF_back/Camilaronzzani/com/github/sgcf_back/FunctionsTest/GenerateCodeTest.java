@@ -1,9 +1,10 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.FunctionsTest;
 
-import Functions.GenerateCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+
+import functions.GenerateCode;
 
 import java.util.HashSet;
 import java.util.Set;

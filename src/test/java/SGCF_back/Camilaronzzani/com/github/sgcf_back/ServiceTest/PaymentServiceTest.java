@@ -1,12 +1,5 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
 
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Controller.DTOs.Request.PaymentRequest;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Customer;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Enum.Status;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Entity.Payment;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.CustomerRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Repositories.PaymentRepository;
-import SGCF_back.Camilaronzzani.com.github.sgcf_back.Service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PaymentRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Payment;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.CustomerRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.PaymentRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.PaymentService;
 
 import java.util.List;
 import java.util.Optional;
