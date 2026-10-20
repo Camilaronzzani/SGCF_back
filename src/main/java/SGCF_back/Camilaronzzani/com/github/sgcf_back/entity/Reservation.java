@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@AllArgsConstructor 
 @NoArgsConstructor
 public class Reservation {
     @Id
@@ -41,7 +41,7 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Status status = Status.Pending;
+    private Status status;
 
     @ManyToMany
     @JoinTable(
@@ -49,8 +49,18 @@ public class Reservation {
             joinColumns = @JoinColumn(name = "reservations_id"),
             inverseJoinColumns = @JoinColumn(name = "customer_id")
     )
-    private List<Customer> customersNotPaying = new ArrayList<>();
+    private List<Customer> customersNotPaying;
 
     @Column(name = "Active")
     private boolean active;
+
+    @PrePersist
+    private void prePersist() {
+        if (status == null) {
+            status = Status.Pending;
+        }
+        if (customersNotPaying == null) {
+            customersNotPaying = new ArrayList<>();
+        }
+    }
 }

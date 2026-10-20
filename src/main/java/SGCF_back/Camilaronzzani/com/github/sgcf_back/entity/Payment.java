@@ -19,7 +19,7 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Status status = Status.Pending;
+    private Status status;
 
     @ManyToOne
     @JoinColumn(name = "fk_customer_id", nullable = false)
@@ -30,4 +30,11 @@ public class Payment {
 
     @Column(name = "Active")
     private boolean active;
+
+    @PrePersist
+    private void prePersist() {
+        if (status == null) {
+            status = Status.Pending;
+        }
+    }
 }

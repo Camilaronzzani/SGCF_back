@@ -35,7 +35,7 @@ public class Customer {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "clientes_languages", joinColumns = @JoinColumn(name = "fk_clientes_id"))
     @Column(name = "language")
-    private List<Language> languageSpeak = new ArrayList<>();
+    private List<Language> languageSpeak;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "country_of_customer")
@@ -45,8 +45,18 @@ public class Customer {
     private String email;
 
     @OneToMany(mappedBy = "customer")
-    private List<Reservation> reservations = new ArrayList<>() ;
+    private List<Reservation> reservations;
 
     @Column(name = "Active")
-    private boolean active ;
+    private boolean active;
+
+    @PrePersist
+    private void prePersist() {
+        if (languageSpeak == null) {
+            languageSpeak = new ArrayList<>();
+        }
+        if (reservations == null) {
+            reservations = new ArrayList<>();
+        }
+    }
 }

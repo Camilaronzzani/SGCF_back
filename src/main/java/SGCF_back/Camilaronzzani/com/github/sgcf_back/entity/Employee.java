@@ -33,12 +33,18 @@ public class Employee {
             name = "languages_funcionario" , joinColumns = @JoinColumn(name = "fk_funcionario_id")
     )
     @Column(name = "language")
-    private List<Language> languagesSpoken = new ArrayList<>();
+    private List<Language> languagesSpoken;
 
     @Column(name = "day_of_birth")
     private LocalDate dayOfBirth;
 
-
     @Column(name = "Active")
-    private boolean active ;
+    private boolean active;
+
+    @PrePersist
+    private void prePersist() {
+        if (languagesSpoken == null) {
+            languagesSpoken = new ArrayList<>();
+        }
+    }
 }
