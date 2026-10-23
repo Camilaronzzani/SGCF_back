@@ -31,7 +31,7 @@
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
 		<sonar.projectKey>SGCF_back</sonar.projectKey>
 		<sonar.projectName>SGCF_back</sonar.projectName>
-		<sonar.token>sqp_b72c6643b8b3874e486a6430650d5bf7a99c8d18</sonar.token>
+		<sonar.token>sqa_33daa9b56aedc1e0f801d68b24383371e6ff6907</sonar.token>
 	</properties>
 	<dependencies>
 		<dependency>
