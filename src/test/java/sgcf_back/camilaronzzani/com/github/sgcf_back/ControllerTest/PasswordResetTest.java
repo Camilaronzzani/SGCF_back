@@ -1,5 +1,10 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.PasswordResetController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PasswordResetRequest;
@@ -9,36 +14,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(PasswordResetController.class)
+@Import(SecurityConfig.class)
 class PasswordResetTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private PasswordResetService passwordResetService;
-
-    @InjectMocks
-    private PasswordResetController passwordResetController;
 
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(passwordResetController).build();
         objectMapper = new ObjectMapper();
     }
 

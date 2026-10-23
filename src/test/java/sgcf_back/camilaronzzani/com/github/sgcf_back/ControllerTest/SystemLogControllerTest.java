@@ -1,5 +1,10 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.SystemLogController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
@@ -7,14 +12,9 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.service.SystemLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,16 +24,15 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(SystemLogController.class)
+@Import(SecurityConfig.class)
 class SystemLogControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private SystemLogService systemLogService;
-
-    @InjectMocks
-    private SystemLogController systemLogController;
 
     private SystemLog sampleLog;
     private MockHttpSession managerSession;
@@ -41,8 +40,6 @@ class SystemLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(systemLogController).build();
-
         sampleLog = new SystemLog();
         sampleLog.setId(1L);
         sampleLog.setLevel("ERROR");
