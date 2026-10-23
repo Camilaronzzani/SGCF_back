@@ -1,5 +1,10 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.CustomerController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.CustomerRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
@@ -10,14 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -27,16 +27,15 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(CustomerController.class)
+@Import(SecurityConfig.class)
 class CustomerControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private CustomerService customerService;
-
-    @InjectMocks
-    private CustomerController customerController;
 
     private ObjectMapper objectMapper;
 
@@ -45,7 +44,6 @@ class CustomerControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
         objectMapper = new ObjectMapper();
 
         sampleCustomer = new Customer();
