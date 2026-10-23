@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.UserController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
@@ -61,14 +61,14 @@ class UserControllerTest {
         sampleUser.setUserName("johndoe");
         sampleUser.setUserPassword("password123");
         sampleUser.setEmail("john@example.com");
-        sampleUser.setPermission(Permission.Manager);
+        sampleUser.setPermission(Permission.MANAGER);
         sampleUser.setEmployee(sampleEmployee);
         sampleUser.setActive(true);
 
         sampleUserRequest = new UserRequest(
                 "johndoe",
                 "password123",
-                Permission.Manager,
+                Permission.MANAGER,
                 "john@example.com",
                 1L
         );
@@ -196,7 +196,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.success").value(true));
 
         assertEquals(1L, session.getAttribute("userId"));
-        assertEquals(Permission.Manager, session.getAttribute("permission"));
+        assertEquals(Permission.MANAGER, session.getAttribute("permission"));
         assertEquals(1L, session.getAttribute("employeeId"));
     }
 
@@ -215,7 +215,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/user/is-manager - User with Manager permission returns 200 OK")
+    @DisplayName("POST /api/user/is-manager - User with MANAGER permission returns 200 OK")
     void isManager_WithManagerPermission_ShouldReturnOk() throws Exception {
         PasswordResetRequest resetRequest = new PasswordResetRequest("john@example.com");
 
@@ -229,10 +229,10 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/user/is-manager - User without Manager permission returns 401 Unauthorized")
+    @DisplayName("POST /api/user/is-manager - User without MANAGER permission returns 401 Unauthorized")
     void isManager_WithoutManagerPermission_ShouldReturnUnauthorized() throws Exception {
         PasswordResetRequest resetRequest = new PasswordResetRequest("john@example.com");
-        sampleUser.setPermission(Permission.Employee);
+        sampleUser.setPermission(Permission.EMPLOYEE);
 
         when(userService.findByEmail("john@example.com")).thenReturn(sampleUser);
 

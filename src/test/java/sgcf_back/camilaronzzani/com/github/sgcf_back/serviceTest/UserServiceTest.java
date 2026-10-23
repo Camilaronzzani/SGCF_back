@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,7 +99,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "manager1",
             "password123",
-            Permission.Manager,
+            Permission.MANAGER,
             "manager@example.com",
             null
         );
@@ -111,7 +111,7 @@ class UserServiceTest {
         verify(userRepository).save(argThat(user ->
             user.getUserName().equals("manager1") &&
             user.getUserPassword().equals("encodedPassword") &&
-            user.getPermission() == Permission.Manager &&
+            user.getPermission() == Permission.MANAGER &&
             user.getEmail().equals("manager@example.com") &&
             user.getEmployee() == null &&
             user.isActive()
@@ -127,7 +127,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
-            Permission.Employee,
+            Permission.EMPLOYEE,
             "employee@example.com",
             1L
         );
@@ -144,7 +144,7 @@ class UserServiceTest {
         verify(userRepository).save(argThat(user ->
             user.getUserName().equals("employee1") &&
             user.getUserPassword().equals("encodedPassword") &&
-            user.getPermission() == Permission.Employee &&
+            user.getPermission() == Permission.EMPLOYEE &&
             user.getEmployee() == employee
         ));
     }
@@ -154,7 +154,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
-            Permission.Employee,
+            Permission.EMPLOYEE,
             "employee@example.com",
             null
         );
@@ -172,7 +172,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
-            Permission.Employee,
+            Permission.EMPLOYEE,
             "employee@example.com",
             999L
         );
@@ -199,7 +199,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
-            Permission.Employee,
+            Permission.EMPLOYEE,
             "employee@example.com",
             1L
         );
@@ -225,13 +225,13 @@ class UserServiceTest {
         existingUser.setId(1L);
         existingUser.setUserName("oldname");
         existingUser.setUserPassword("oldpassword");
-        existingUser.setPermission(Permission.Employee);
+        existingUser.setPermission(Permission.EMPLOYEE);
         existingUser.setEmail("old@example.com");
 
         UserRequest request = new UserRequest(
             "newname",
             "newpassword",
-            Permission.Manager,
+            Permission.MANAGER,
             "new@example.com",
             null
         );
@@ -243,7 +243,7 @@ class UserServiceTest {
 
         assertEquals("newname", result.getUserName());
         assertEquals("encodedNewPassword", result.getUserPassword());
-        assertEquals(Permission.Manager, result.getPermission());
+        assertEquals(Permission.MANAGER, result.getPermission());
         assertEquals("new@example.com", result.getEmail());
         verify(userRepository).findById(1L);
         verify(passwordEncoder).encode("newpassword");
@@ -254,7 +254,7 @@ class UserServiceTest {
         UserRequest request = new UserRequest(
             "newname",
             "newpassword",
-            Permission.Manager,
+            Permission.MANAGER,
             "new@example.com",
             null
         );

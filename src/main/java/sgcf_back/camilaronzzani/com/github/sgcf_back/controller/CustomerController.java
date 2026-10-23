@@ -34,7 +34,7 @@ public class CustomerController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity  salve(@Valid @RequestBody CustomerRequest customerRequest){
+    public ResponseEntity<Void>  salve(@Valid @RequestBody CustomerRequest customerRequest){
             customerService.save(customerRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }

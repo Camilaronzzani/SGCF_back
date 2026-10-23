@@ -33,7 +33,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/deactivate/{id}")
-    public ResponseEntity deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
+    public ResponseEntity<Void> deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
             if (!userService.authenticate(new AuthenticateRequest(request.email(), request.password()))) {
                 return ResponseEntity.status(401).build();
             }
@@ -48,7 +48,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity salve(@Valid @RequestBody EmployeeRequest employeeRequest){
+    public ResponseEntity<Void> salve(@Valid @RequestBody EmployeeRequest employeeRequest){
             employeeService.save(employeeRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }

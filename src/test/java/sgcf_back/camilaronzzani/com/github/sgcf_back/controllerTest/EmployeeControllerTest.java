@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.EmployeeController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.EmployeDto;
@@ -63,7 +63,7 @@ class EmployeeControllerTest {
         sampleEmployee.setId(1L);
         sampleEmployee.setCpf("52998224725");
         sampleEmployee.setName("alex");
-        sampleEmployee.setLanguagesSpoken(List.of(Language.Portuguese));
+        sampleEmployee.setLanguagesSpoken(List.of(Language.PORTUGUESE));
         sampleEmployee.setActive(true);
 
         sampleDto = EmployeDto.toDto(sampleEmployee);
@@ -71,7 +71,7 @@ class EmployeeControllerTest {
         sampleRequest = new EmployeeRequest(
                 "52998224725",
                 "camila",
-                List.of(Language.Portuguese),
+                List.of(Language.PORTUGUESE),
                 null
         );
     }

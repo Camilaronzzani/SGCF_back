@@ -64,7 +64,7 @@ public class PaymentService {
         payment.setCustomer(findCustomer(paymentRequest.customerId()));
         payment.setTotalAccount(paymentRequest.totalAccount());
         payment.setStatus(paymentRequest.status() == null
-                ? Status.Pending
+                ? Status.PENDING
                 : paymentRequest.status());
         payment.setActive(true);
         return payment;

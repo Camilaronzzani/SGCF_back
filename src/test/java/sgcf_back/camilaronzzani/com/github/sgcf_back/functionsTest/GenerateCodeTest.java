@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.FunctionsTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.functionsTest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;

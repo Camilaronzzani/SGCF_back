@@ -1,30 +1,26 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.config;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.SystemLogRepository;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@Slf4j
 public class SystemLogStore {
 
     private static SystemLogRepository repository;
 
     private static boolean salvando = false;
 
-    @Autowired
-    private SystemLogRepository systemLogRepository;
-
-    @PostConstruct
-    public void init() {
-        repository = systemLogRepository;
+    public SystemLogStore(SystemLogRepository systemLogRepository) {
+        SystemLogStore.repository = systemLogRepository;
     }
 
-    public static void record(String level, String loggerName, String message,
-                              String exceptionType, String stackTrace) {
+    public static void writeLog(String level, String loggerName, String message,
+                                String exceptionType, String stackTrace) {
         if (repository == null || salvando) {
             return;
         }
@@ -42,7 +38,7 @@ public class SystemLogStore {
 
             repository.save(systemLog);
         } catch (Exception e) {
-            System.out.println("Nao foi possivel gravar o log no banco");
+            log.error("Nao foi possivel gravar o log no banco", e);
         } finally {
             salvando = false;
         }

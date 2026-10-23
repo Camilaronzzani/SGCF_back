@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import jakarta.servlet.http.HttpSession;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.QuotaDto;
@@ -13,6 +13,9 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.service.QuotaService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -262,14 +266,13 @@ class QuotaServiceTest {
         assertStatusCause(exception, HttpStatus.BAD_REQUEST);
     }
 
-    @Test
-    void updateRejectsEmployeeQuotaBelowMinimumTarget() {
+    @ParameterizedTest
+    @MethodSource("provideInvalidEmployeeQuotaRequests")
+    void updateRejectsInvalidEmployeeQuotaRequests(QuotaRequest request) {
         Employee employee = new Employee();
         Quota existing = new Quota(1L, LocalDate.of(2026, 9, 1),
                 LocalDate.of(2026, 9, 30), 1000.0, employee, true);
         when(quotaRepository.findById(1L)).thenReturn(Optional.of(existing));
-        QuotaRequest request = new QuotaRequest(LocalDate.of(2026, 10, 1),
-                LocalDate.of(2026, 10, 31), 99.0, 7L);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> quotaService.update(request, 1L));
@@ -277,34 +280,12 @@ class QuotaServiceTest {
         assertStatusCause(exception, HttpStatus.BAD_REQUEST);
     }
 
-    @Test
-    void updateRejectsEmployeeQuotaAboveMaximumTarget() {
-        Employee employee = new Employee();
-        Quota existing = new Quota(1L, LocalDate.of(2026, 9, 1),
-                LocalDate.of(2026, 9, 30), 1000.0, employee, true);
-        when(quotaRepository.findById(1L)).thenReturn(Optional.of(existing));
-        QuotaRequest request = new QuotaRequest(LocalDate.of(2026, 10, 1),
-                LocalDate.of(2026, 10, 31), 10001.0, 7L);
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> quotaService.update(request, 1L));
-
-        assertStatusCause(exception, HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void updateRejectsEmployeeQuotaWithInvalidDates() {
-        Employee employee = new Employee();
-        Quota existing = new Quota(1L, LocalDate.of(2026, 9, 1),
-                LocalDate.of(2026, 9, 30), 1000.0, employee, true);
-        when(quotaRepository.findById(1L)).thenReturn(Optional.of(existing));
-        QuotaRequest request = new QuotaRequest(LocalDate.of(2026, 10, 31),
-                LocalDate.of(2026, 10, 1), 1000.0, 7L);
-
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> quotaService.update(request, 1L));
-
-        assertStatusCause(exception, HttpStatus.BAD_REQUEST);
+    private static Stream<Arguments> provideInvalidEmployeeQuotaRequests() {
+        return Stream.of(
+                Arguments.of(new QuotaRequest(LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31), 99.0, 7L)),
+                Arguments.of(new QuotaRequest(LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31), 10001.0, 7L)),
+                Arguments.of(new QuotaRequest(LocalDate.of(2026, 10, 31), LocalDate.of(2026, 10, 1), 1000.0, 7L))
+        );
     }
 
     @Test
@@ -382,13 +363,13 @@ class QuotaServiceTest {
         LocalDate endDate = LocalDate.now().plusDays(10);
         Quota quota = new Quota(1L, startDate, endDate, 5000.0, null, true);
         when(reservationRepository.sumValueByStatusAndDateBetween(
-                Status.Confirmed, startDate, LocalDate.now())).thenReturn(2750.0);
+                Status.CONFIRMED, startDate, LocalDate.now())).thenReturn(2750.0);
 
         QuotaDto dto = quotaService.toDto(quota);
 
         assertEquals(2750.0, dto.achievedValue());
         verify(reservationRepository).sumValueByStatusAndDateBetween(
-                Status.Confirmed, startDate, LocalDate.now());
+                Status.CONFIRMED, startDate, LocalDate.now());
     }
 
     @Test
@@ -399,19 +380,23 @@ class QuotaServiceTest {
         employee.setId(7L);
         Quota quota = new Quota(1L, startDate, endDate, 1000.0, employee, true);
         when(reservationRepository.sumValueByEmployeeAndStatusAndDateBetween(
-                7L, Status.Confirmed, startDate, endDate)).thenReturn(850.0);
+                7L, Status.CONFIRMED, startDate, endDate)).thenReturn(850.0);
 
         QuotaDto dto = quotaService.toDto(quota);
 
         assertEquals(850.0, dto.achievedValue());
         assertNotNull(dto.employee());
         verify(reservationRepository).sumValueByEmployeeAndStatusAndDateBetween(
-                7L, Status.Confirmed, startDate, endDate);
+                7L, Status.CONFIRMED, startDate, endDate);
     }
 
     private void assertStatusCause(RuntimeException exception, HttpStatus expectedStatus) {
-        assertInstanceOf(ResponseStatusException.class, exception.getCause());
-        assertEquals(expectedStatus,
-                ((ResponseStatusException) exception.getCause()).getStatusCode());
+        if (exception instanceof ResponseStatusException rse) {
+            assertEquals(expectedStatus, rse.getStatusCode());
+        } else if (exception.getCause() instanceof ResponseStatusException rseCause) {
+            assertEquals(expectedStatus, rseCause.getStatusCode());
+        } else {
+            fail("Exceção lançada não é do tipo ResponseStatusException nem possui uma como causa.");
+        }
     }
 }

@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.PaymentController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PaymentRequest;
@@ -57,12 +57,12 @@ class PaymentControllerTest {
 
         samplePayment = new Payment();
         samplePayment.setId(1L);
-        samplePayment.setStatus(Status.Pending);
+        samplePayment.setStatus(Status.PENDING);
         samplePayment.setCustomer(sampleCustomer);
         samplePayment.setTotalAccount(300.0);
         samplePayment.setActive(true);
 
-        sampleRequest = new PaymentRequest(1L, Status.Pending, 300.0);
+        sampleRequest = new PaymentRequest(1L, Status.PENDING, 300.0);
     }
 
     @Test
@@ -179,15 +179,15 @@ class PaymentControllerTest {
     @DisplayName("Buscar pagamentos pelo status")
     void deveRetornarPagamentosPeloStatus() throws Exception {
         // Given
-        when(paymentService.findByStatus(Status.Pending)).thenReturn(List.of(samplePayment));
+        when(paymentService.findByStatus(Status.PENDING)).thenReturn(List.of(samplePayment));
 
         // When
-        ResultActions resposta = mockMvc.perform(get("/api/Payment/findByStatus/{status}", Status.Pending));
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findByStatus/{status}", Status.PENDING));
 
         // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
-        verify(paymentService, times(1)).findByStatus(Status.Pending);
+        verify(paymentService, times(1)).findByStatus(Status.PENDING);
     }
 
     @Test

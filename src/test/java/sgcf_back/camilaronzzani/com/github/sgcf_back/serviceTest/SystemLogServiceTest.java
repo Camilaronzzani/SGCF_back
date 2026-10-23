@@ -1,6 +1,5 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

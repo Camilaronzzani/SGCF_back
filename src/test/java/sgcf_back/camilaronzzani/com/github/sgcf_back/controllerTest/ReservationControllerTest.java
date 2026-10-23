@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.ReservationController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ReservationRequest;
@@ -72,7 +72,7 @@ class ReservationControllerTest {
         sampleReservation.setCustomer(sampleCustomer);
         sampleReservation.setEmployee(sampleEmployee);
         sampleReservation.setValue(150.0);
-        sampleReservation.setStatus(Status.Pending);
+        sampleReservation.setStatus(Status.PENDING);
         sampleReservation.setCustomersNotPaying(new ArrayList<>());
         sampleReservation.setActive(true);
 
@@ -81,7 +81,7 @@ class ReservationControllerTest {
                 1L,
                 1L,
                 1L,
-                Status.Pending,
+                Status.PENDING,
                 List.of(2L, 3L)
         );
     }
@@ -142,9 +142,9 @@ class ReservationControllerTest {
     @DisplayName("PATCH /api/reservation/updateStatus/{id} - Should update status")
     void updateStatus_ShouldReturnReservationWithNewStatus() throws Exception {
         Map<String, Status> statusMap = new HashMap<>();
-        statusMap.put("status", Status.Pending);
+        statusMap.put("status", Status.PENDING);
 
-        when(reservationService.updateStatus(1L, Status.Pending)).thenReturn(sampleReservation);
+        when(reservationService.updateStatus(1L, Status.PENDING)).thenReturn(sampleReservation);
 
         mockMvc.perform(patch("/api/reservation/updateStatus/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +152,7 @@ class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
 
-        verify(reservationService, times(1)).updateStatus(1L, Status.Pending);
+        verify(reservationService, times(1)).updateStatus(1L, Status.PENDING);
     }
 
     @Test
@@ -194,12 +194,12 @@ class ReservationControllerTest {
     @Test
     @DisplayName("GET /api/reservation/findByStatus/{status} - Should return reservations filtered by status")
     void findByStatus_ShouldReturnList() throws Exception {
-        when(reservationService.findByStatus(Status.Pending)).thenReturn(List.of(sampleReservation));
+        when(reservationService.findByStatus(Status.PENDING)).thenReturn(List.of(sampleReservation));
 
-        mockMvc.perform(get("/api/reservation/findByStatus/{status}", Status.Pending))
+        mockMvc.perform(get("/api/reservation/findByStatus/{status}", Status.PENDING))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
 
-        verify(reservationService, times(1)).findByStatus(Status.Pending);
+        verify(reservationService, times(1)).findByStatus(Status.PENDING);
     }
 }

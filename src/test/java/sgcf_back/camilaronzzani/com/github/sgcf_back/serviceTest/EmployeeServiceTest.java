@@ -120,6 +120,6 @@ class EmployeeServiceTest {
 
         assertNotNull(dto);
         verify(reservationRepository).countByEmployeeIdAndActiveTrue(1L);
-        verify(reservationRepository).sumValueByEmployeeAndStatus(1L, Status.Confirmed);
+        verify(reservationRepository).sumValueByEmployeeAndStatus(1L, Status.CONFIRMED);
     }
 }

@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,7 +58,7 @@ class TourServiceTest {
     void savePersistsTourFromRequest() {
         TourRequest request = new TourRequest(
                 1500.00,
-                CountryTour.Brazil,
+                CountryTour.BRAZIL,
                 500L,
                 "Beach Tour",
                 "Rio de Janeiro, Santos"
@@ -68,7 +68,7 @@ class TourServiceTest {
 
         verify(tourRepository).save(argThat(tour ->
                 tour.getPrice() == 1500.00
-                        && tour.getCountryTour() == CountryTour.Brazil
+                        && tour.getCountryTour() == CountryTour.BRAZIL
                         && tour.getKmOftour() == 500L
                         && tour.getNameOfTour().equals("Beach Tour")
                         && tour.getLocations().equals("Rio de Janeiro, Santos")
@@ -81,7 +81,7 @@ class TourServiceTest {
         existingTour.setId(1L);
         existingTour.setNameOfTour("Old Tour");
         existingTour.setPrice(1000.00);
-        existingTour.setCountryTour(CountryTour.Brazil);
+        existingTour.setCountryTour(CountryTour.BRAZIL);
         existingTour.setKmOftour(300L);
         existingTour.setLocations("Old Location");
 
@@ -89,7 +89,7 @@ class TourServiceTest {
 
         TourRequest updateRequest = new TourRequest(
                 2000.00,
-                CountryTour.Argentina,
+                CountryTour.ARGENTINA,
                 600L,
                 "Updated Tour",
                 "Buenos Aires, Mendoza"
@@ -99,7 +99,7 @@ class TourServiceTest {
 
         assertSame(existingTour, updated);
         assertEquals(2000.00, updated.getPrice());
-        assertEquals(CountryTour.Argentina, updated.getCountryTour());
+        assertEquals(CountryTour.ARGENTINA, updated.getCountryTour());
         assertEquals(600L, updated.getKmOftour());
         assertEquals("Updated Tour", updated.getNameOfTour());
         assertEquals("Buenos Aires, Mendoza", updated.getLocations());
@@ -146,7 +146,7 @@ class TourServiceTest {
 
         TourRequest newData = new TourRequest(
                 3000.00,
-                CountryTour.Paraguay,
+                CountryTour.PARAGUAY,
                 800L,
                 "New Name",
                 "Asuncion, Ciudad del Este"
@@ -156,7 +156,7 @@ class TourServiceTest {
 
         assertSame(existingTour, result);
         assertEquals(3000.00, result.getPrice());
-        assertEquals(CountryTour.Paraguay, result.getCountryTour());
+        assertEquals(CountryTour.PARAGUAY, result.getCountryTour());
         assertEquals(800L, result.getKmOftour());
         assertEquals("New Name", result.getNameOfTour());
         assertEquals("Asuncion, Ciudad del Este", result.getLocations());
@@ -180,7 +180,7 @@ class TourServiceTest {
 
         TourRequest request = new TourRequest(
                 1500.00,
-                CountryTour.Brazil,
+                CountryTour.BRAZIL,
                 500L,
                 "Beach Tour",
                 "Rio de Janeiro"
@@ -212,7 +212,7 @@ class TourServiceTest {
 
         TourRequest request = new TourRequest(
                 1500.00,
-                CountryTour.Brazil,
+                CountryTour.BRAZIL,
                 500L,
                 "Beach Tour",
                 "Rio de Janeiro"
@@ -239,7 +239,7 @@ class TourServiceTest {
 
         TourRequest request = new TourRequest(
                 1500.00,
-                CountryTour.Brazil,
+                CountryTour.BRAZIL,
                 500L,
                 "Beach Tour",
                 "Rio de Janeiro"

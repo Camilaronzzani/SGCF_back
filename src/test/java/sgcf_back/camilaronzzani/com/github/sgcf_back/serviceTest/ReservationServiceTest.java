@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,9 +90,9 @@ class ReservationServiceTest {
     @Test
     void findByStatusReturnsReservationsWithRequestedStatus() {
         List<Reservation> reservations = List.of(new Reservation());
-        when(reservationRepository.findByStatus(Status.Confirmed)).thenReturn(reservations);
+        when(reservationRepository.findByStatus(Status.CONFIRMED)).thenReturn(reservations);
 
-        assertSame(reservations, reservationService.findByStatus(Status.Confirmed));
+        assertSame(reservations, reservationService.findByStatus(Status.CONFIRMED));
     }
 
     @Test
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         when(customerRepository.findById(4L)).thenReturn(Optional.of(nonPayingCustomer));
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2026, 11, 10), 1L, 2L, 3L,
-                Status.Confirmed, List.of(4L));
+                Status.CONFIRMED, List.of(4L));
 
         Reservation reservation = reservationService.toReservation(request);
 
@@ -116,7 +116,7 @@ class ReservationServiceTest {
         assertSame(tour, reservation.getTour());
         assertSame(customer, reservation.getCustomer());
         assertSame(employee, reservation.getEmployee());
-        assertEquals(Status.Confirmed, reservation.getStatus());
+        assertEquals(Status.CONFIRMED, reservation.getStatus());
         assertEquals(List.of(nonPayingCustomer), reservation.getCustomersNotPaying());
         assertTrue(reservation.isActive());
     }
@@ -129,7 +129,7 @@ class ReservationServiceTest {
 
         Reservation reservation = reservationService.toReservation(request);
 
-        assertEquals(Status.Pending, reservation.getStatus());
+        assertEquals(Status.PENDING, reservation.getStatus());
         assertNotNull(reservation.getCustomersNotPaying());
         assertTrue(reservation.getCustomersNotPaying().isEmpty());
         assertTrue(reservation.isActive());
@@ -138,7 +138,7 @@ class ReservationServiceTest {
     @Test
     void toReservationRejectsMissingTourId() {
         ReservationRequest request = new ReservationRequest(
-                LocalDate.now(), null, 2L, 3L, Status.Pending, null);
+                LocalDate.now(), null, 2L, 3L, Status.PENDING, null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
@@ -151,7 +151,7 @@ class ReservationServiceTest {
     void toReservationRejectsMissingCustomerId() {
         when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour()));
         ReservationRequest request = new ReservationRequest(
-                LocalDate.now(), 1L, null, 3L, Status.Pending, null);
+                LocalDate.now(), 1L, null, 3L, Status.PENDING, null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
@@ -165,7 +165,7 @@ class ReservationServiceTest {
         when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour()));
         when(customerRepository.findById(2L)).thenReturn(Optional.of(new Customer()));
         ReservationRequest request = new ReservationRequest(
-                LocalDate.now(), 1L, 2L, null, Status.Pending, null);
+                LocalDate.now(), 1L, 2L, null, Status.PENDING, null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
@@ -177,7 +177,7 @@ class ReservationServiceTest {
     void toReservationRejectsUnknownRelatedEntity() {
         when(tourRepository.findById(1L)).thenReturn(Optional.empty());
         ReservationRequest request = new ReservationRequest(
-                LocalDate.now(), 1L, 2L, 3L, Status.Pending, null);
+                LocalDate.now(), 1L, 2L, 3L, Status.PENDING, null);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
@@ -201,7 +201,7 @@ class ReservationServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2026, 11, 10), 1L, 2L, 3L,
-                Status.Confirmed, List.of(4L));
+                Status.CONFIRMED, List.of(4L));
 
         reservationService.save(request);
 
@@ -209,7 +209,7 @@ class ReservationServiceTest {
                 reservation.getTour() == tour
                         && reservation.getCustomer() == customer
                         && reservation.getEmployee() == employee
-                        && reservation.getStatus() == Status.Pending
+                        && reservation.getStatus() == Status.PENDING
                         && reservation.getValue() == 400.0
                         && reservation.isActive()));
     }
@@ -229,7 +229,7 @@ class ReservationServiceTest {
         when(customerRepository.findById(4L)).thenReturn(Optional.of(nonPayingCustomer));
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2026, 12, 1), 1L, 2L, 3L,
-                Status.Confirmed, List.of(4L));
+                Status.CONFIRMED, List.of(4L));
 
         Reservation updated = reservationService.update(request, 1L);
 
@@ -238,7 +238,7 @@ class ReservationServiceTest {
         assertSame(tour, updated.getTour());
         assertSame(customer, updated.getCustomer());
         assertSame(employee, updated.getEmployee());
-        assertEquals(Status.Confirmed, updated.getStatus());
+        assertEquals(Status.CONFIRMED, updated.getStatus());
         assertEquals(300.0, updated.getValue());
     }
 
@@ -247,7 +247,7 @@ class ReservationServiceTest {
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
         stubRelatedEntities(1L, 2L, 3L);
         ReservationRequest request = new ReservationRequest(
-                LocalDate.now(), 1L, 2L, 3L, Status.Pending, null);
+                LocalDate.now(), 1L, 2L, 3L, Status.PENDING, null);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> reservationService.update(request, 1L));
@@ -260,10 +260,10 @@ class ReservationServiceTest {
         Reservation reservation = new Reservation();
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-        Reservation updated = reservationService.updateStatus(1L, Status.Confirmed);
+        Reservation updated = reservationService.updateStatus(1L, Status.CONFIRMED);
 
         assertSame(reservation, updated);
-        assertEquals(Status.Confirmed, updated.getStatus());
+        assertEquals(Status.CONFIRMED, updated.getStatus());
     }
 
     @Test
@@ -280,7 +280,7 @@ class ReservationServiceTest {
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> reservationService.updateStatus(1L, Status.Confirmed));
+                () -> reservationService.updateStatus(1L, Status.CONFIRMED));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }

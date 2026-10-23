@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.CustomerController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.CustomerRequest;
@@ -52,8 +52,8 @@ class CustomerControllerTest {
         sampleCustomer.setId(1L);
         sampleCustomer.setCpf("52998224725");
         sampleCustomer.setName("Camila");
-        sampleCustomer.setLanguageSpeak(List.of(Language.Portuguese));
-        sampleCustomer.setCountryCustomer(CountryCustomer.Brazil);
+        sampleCustomer.setLanguageSpeak(List.of(Language.PORTUGUESE));
+        sampleCustomer.setCountryCustomer(CountryCustomer.BRAZIL);
         sampleCustomer.setEmail("camila@email.com");
         sampleCustomer.setActive(true);
 
@@ -61,8 +61,8 @@ class CustomerControllerTest {
                 null,
                 "52998224725",
                 "Camila",
-                List.of(Language.Portuguese),
-                CountryCustomer.Brazil,
+                List.of(Language.PORTUGUESE),
+                CountryCustomer.BRAZIL,
                 "camila@email.com"
         );
     }

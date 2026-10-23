@@ -34,7 +34,7 @@ public class Payment {
     @PrePersist
     private void prePersist() {
         if (status == null) {
-            status = Status.Pending;
+            status = Status.PENDING;
         }
     }
 }

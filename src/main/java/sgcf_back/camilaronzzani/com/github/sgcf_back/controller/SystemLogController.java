@@ -50,7 +50,7 @@ public class SystemLogController {
     }
 
     private void requireManager(HttpSession session) {
-        if (session.getAttribute("userId") == null || session.getAttribute("permission") != Permission.Manager) {
+        if (session.getAttribute("userId") == null || session.getAttribute("permission") != Permission.MANAGER) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }

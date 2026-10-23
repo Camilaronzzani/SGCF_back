@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.PasswordResetController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;

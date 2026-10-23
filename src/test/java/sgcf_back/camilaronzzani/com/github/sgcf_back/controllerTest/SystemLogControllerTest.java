@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.SystemLogController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
@@ -53,11 +53,11 @@ class SystemLogControllerTest {
 
         managerSession = new MockHttpSession();
         managerSession.setAttribute("userId", 1L);
-        managerSession.setAttribute("permission", Permission.Manager);
+        managerSession.setAttribute("permission", Permission.MANAGER);
 
         unauthorizedSession = new MockHttpSession();
         unauthorizedSession.setAttribute("userId", 2L);
-        unauthorizedSession.setAttribute("permission", Permission.Employee);
+        unauthorizedSession.setAttribute("permission", Permission.EMPLOYEE);
     }
 
 
@@ -81,7 +81,7 @@ class SystemLogControllerTest {
 
 
     @Test
-    @DisplayName("GET /api/log/findAll - Manager session should return list of log DTOs")
+    @DisplayName("GET /api/log/findAll - MANAGER session should return list of log DTOs")
     void findAll_ManagerSession_ShouldReturnList() throws Exception {
         when(systemLogService.findAll("ERROR")).thenReturn(List.of(sampleLog));
 
@@ -98,7 +98,7 @@ class SystemLogControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/log/findId/{id} - Manager session should return log DTO by ID")
+    @DisplayName("GET /api/log/findId/{id} - MANAGER session should return log DTO by ID")
     void findById_ManagerSession_ShouldReturnLog() throws Exception {
         when(systemLogService.findById(1L)).thenReturn(sampleLog);
 
@@ -111,7 +111,7 @@ class SystemLogControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/log/summary - Manager session should return log counts summary map")
+    @DisplayName("GET /api/log/summary - MANAGER session should return log counts summary map")
     void summary_ManagerSession_ShouldReturnMap() throws Exception {
         Map<String, Long> mockSummary = Map.of("ERROR", 5L, "INFO", 12L);
         when(systemLogService.summary()).thenReturn(mockSummary);
@@ -125,7 +125,7 @@ class SystemLogControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/log/deleteAll - Manager session should delete all logs")
+    @DisplayName("DELETE /api/log/deleteAll - MANAGER session should delete all logs")
     void deleteAll_ManagerSession_ShouldReturnOk() throws Exception {
         when(systemLogService.deleteAll()).thenReturn("All logs deleted successfully");
 

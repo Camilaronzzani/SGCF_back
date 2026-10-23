@@ -18,7 +18,7 @@ public class DatabaseLogAppender extends AppenderBase<ILoggingEvent> {
         String exceptionType = throwable == null ? null : throwable.getClassName();
         String stackTrace = throwable == null ? null : ThrowableProxyUtil.asString(throwable);
 
-        sgcf_back.camilaronzzani.com.github.sgcf_back.config.SystemLogStore.record(
+        sgcf_back.camilaronzzani.com.github.sgcf_back.config.SystemLogStore.writeLog(
                 event.getLevel().toString(),
                 event.getLoggerName(),
                 event.getFormattedMessage(),

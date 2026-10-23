@@ -36,7 +36,7 @@ public class QuotaController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@Valid @RequestBody QuotaRequest quotaRequest) {
+    public ResponseEntity<Void> save(@Valid @RequestBody QuotaRequest quotaRequest) {
             quotaService.save(quotaRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -48,7 +48,7 @@ public class QuotaController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
             quotaService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

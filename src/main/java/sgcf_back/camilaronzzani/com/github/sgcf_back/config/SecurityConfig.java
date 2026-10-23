@@ -25,7 +25,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -37,15 +37,16 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
-    public CorsConfigurationSource cors (){
+    public CorsConfigurationSource cors() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
 
-        UrlBasedCorsConfigurationSource sourse = new UrlBasedCorsConfigurationSource();
-        sourse.registerCorsConfiguration("/**", config);
-        return sourse;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

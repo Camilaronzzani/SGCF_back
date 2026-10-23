@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ServiceTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +71,7 @@ class PaymentServiceTest {
 
         assertSame(customer, payment.getCustomer());
         assertEquals(125.50, payment.getTotalAccount());
-        assertEquals(Status.Pending, payment.getStatus());
+        assertEquals(Status.PENDING, payment.getStatus());
         assertTrue(payment.isActive());
     }
 
@@ -79,23 +79,23 @@ class PaymentServiceTest {
     void toPaymentUsesStatusProvidedInRequest() {
         Customer customer = new Customer();
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
-        PaymentRequest request = new PaymentRequest(7L, Status.Confirmed, 125.50);
+        PaymentRequest request = new PaymentRequest(7L, Status.CONFIRMED, 125.50);
 
-        assertEquals(Status.Confirmed, paymentService.toPayment(request).getStatus());
+        assertEquals(Status.CONFIRMED, paymentService.toPayment(request).getStatus());
     }
 
     @Test
     void savePersistsMappedPayment() {
         Customer customer = new Customer();
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
-        PaymentRequest request = new PaymentRequest(7L, Status.Pending, 125.50);
+        PaymentRequest request = new PaymentRequest(7L, Status.PENDING, 125.50);
 
         paymentService.save(request);
 
         verify(paymentRepository).save(argThat(payment ->
                 payment.getCustomer() == customer
                         && payment.getTotalAccount() == 125.50
-                        && payment.getStatus() == Status.Pending
+                        && payment.getStatus() == Status.PENDING
                         && payment.isActive()));
     }
 
@@ -105,14 +105,14 @@ class PaymentServiceTest {
         Customer customer = new Customer();
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
-        PaymentRequest request = new PaymentRequest(7L, Status.Confirmed, 200.0);
+        PaymentRequest request = new PaymentRequest(7L, Status.CONFIRMED, 200.0);
 
         Payment updated = paymentService.update(request, 1L);
 
         assertSame(existing, updated);
         assertSame(customer, updated.getCustomer());
         assertEquals(200.0, updated.getTotalAccount());
-        assertEquals(Status.Confirmed, updated.getStatus());
+        assertEquals(Status.CONFIRMED, updated.getStatus());
     }
 
     @Test
@@ -146,8 +146,8 @@ class PaymentServiceTest {
     @Test
     void findByStatusDelegatesToRepository() {
         List<Payment> payments = List.of(new Payment());
-        when(paymentRepository.findByStatus(Status.Confirmed)).thenReturn(payments);
+        when(paymentRepository.findByStatus(Status.CONFIRMED)).thenReturn(payments);
 
-        assertSame(payments, paymentService.findByStatus(Status.Confirmed));
+        assertSame(payments, paymentService.findByStatus(Status.CONFIRMED));
     }
 }
