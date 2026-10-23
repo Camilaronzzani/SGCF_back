@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 public class GenerateCode {
 
-    public GenerateCode() {
+    private GenerateCode() {
     }
 
     public static String generateCode() {

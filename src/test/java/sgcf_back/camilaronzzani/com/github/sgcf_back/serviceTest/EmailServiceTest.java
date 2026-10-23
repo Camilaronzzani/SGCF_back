@@ -35,7 +35,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void deveSubstituirOCodigoNoTemplate() throws Exception {
+    void loadTemplateReplacesCodePlaceholder() throws Exception {
         String html = service.loadTemplate("123456");
 
         assertTrue(html.contains("123456"));
@@ -43,7 +43,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void deveEnviarEmail() throws Exception {
+    void sendEmailSendsMessageWithSubject() throws Exception {
         MimeMessage message = criarMimeMessage();
         when(mailSender.createMimeMessage()).thenReturn(message);
 
@@ -54,7 +54,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void deveLancarErroQuandoEnvioFalha() {
+    void sendEmailThrowsWhenMailSenderFails() {
         when(mailSender.createMimeMessage()).thenReturn(criarMimeMessage());
         doThrow(new MailSendException("falha")).when(mailSender).send(any(MimeMessage.class));
 

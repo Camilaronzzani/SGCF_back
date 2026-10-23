@@ -78,15 +78,12 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Listar todos os funcionários")
-    void deveRetornarListaDeFuncionarios() throws Exception {
-        // Given
+    void findAllReturnsListOfEmployees() throws Exception {
         when(employeeService.findAll()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/employee/findAll"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -96,48 +93,39 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Desativar funcionário com senha certa")
-    void deveDesativarFuncionarioQuandoSenhaEstiverCerta() throws Exception {
-        // Given
+    void deactivateReturns204WhenPasswordIsCorrect() throws Exception {
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "123456");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(true);
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // Then
         resposta.andExpect(status().isNoContent());
         verify(employeeService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("Não desativar funcionário com senha errada")
-    void deveRetornar401QuandoSenhaEstiverErrada() throws Exception {
-        // Given
+    void deactivateReturns401WhenPasswordIsWrong() throws Exception {
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "wrong");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(false);
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // Then
         resposta.andExpect(status().isUnauthorized());
         verify(employeeService, never()).delete(anyLong());
     }
 
     @Test
     @DisplayName("Buscar funcionário pelo id")
-    void deveRetornarFuncionarioPeloId() throws Exception {
-        // Given
+    void findByIdReturnsEmployeeWhenItExists() throws Exception {
         when(employeeService.findById(1L)).thenReturn(sampleEmployee);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/employee/findId/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.cpf").value("52998224725"));
@@ -146,32 +134,26 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Salvar funcionário")
-    void deveSalvarFuncionarioERetornar201() throws Exception {
-        // Given
+    void saveReturns201WhenRequestIsValid() throws Exception {
         doNothing().when(employeeService).save(any(EmployeeRequest.class));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/employee/save")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isCreated());
         verify(employeeService, times(1)).save(any(EmployeeRequest.class));
     }
 
     @Test
     @DisplayName("Atualizar funcionário")
-    void deveAtualizarFuncionario() throws Exception {
-        // Given
+    void updateReturnsUpdatedEmployee() throws Exception {
         when(employeeService.update(any(EmployeeRequest.class), eq(1L))).thenReturn(sampleEmployee);
 
-        // When
         ResultActions resposta = mockMvc.perform(put("/api/employee/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
         verify(employeeService, times(1)).update(any(EmployeeRequest.class), eq(1L));
@@ -179,15 +161,12 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Listar funcionários ativos")
-    void deveRetornarListaDeFuncionariosAtivos() throws Exception {
-        // Given
+    void findAllActiveReturnsListOfActiveEmployees() throws Exception {
         when(employeeService.findAllActive()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/employee/findAll/active"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));

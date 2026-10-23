@@ -15,7 +15,7 @@ class GenerateCodeTest {
 
     @Test
     @DisplayName("generateCode - Should return a 6-digit numeric string")
-    void generateCode_ShouldReturnSixDigitString() {
+    void generateCodeReturnsSixDigitString() {
         String code = GenerateCode.generateCode();
 
         assertNotNull(code);
@@ -25,16 +25,16 @@ class GenerateCodeTest {
 
     @Test
     @DisplayName("generateCode - Should generate a value between 100000 and 999999 inclusive")
-    void generateCode_ShouldBeWithinExpectedRange() {
+    void generateCodeReturnsValueWithinExpectedRange() {
         String codeStr = GenerateCode.generateCode();
-        int code = Integer.parseInt(codeStr);
 
+        int code = Integer.parseInt(codeStr);
         assertTrue(code >= 100000 && code <= 999999, "Generated code must be between 100000 and 999999");
     }
 
     @RepeatedTest(100)
     @DisplayName("generateCode - Repeated executions should consistently produce valid 6-digit codes")
-    void generateCode_RepeatedCheck() {
+    void generateCodeAlwaysReturnsValidCode() {
         String codeStr = GenerateCode.generateCode();
 
         assertEquals(6, codeStr.length());
@@ -44,7 +44,7 @@ class GenerateCodeTest {
 
     @Test
     @DisplayName("generateCode - Should produce random distinct values across multiple calls")
-    void generateCode_ShouldProduceVariedCodes() {
+    void generateCodeReturnsDifferentValuesAcrossCalls() {
         Set<String> generatedCodes = new HashSet<>();
         int iterations = 100;
 

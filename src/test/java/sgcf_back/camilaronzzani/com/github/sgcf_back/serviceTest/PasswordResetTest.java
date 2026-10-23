@@ -43,7 +43,7 @@ class PasswordResetTest {
     private PasswordResetService service;
 
     @Test
-    void deveSolicitarRedefinicaoDeSenha() throws Exception {
+    void requestPasswordResetSendsEmailAndSavesToken() throws Exception {
         PasswordResetRequest request = mock(PasswordResetRequest.class);
         when(request.email()).thenReturn("cliente@teste.com");
         when(userRepository.findByEmail("cliente@teste.com")).thenReturn(Optional.of(new User()));
@@ -56,7 +56,7 @@ class PasswordResetTest {
     }
 
     @Test
-    void deveLancarErroQuandoUsuarioNaoExiste() {
+    void requestPasswordResetThrowsWhenUserDoesNotExist() {
         PasswordResetRequest request = mock(PasswordResetRequest.class);
         when(request.email()).thenReturn("cliente@teste.com");
         when(userRepository.findByEmail("cliente@teste.com")).thenReturn(Optional.empty());
@@ -65,7 +65,7 @@ class PasswordResetTest {
     }
 
     @Test
-    void deveValidarTokenCorreto() {
+    void compareTokenReturnsTrueWhenTokenIsCorrect() {
         User user = new User();
         user.setId(1L);
 
@@ -87,7 +87,7 @@ class PasswordResetTest {
     }
 
     @Test
-    void deveRejeitarTokenIncorreto() {
+    void compareTokenReturnsFalseWhenTokenIsWrong() {
         User user = new User();
         user.setId(1L);
 

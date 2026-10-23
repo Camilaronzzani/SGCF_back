@@ -30,65 +30,70 @@ class CustomerServiceTest {
     private CustomerService service;
 
     @Test
-    void deveListarTodosOsClientes() {
+    void findAllReturnsAllCustomers() {
         Customer c = new Customer();
         when(customerRepository.findAll()).thenReturn(List.of(c));
 
         List<Customer> resultado = service.findAll();
+
         assertEquals(1, resultado.size());
     }
 
     @Test
-    void deveBuscarClientePorId() {
+    void findByIdReturnsCustomerWhenItExists() {
         Customer c = new Customer();
         c.setName("Maria");
         when(customerRepository.findById(1L)).thenReturn(Optional.of(c));
 
         Customer resultado = service.findById(1L);
+
         assertEquals("Maria", resultado.getName());
     }
 
     @Test
-    void deveLancarErroQuandoClienteNaoExiste() {
+    void findByIdThrowsWhenCustomerDoesNotExist() {
         when(customerRepository.findById(99L)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(99L));
+
         assertTrue(ex.getCause() instanceof ResponseStatusException);
     }
 
     @Test
-    void deveSalvarCliente() {
+    void saveStoresCustomerInRepository() {
         CustomerRequest request = mock(CustomerRequest.class);
 
         service.save(request);
+
         verify(customerRepository).save(any(Customer.class));
     }
 
     @Test
-    void deveAtualizarDadosDoCliente() {
+    void updateChangesCustomerData() {
         Customer c = new Customer();
         c.setName("Antigo");
         when(customerRepository.findById(1L)).thenReturn(Optional.of(c));
-
         CustomerRequest request = mock(CustomerRequest.class);
         when(request.name()).thenReturn("Novo");
 
         Customer resultado = service.update(request, 1L);
+
         assertEquals("Novo", resultado.getName());
     }
 
     @Test
-    void deveDesativarCliente() {
+    void deleteDeactivatesCustomer() {
         Customer c = new Customer();
         c.setActive(true);
         when(customerRepository.findById(1L)).thenReturn(Optional.of(c));
 
         service.delete(1L);
+
         assertFalse(c.isActive());
     }
 
     @Test
-    void deveListarApenasClientesAtivos() {
+    void findAllActiveReturnsOnlyActiveCustomers() {
         when(customerRepository.findByActiveTrue()).thenReturn(List.of(new Customer()));
 
         List<Customer> resultado = service.findAllActive();

@@ -1,6 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.TourRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Tour;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.ReservationRepository;
@@ -19,6 +20,8 @@ import static sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.reque
 @Slf4j
 @Service
 public class TourService {
+
+    private static final String TOUR_NOT_FOUND = "tour not found";
     @Autowired
     private TourRepository tourRepository;
 
@@ -32,7 +35,7 @@ public class TourService {
 
         } catch (RuntimeException e) {
             log.error("Error in TourService.findAll", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
 
     }
@@ -41,14 +44,14 @@ public class TourService {
         try {
 
             Tour tour = tourRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, TOUR_NOT_FOUND));
 
             log.info("Tour {} found successfully", id);
             return tour;
 
         } catch (Exception e) {
             log.error("Error in TourService.findById", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -62,14 +65,14 @@ public class TourService {
 
         } catch (Exception e) {
             log.error("Error in TourService.save", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
 
     public Tour changeDataByTour(long id, TourRequest newTour){
         Tour tourOld = tourRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, TOUR_NOT_FOUND));
 
         tourOld.setCountryTour(newTour.countryTour());
         tourOld.setNameOfTour(newTour.nameOfTour());
@@ -90,7 +93,7 @@ public class TourService {
 
         } catch (Exception e) {
             log.error("Error in TourService.update", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -99,13 +102,13 @@ public class TourService {
         try {
 
             Tour tour = tourRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, TOUR_NOT_FOUND));
             tour.setActive(false);
 
             log.info("Tour {} deactivated successfully", tour.getNameOfTour());
         } catch (Exception e) {
             log.error("Error in TourService.delete", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -116,7 +119,7 @@ public class TourService {
 
         } catch (Exception e) {
             log.error("Error in TourService.findAllActive", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 }

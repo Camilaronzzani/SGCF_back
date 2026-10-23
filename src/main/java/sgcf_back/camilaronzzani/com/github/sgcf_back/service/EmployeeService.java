@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.EmployeDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.EmployeeRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
@@ -32,7 +33,7 @@ public class EmployeeService {
             return employeeRepository.findAll();
         } catch (RuntimeException e) {
             log.error("Error in employeeService.findAll" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
 
     }
@@ -47,7 +48,7 @@ public class EmployeeService {
         } catch (Exception e) {
 
             log.error("Error in employeeService.findById" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -60,7 +61,7 @@ public class EmployeeService {
 
         } catch (Exception e) {
             log.error("Error in employeeService.findById" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -89,7 +90,7 @@ public class EmployeeService {
 
         } catch (Exception e) {
             log.error("Error in employeeService.update" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -104,7 +105,7 @@ public class EmployeeService {
 
         } catch (Exception e) {
             log.error("Error in employeeService.delete" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -115,7 +116,7 @@ public class EmployeeService {
 
         } catch (Exception e) {
             log.error("Error in employeeService.findAllActivate" , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 

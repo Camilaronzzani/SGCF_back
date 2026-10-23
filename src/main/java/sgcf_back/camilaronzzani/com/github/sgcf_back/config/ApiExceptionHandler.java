@@ -13,17 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-@Slf4j
+@Slf4j //log
 public class ApiExceptionHandler {
 
-    private static final String MESSAGE_KEY = "message";
+    private static final String MESSAGE = "message";
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException exception) {
         log.error("Request failed: {}", exception.getReason());
 
         Map<String, String> erro = new HashMap<>();
-        erro.put(MESSAGE_KEY, exception.getReason());
+        erro.put(MESSAGE, exception.getReason());
 
         return ResponseEntity.status(exception.getStatusCode()).body(erro);
     }
@@ -52,7 +52,7 @@ public class ApiExceptionHandler {
 
         if (exception instanceof ErrorResponse errorResponse) {
             Map<String, String> aviso = new HashMap<>();
-            aviso.put(MESSAGE_KEY, exception.getMessage());
+            aviso.put(MESSAGE, exception.getMessage());
 
             return ResponseEntity.status(errorResponse.getStatusCode()).body(aviso);
         }
@@ -60,7 +60,7 @@ public class ApiExceptionHandler {
         log.error("Unexpected error", exception);
 
         Map<String, String> erro = new HashMap<>();
-        erro.put(MESSAGE_KEY, "erro ao processar a requisicao");
+        erro.put(MESSAGE, "erro ao processar a requisicao");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
     }

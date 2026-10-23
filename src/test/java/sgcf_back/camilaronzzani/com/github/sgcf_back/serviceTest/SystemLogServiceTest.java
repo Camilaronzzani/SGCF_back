@@ -1,6 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -223,45 +225,14 @@ class SystemLogServiceTest {
         assertEquals(5L, result.get("warn"));
     }
 
-    @Test
-    void deleteAllRemovesAllLogsAndReturnsCorrectMessage() {
-        when(systemLogRepository.count()).thenReturn(50L);
+    @ParameterizedTest
+    @ValueSource(longs = {0L, 1L, 50L, 10000L})
+    void deleteAllRemovesLogsAndReturnsCountMessage(long count) {
+        when(systemLogRepository.count()).thenReturn(count);
 
         String result = systemLogService.deleteAll();
 
-        assertEquals("50 log(s) removido(s)", result);
-        verify(systemLogRepository).count();
-        verify(systemLogRepository).deleteAll();
-    }
-
-    @Test
-    void deleteAllWorksWhenNoLogsExist() {
-        when(systemLogRepository.count()).thenReturn(0L);
-
-        String result = systemLogService.deleteAll();
-
-        assertEquals("0 log(s) removido(s)", result);
-        verify(systemLogRepository).count();
-        verify(systemLogRepository).deleteAll();
-    }
-
-    @Test
-    void deleteAllRemovesSingleLog() {
-        when(systemLogRepository.count()).thenReturn(1L);
-
-        String result = systemLogService.deleteAll();
-
-        assertEquals("1 log(s) removido(s)", result);
-        verify(systemLogRepository).deleteAll();
-    }
-
-    @Test
-    void deleteAllRemovesLargeNumberOfLogs() {
-        when(systemLogRepository.count()).thenReturn(10000L);
-
-        String result = systemLogService.deleteAll();
-
-        assertEquals("10000 log(s) removido(s)", result);
+        assertEquals(count + " log(s) removido(s)", result);
         verify(systemLogRepository).count();
         verify(systemLogRepository).deleteAll();
     }

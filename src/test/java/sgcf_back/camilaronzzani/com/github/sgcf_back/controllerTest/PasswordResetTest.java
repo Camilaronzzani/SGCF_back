@@ -44,18 +44,15 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Pedir troca de senha")
-    void deveRetornarMensagemAoPedirTrocaDeSenha() throws Exception {
-        // Given
+    void requestPasswordResetReturnsMessage() throws Exception {
         PasswordResetRequest request = new PasswordResetRequest("camila@email.com");
         when(passwordResetService.requestPasswordReset(any(PasswordResetRequest.class)))
                 .thenReturn("Email sent");
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/password/reset/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Email sent"));
         verify(passwordResetService, times(1)).requestPasswordReset(any(PasswordResetRequest.class));
@@ -63,18 +60,15 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Token válido")
-    void deveRetornarTrueQuandoTokenForValido() throws Exception {
-        // Given
+    void compareTokenReturnsTrueWhenTokenIsValid() throws Exception {
         TokenRequest request = new TokenRequest("123456", "camila@email.com");
         when(passwordResetService.compareToken(any(TokenRequest.class)))
                 .thenReturn(new BooleanRequest(true, "Valid token"));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/password/reset/compareToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.bool").value(true))
                 .andExpect(jsonPath("$.message").value("Valid token"));
@@ -83,18 +77,15 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Token inválido")
-    void deveRetornarFalseQuandoTokenForInvalido() throws Exception {
-        // Given
+    void compareTokenReturnsFalseWhenTokenIsInvalid() throws Exception {
         TokenRequest request = new TokenRequest("000000", "camila@email.com");
         when(passwordResetService.compareToken(any(TokenRequest.class)))
                 .thenReturn(new BooleanRequest(false, "Invalid token"));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/password/reset/compareToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.bool").value(false));
         verify(passwordResetService, times(1)).compareToken(any(TokenRequest.class));

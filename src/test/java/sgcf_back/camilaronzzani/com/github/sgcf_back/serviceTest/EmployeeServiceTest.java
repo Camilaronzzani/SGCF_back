@@ -39,7 +39,7 @@ class EmployeeServiceTest {
     private EmployeeService service;
 
     @Test
-    void deveListarTodosOsFuncionarios() {
+    void findAllReturnsAllEmployees() {
         when(employeeRepository.findAll()).thenReturn(List.of(new Employee()));
 
         List<Employee> resultado = service.findAll();
@@ -48,7 +48,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveBuscarFuncionarioPorId() {
+    void findByIdReturnsEmployeeWhenItExists() {
         Employee e = new Employee();
         e.setName("Joao");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
@@ -59,7 +59,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveLancarErroQuandoFuncionarioNaoExiste() {
+    void findByIdThrowsWhenEmployeeDoesNotExist() {
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(99L));
@@ -68,7 +68,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveSalvarFuncionario() {
+    void saveStoresEmployeeInRepository() {
         EmployeeRequest request = mock(EmployeeRequest.class);
 
         service.save(request);
@@ -77,11 +77,10 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveAtualizarDadosDoFuncionario() {
+    void updateChangesEmployeeData() {
         Employee e = new Employee();
         e.setName("Antigo");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
-
         EmployeeRequest request = mock(EmployeeRequest.class);
         when(request.name()).thenReturn("Novo");
 
@@ -91,7 +90,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveDesativarFuncionario() {
+    void deleteDeactivatesEmployee() {
         Employee e = new Employee();
         e.setActive(true);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
@@ -102,7 +101,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveListarApenasFuncionariosAtivos() {
+    void findAllActiveReturnsOnlyActiveEmployees() {
         when(employeeRepository.findByActiveTrue()).thenReturn(List.of(new Employee()));
 
         List<Employee> resultado = service.findAllActive();
@@ -111,7 +110,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void deveMontarDtoResumido() {
+    void toSummaryDtoBuildsDtoUsingReservationTotals() {
         Employee e = new Employee();
         e.setId(1L);
         e.setName("Joao");

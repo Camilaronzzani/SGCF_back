@@ -69,14 +69,11 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Listar todos os clientes")
-    void deveRetornarListaDeClientes() throws Exception {
-        // Given
+    void findAllReturnsListOfCustomers() throws Exception {
         when(customerService.findAll()).thenReturn(List.of(sampleCustomer));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/customer/findAll"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -86,14 +83,11 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Buscar cliente pelo id")
-    void deveRetornarClientePeloId() throws Exception {
-        // Given
+    void findByIdReturnsCustomerWhenItExists() throws Exception {
         when(customerService.findById(1L)).thenReturn(sampleCustomer);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/customer/findById/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.email").value("camila@email.com"));
@@ -102,32 +96,26 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Salvar cliente")
-    void deveSalvarClienteERetornar201() throws Exception {
-        // Given
+    void saveReturns201WhenRequestIsValid() throws Exception {
         doNothing().when(customerService).save(any(CustomerRequest.class));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/customer/save")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isCreated());
         verify(customerService, times(1)).save(any(CustomerRequest.class));
     }
 
     @Test
     @DisplayName("Atualizar cliente")
-    void deveAtualizarCliente() throws Exception {
-        // Given
+    void updateReturnsUpdatedCustomer() throws Exception {
         when(customerService.update(any(CustomerRequest.class), eq(1L))).thenReturn(sampleCustomer);
 
-        // When
         ResultActions resposta = mockMvc.perform(put("/api/customer/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
         verify(customerService, times(1)).update(any(CustomerRequest.class), eq(1L));
@@ -135,28 +123,22 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Deletar cliente")
-    void deveDeletarClienteERetornar204() throws Exception {
-        // Given
+    void deleteReturns204WhenCustomerIsDeleted() throws Exception {
         doNothing().when(customerService).delete(1L);
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/customer/delete/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isNoContent());
         verify(customerService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("Listar clientes ativos")
-    void deveRetornarListaDeClientesAtivos() throws Exception {
-        // Given
+    void findAllActiveReturnsListOfActiveCustomers() throws Exception {
         when(customerService.findAllActive()).thenReturn(List.of(sampleCustomer));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/customer/findAll/active"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));

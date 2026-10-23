@@ -59,6 +59,7 @@ class UserServiceTest {
         when(userRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(RuntimeException.class, () -> userService.findAll());
+
         verify(userRepository).findAll();
     }
 
@@ -84,7 +85,7 @@ class UserServiceTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.findById(1L));
-        
+
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         ResponseStatusException rse = (ResponseStatusException) exception.getCause();
@@ -262,6 +263,7 @@ class UserServiceTest {
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> userService.update(request, 999L));
+
         verify(userRepository).findById(999L);
         verify(passwordEncoder, never()).encode(anyString());
     }
@@ -288,6 +290,7 @@ class UserServiceTest {
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> userService.delete(999L));
+
         verify(userRepository).findById(999L);
     }
 
@@ -315,6 +318,7 @@ class UserServiceTest {
         when(userRepository.findByActiveTrue()).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(RuntimeException.class, () -> userService.findAllActive());
+
         verify(userRepository).findByActiveTrue();
     }
 

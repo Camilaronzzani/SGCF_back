@@ -24,19 +24,21 @@ class CurrencyServiceTest {
     }
 
     @Test
-    void deveRetornarCotacao() {
+    void getQuotationReturnsBidValueFromApi() {
         String json = "{\"USDBRL\": {\"bid\": \"5.35\"}}";
-
         server.expect(requestTo("https://economia.awesomeapi.com.br/json/last/USD-BRL"))
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
+
         double resultado = service.getQuotation("USD");
+
         assertEquals(5.35, resultado, 0.001);
     }
 
     @Test
-    void deveLancarErroQuandoRespostaVazia() {
+    void getQuotationThrowsWhenResponseIsEmpty() {
         server.expect(requestTo("https://economia.awesomeapi.com.br/json/last/USD-BRL"))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+
         assertThrows(ResponseStatusException.class, () -> service.getQuotation("USD"));
     }
 }

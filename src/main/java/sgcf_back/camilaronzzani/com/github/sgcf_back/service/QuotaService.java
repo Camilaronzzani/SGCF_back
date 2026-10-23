@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.QuotaDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.QuotaRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
@@ -40,7 +41,7 @@ public class QuotaService {
 
         } catch (RuntimeException e) {
             log.error("Error in QuotaService.findAll ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -54,7 +55,7 @@ public class QuotaService {
 
         } catch (Exception e) {
             log.error("Error in QuotaService.findById ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -68,7 +69,7 @@ public class QuotaService {
 
         } catch (Exception e) {
             log.error("Error in QuotaService.save ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -105,7 +106,7 @@ public class QuotaService {
 
         } catch (Exception e) {
             log.error("Error in QuotaService.update ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -125,7 +126,7 @@ public class QuotaService {
 
         } catch (Exception e) {
             log.error("Error in QuotaService.delete ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -137,7 +138,7 @@ public class QuotaService {
             return quotaList;
         } catch (Exception e) {
             log.error("Error in QuotaService.findAllActive ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -147,7 +148,7 @@ public class QuotaService {
             return quotaRepository.findByEmployeeId(employeeId);
         } catch (Exception e) {
             log.error("Error in QuotaService.findByEmployee ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -157,7 +158,7 @@ public class QuotaService {
             return quotaRepository.findByEmployeeIsNull();
         } catch (Exception e) {
             log.error("Error in QuotaService.findAllCompany ", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -194,13 +195,6 @@ public class QuotaService {
         validateEmployeeTarget(quotaRequest.targetValue());
     }
 
-    private void validateCompanyTarget(Object value) {
-        if (value == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "targetValue is required");
-        }
-        validateCompanyTarget(parseTarget(value));
-    }
-
     private void validateCompanyTarget(double targetValue) {
         if (!Double.isFinite(targetValue) || targetValue < 5000) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "company quota must be at least 5000");
@@ -219,13 +213,6 @@ public class QuotaService {
         }
     }
 
-    private double parseTarget(Object value) {
-        try {
-            return Double.parseDouble(value.toString());
-        } catch (NumberFormatException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "targetValue must be a number");
-        }
-    }
 
 
     public Employee findEmployee(Long employeeId) {

@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.CustomerRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.CustomerRepository;
@@ -18,6 +19,8 @@ import static sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.reque
 @Service
 public class CustomerService {
 
+    private static final String CUSTOMER_NOT_FOUND = "customer not found";
+
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -29,19 +32,19 @@ public class CustomerService {
         return customerList;
         } catch (Exception e) {
             log.error("Error in CustomerService.findAll()", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
     public Customer findById(long id) {
         try {
             Customer customer = customerRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, CUSTOMER_NOT_FOUND));
             log.info("Customer found successfully {}" , customer);
             return customer;
         } catch (Exception e) {
             log.error("Error in CustomerService.findById()", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -52,14 +55,14 @@ public class CustomerService {
             log.info("Customer saved  successfully: {}" , customer);
         } catch (Exception e) {
             log.error("Error in CustomerService.save()", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
 
     public Customer changeDataByCustomer(long id, CustomerRequest newCustomer){
         Customer customerOld = customerRepository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, CUSTOMER_NOT_FOUND));
 
         customerOld.setCountryCustomer(newCustomer.countryCustomer());
         customerOld.setCnpj(newCustomer.cnpj());
@@ -81,7 +84,7 @@ public class CustomerService {
 
         } catch (Exception e) {
             log.error("Error in CustomerService.update()", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -89,7 +92,7 @@ public class CustomerService {
     public void delete(long id) {
         try {
             Customer customer = customerRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, CUSTOMER_NOT_FOUND));
 
             customer.setActive(false);
 
@@ -97,7 +100,7 @@ public class CustomerService {
 
         } catch (Exception e) {
             log.error("Error in CustomerService.delete " , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -108,7 +111,7 @@ public class CustomerService {
 
         } catch (Exception e) {
             log.error("Error in CustomerService.findAllActive " , e );
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 }

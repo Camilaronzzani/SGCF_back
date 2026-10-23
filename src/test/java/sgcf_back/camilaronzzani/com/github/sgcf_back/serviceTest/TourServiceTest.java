@@ -38,7 +38,9 @@ class TourServiceTest {
         List<Tour> tours = List.of(new Tour());
         when(tourRepository.findAll()).thenReturn(tours);
 
-        assertSame(tours, tourService.findAll());
+        List<Tour> result = tourService.findAll();
+
+        assertSame(tours, result);
     }
 
     @Test
@@ -84,9 +86,7 @@ class TourServiceTest {
         existingTour.setCountryTour(CountryTour.BRAZIL);
         existingTour.setKmOftour(300L);
         existingTour.setLocations("Old Location");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(existingTour));
-
         TourRequest updateRequest = new TourRequest(
                 2000.00,
                 CountryTour.ARGENTINA,
@@ -111,7 +111,6 @@ class TourServiceTest {
         tour.setId(1L);
         tour.setActive(true);
         tour.setNameOfTour("Tour to Delete");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
 
         tourService.delete(1L);
@@ -127,7 +126,6 @@ class TourServiceTest {
         Tour tour2 = new Tour();
         tour2.setActive(true);
         List<Tour> activeTours = List.of(tour1, tour2);
-
         when(tourRepository.findByActiveTrue()).thenReturn(activeTours);
 
         List<Tour> result = tourService.findAllActive();
@@ -141,9 +139,7 @@ class TourServiceTest {
         Tour existingTour = new Tour();
         existingTour.setId(1L);
         existingTour.setNameOfTour("Old Name");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(existingTour));
-
         TourRequest newData = new TourRequest(
                 3000.00,
                 CountryTour.PARAGUAY,
@@ -177,7 +173,6 @@ class TourServiceTest {
     @Test
     void updateWrapsNotFoundErrorWhenTourDoesNotExist() {
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.BRAZIL,
@@ -209,7 +204,6 @@ class TourServiceTest {
     @Test
     void changeDataByTourThrowsNotFoundWhenTourDoesNotExist() {
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.BRAZIL,
@@ -236,7 +230,6 @@ class TourServiceTest {
     void saveWrapsExceptionWhenRepositoryFails() {
         when(tourRepository.save(any(Tour.class)))
                 .thenThrow(new RuntimeException("Database error"));
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.BRAZIL,

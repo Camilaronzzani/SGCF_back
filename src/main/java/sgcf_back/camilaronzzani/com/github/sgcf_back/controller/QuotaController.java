@@ -42,8 +42,8 @@ public class QuotaController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
-            QuotaDto quotaDto = quotaService.toDto(quotaService.update(quotaRequest, id));
+    public ResponseEntity<Void> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
+            quotaService.update(quotaRequest, id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
