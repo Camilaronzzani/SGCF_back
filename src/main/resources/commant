@@ -1,0 +1,1 @@
+.\mvnw clean verify "org.sonarsource.scanner.maven:sonar-maven-plugin:3.10.0.2594:sonar" "-Dsonar.projectKey=SGCF_back" "-Dsonar.projectName=SGCF_back" "-Dsonar.host.url=http://localhost:9000" "-Dsonar.login=sqp_b72c6643b8b3874e486a6430650d5bf7a99c8d18"
