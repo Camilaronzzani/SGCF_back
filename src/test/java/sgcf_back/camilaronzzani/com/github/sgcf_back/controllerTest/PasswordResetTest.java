@@ -88,4 +88,32 @@ class PasswordResetTest {
                 .andExpect(jsonPath("$.bool").value(false));
         verify(passwordResetService, times(1)).compareToken(any(TokenRequest.class));
     }
+
+    @Test
+    @DisplayName("Não pedir troca de senha com email inválido")
+    void requestPasswordResetReturns400WhenEmailIsInvalid() throws Exception {
+        PasswordResetRequest invalidRequest = new PasswordResetRequest("email-errado");
+
+        ResultActions resposta = mockMvc.perform(post("/api/password/reset/request")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").exists());
+        verify(passwordResetService, never()).requestPasswordReset(any());
+    }
+
+    @Test
+    @DisplayName("Não comparar token vazio")
+    void compareTokenReturns400WhenTokenIsBlank() throws Exception {
+        TokenRequest invalidRequest = new TokenRequest("", "camila@email.com");
+
+        ResultActions resposta = mockMvc.perform(post("/api/password/reset/compareToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.token").exists());
+        verify(passwordResetService, never()).compareToken(any());
+    }
 }

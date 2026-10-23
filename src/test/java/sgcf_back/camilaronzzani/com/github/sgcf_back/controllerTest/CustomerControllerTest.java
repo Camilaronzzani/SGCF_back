@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -21,6 +24,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -102,7 +106,9 @@ class CustomerControllerTest {
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(customerService, times(1)).save(any(CustomerRequest.class));
+        ArgumentCaptor<CustomerRequest> captor = ArgumentCaptor.forClass(CustomerRequest.class);
+        verify(customerService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -141,5 +147,30 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));
         verify(customerService, times(1)).findAllActive();
+    }
+
+    @Test
+    @DisplayName("Buscar cliente com id que não existe")
+    void findByIdReturns404WhenCustomerDoesNotExist() throws Exception {
+        when(customerService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "customer not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/customer/findById/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("customer not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar cliente com email inválido")
+    void saveReturns400WhenEmailIsInvalid() throws Exception {
+        CustomerRequest invalidRequest = new CustomerRequest(null, "52998224725", "Camila", List.of(Language.Portuguese), CountryCustomer.Brazil, "email-errado");
+
+        ResultActions resposta = mockMvc.perform(post("/api/customer/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").exists());
+        verify(customerService, never()).save(any());
     }
 }

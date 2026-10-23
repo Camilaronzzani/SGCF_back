@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -108,7 +111,9 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(sampleUserRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(userService, times(1)).save(any(UserRequest.class));
+        ArgumentCaptor<UserRequest> captor = ArgumentCaptor.forClass(UserRequest.class);
+        verify(userService, times(1)).save(captor.capture());
+        assertEquals(sampleUserRequest, captor.getValue());
     }
 
     @Test
@@ -242,5 +247,30 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(resetRequest)));
 
         resposta.andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Buscar usuário com id que não existe")
+    void findByIdReturns404WhenUserDoesNotExist() throws Exception {
+        when(userService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/user/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("user not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar usuário com email inválido")
+    void saveReturns400WhenEmailIsInvalid() throws Exception {
+        UserRequest invalidRequest = new UserRequest("johndoe", "password123", Permission.Manager, "email-errado", 1L);
+
+        ResultActions resposta = mockMvc.perform(post("/api/user/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").exists());
+        verify(userService, never()).save(any());
     }
 }

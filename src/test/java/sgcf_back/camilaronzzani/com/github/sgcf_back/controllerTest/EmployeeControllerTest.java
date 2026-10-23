@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -139,7 +143,9 @@ class EmployeeControllerTest {
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(employeeService, times(1)).save(any(EmployeeRequest.class));
+        ArgumentCaptor<EmployeeRequest> captor = ArgumentCaptor.forClass(EmployeeRequest.class);
+        verify(employeeService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -168,5 +174,30 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));
         verify(employeeService, times(1)).findAllActive();
+    }
+
+    @Test
+    @DisplayName("Buscar funcionário com id que não existe")
+    void findByIdReturns404WhenEmployeeDoesNotExist() throws Exception {
+        when(employeeService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "employee not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/employee/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("employee not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar funcionário com nome vazio")
+    void saveReturns400WhenNameIsBlank() throws Exception {
+        EmployeeRequest invalidRequest = new EmployeeRequest("52998224725", "", List.of(Language.Portuguese), null);
+
+        ResultActions resposta = mockMvc.perform(post("/api/employee/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.name").exists());
+        verify(employeeService, never()).save(any());
     }
 }

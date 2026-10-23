@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -19,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -97,7 +101,9 @@ class TourControllerTest {
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(tourService, times(1)).save(any(TourRequest.class));
+        ArgumentCaptor<TourRequest> captor = ArgumentCaptor.forClass(TourRequest.class);
+        verify(tourService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -136,5 +142,30 @@ class TourControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));
         verify(tourService, times(1)).findAllActive();
+    }
+
+    @Test
+    @DisplayName("Buscar passeio com id que não existe")
+    void findByIdReturns404WhenTourDoesNotExist() throws Exception {
+        when(tourService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "tour not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/tour/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("tour not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar passeio com nome vazio")
+    void saveReturns400WhenNameIsBlank() throws Exception {
+        TourRequest invalidRequest = new TourRequest(250.0, null, 120L, "", "Foz do Iguacu");
+
+        ResultActions resposta = mockMvc.perform(post("/api/tour/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.nameOfTour").exists());
+        verify(tourService, never()).save(any());
     }
 }

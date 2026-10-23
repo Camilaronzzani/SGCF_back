@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -119,7 +123,9 @@ class ReservationControllerTest {
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(reservationService, times(1)).save(any(ReservationRequest.class));
+        ArgumentCaptor<ReservationRequest> captor = ArgumentCaptor.forClass(ReservationRequest.class);
+        verify(reservationService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -199,5 +205,30 @@ class ReservationControllerTest {
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(reservationService, times(1)).findByStatus(Status.Pending);
+    }
+
+    @Test
+    @DisplayName("Buscar reserva com id que não existe")
+    void findByIdReturns404WhenReservationDoesNotExist() throws Exception {
+        when(reservationService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/reservation/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("reservation not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar reserva com data no passado")
+    void saveReturns400WhenDateIsInThePast() throws Exception {
+        ReservationRequest invalidRequest = new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, 1L, Status.Pending, List.of());
+
+        ResultActions resposta = mockMvc.perform(post("/api/reservation/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.date").exists());
+        verify(reservationService, never()).save(any());
     }
 }

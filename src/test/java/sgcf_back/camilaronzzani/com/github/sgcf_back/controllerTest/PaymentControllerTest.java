@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -22,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -109,7 +113,9 @@ class PaymentControllerTest {
 
         // Then
         resposta.andExpect(status().isCreated());
-        verify(paymentService, times(1)).save(any(PaymentRequest.class));
+        ArgumentCaptor<PaymentRequest> captor = ArgumentCaptor.forClass(PaymentRequest.class);
+        verify(paymentService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -201,5 +207,30 @@ class PaymentControllerTest {
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(5.25));
         verify(currencyService, times(1)).getQuotation("USD");
+    }
+
+    @Test
+    @DisplayName("Buscar pagamento com id que não existe")
+    void findByIdReturns404WhenPaymentDoesNotExist() throws Exception {
+        when(paymentService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "payment not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("payment not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar pagamento com valor negativo")
+    void saveReturns400WhenValueIsNegative() throws Exception {
+        PaymentRequest invalidRequest = new PaymentRequest(1L, Status.Pending, -10.0);
+
+        ResultActions resposta = mockMvc.perform(post("/api/Payment/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.totalAccount").exists());
+        verify(paymentService, never()).save(any());
     }
 }

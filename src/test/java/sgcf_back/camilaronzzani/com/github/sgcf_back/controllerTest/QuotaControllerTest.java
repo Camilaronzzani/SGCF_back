@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentCaptor;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -22,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -103,7 +107,9 @@ class QuotaControllerTest {
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
         resposta.andExpect(status().isCreated());
-        verify(quotaService, times(1)).save(any(QuotaRequest.class));
+        ArgumentCaptor<QuotaRequest> captor = ArgumentCaptor.forClass(QuotaRequest.class);
+        verify(quotaService, times(1)).save(captor.capture());
+        assertEquals(sampleRequest, captor.getValue());
     }
 
     @Test
@@ -167,5 +173,30 @@ class QuotaControllerTest {
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findAllCompany();
+    }
+
+    @Test
+    @DisplayName("Buscar meta com id que não existe")
+    void findByIdReturns404WhenQuotaDoesNotExist() throws Exception {
+        when(quotaService.findById(99L)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "quota not found"));
+
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findId/{id}", 99L));
+
+        resposta.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("quota not found"));
+    }
+
+    @Test
+    @DisplayName("Não salvar meta com valor negativo")
+    void saveReturns400WhenValueIsNegative() throws Exception {
+        QuotaRequest invalidRequest = new QuotaRequest(LocalDate.now(), LocalDate.now().plusDays(30), -1.0, 1L);
+
+        ResultActions resposta = mockMvc.perform(post("/api/quota/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)));
+
+        resposta.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.targetValue").exists());
+        verify(quotaService, never()).save(any());
     }
 }
