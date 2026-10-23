@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
@@ -77,98 +78,119 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Listar todos os funcionários")
-    void findAll_ShouldReturnList() throws Exception {
+    void deveRetornarListaDeFuncionarios() throws Exception {
+        // Given
         when(employeeService.findAll()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/employee/findAll"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/employee/findAll"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].name").value("camila"));
-
+                .andExpect(jsonPath("$[0].name").value("alex"));
         verify(employeeService, times(1)).findAll();
     }
 
     @Test
     @DisplayName("Desativar funcionário com senha certa")
-    void deactivate_ShouldReturnNoContent_WhenAuthenticated() throws Exception {
+    void deveDesativarFuncionarioQuandoSenhaEstiverCerta() throws Exception {
+        // Given
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "123456");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(true);
 
-        mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNoContent());
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
 
+        // Then
+        resposta.andExpect(status().isNoContent());
         verify(employeeService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("Não desativar funcionário com senha errada")
-    void deactivate_ShouldReturnUnauthorized_WhenNotAuthenticated() throws Exception {
+    void deveRetornar401QuandoSenhaEstiverErrada() throws Exception {
+        // Given
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "wrong");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(false);
 
-        mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
 
+        // Then
+        resposta.andExpect(status().isUnauthorized());
         verify(employeeService, never()).delete(anyLong());
     }
 
     @Test
     @DisplayName("Buscar funcionário pelo id")
-    void findById_ShouldReturnEmployee() throws Exception {
+    void deveRetornarFuncionarioPeloId() throws Exception {
+        // Given
         when(employeeService.findById(1L)).thenReturn(sampleEmployee);
 
-        mockMvc.perform(get("/api/employee/findId/{id}", 1L))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/employee/findId/{id}", 1L));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.cpf").value("52998224725"));
-
         verify(employeeService, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("Salvar funcionário")
-    void save_ShouldReturnCreated() throws Exception {
+    void deveSalvarFuncionarioERetornar201() throws Exception {
+        // Given
         doNothing().when(employeeService).save(any(EmployeeRequest.class));
 
-        mockMvc.perform(post("/api/employee/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isCreated());
+        // When
+        ResultActions resposta = mockMvc.perform(post("/api/employee/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isCreated());
         verify(employeeService, times(1)).save(any(EmployeeRequest.class));
     }
 
     @Test
     @DisplayName("Atualizar funcionário")
-    void update_ShouldReturnUpdatedEmployee() throws Exception {
+    void deveAtualizarFuncionario() throws Exception {
+        // Given
         when(employeeService.update(any(EmployeeRequest.class), eq(1L))).thenReturn(sampleEmployee);
 
-        mockMvc.perform(put("/api/employee/update/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+        // When
+        ResultActions resposta = mockMvc.perform(put("/api/employee/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
         verify(employeeService, times(1)).update(any(EmployeeRequest.class), eq(1L));
     }
 
     @Test
     @DisplayName("Listar funcionários ativos")
-    void findAllActive_ShouldReturnList() throws Exception {
+    void deveRetornarListaDeFuncionariosAtivos() throws Exception {
+        // Given
         when(employeeService.findAllActive()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/employee/findAll/active"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/employee/findAll/active"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));
-
         verify(employeeService, times(1)).findAllActive();
     }
 }

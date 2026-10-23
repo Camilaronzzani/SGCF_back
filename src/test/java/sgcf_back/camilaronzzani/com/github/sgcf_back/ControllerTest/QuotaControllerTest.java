@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
@@ -68,106 +69,130 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Listar todas as metas")
-    void findAll_ShouldReturnList() throws Exception {
+    void deveRetornarListaDeMetas() throws Exception {
+        // Given
         when(quotaService.findAll()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/quota/findAll"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findAll"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].targetValue").value(1000.0));
-
         verify(quotaService, times(1)).findAll();
     }
 
     @Test
     @DisplayName("Buscar meta pelo id")
-    void findById_ShouldReturnQuota() throws Exception {
+    void deveRetornarMetaPeloId() throws Exception {
+        // Given
         when(quotaService.findById(1L)).thenReturn(sampleQuota);
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/quota/findId/{id}", 1L))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findId/{id}", 1L));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.achievedValue").value(500.0));
-
         verify(quotaService, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("Salvar meta")
-    void save_ShouldReturnCreated() throws Exception {
+    void deveSalvarMetaERetornar201() throws Exception {
+        // Given
         doNothing().when(quotaService).save(any(QuotaRequest.class));
 
-        mockMvc.perform(post("/api/quota/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isCreated());
+        // When
+        ResultActions resposta = mockMvc.perform(post("/api/quota/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isCreated());
         verify(quotaService, times(1)).save(any(QuotaRequest.class));
     }
 
     @Test
     @DisplayName("Atualizar meta")
-    void update_ShouldReturnNoContent() throws Exception {
+    void deveAtualizarMetaERetornar204() throws Exception {
+        // Given
         when(quotaService.update(any(QuotaRequest.class), eq(1L))).thenReturn(sampleQuota);
 
-        mockMvc.perform(put("/api/quota/update/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isNoContent());
+        // When
+        ResultActions resposta = mockMvc.perform(put("/api/quota/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isNoContent());
         verify(quotaService, times(1)).update(any(QuotaRequest.class), eq(1L));
     }
 
     @Test
     @DisplayName("Deletar meta")
-    void delete_ShouldReturnNoContent() throws Exception {
+    void deveDeletarMetaERetornar204() throws Exception {
+        // Given
         doNothing().when(quotaService).delete(1L);
 
-        mockMvc.perform(delete("/api/quota/delete/{id}", 1L))
-                .andExpect(status().isNoContent());
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/quota/delete/{id}", 1L));
 
+        // Then
+        resposta.andExpect(status().isNoContent());
         verify(quotaService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("Listar metas ativas")
-    void findAllActive_ShouldReturnList() throws Exception {
+    void deveRetornarListaDeMetasAtivas() throws Exception {
+        // Given
         when(quotaService.findAllActive()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/quota/findAll/active"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findAll/active"));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findAllActive();
     }
 
     @Test
     @DisplayName("Buscar metas do funcionário")
-    void findByEmployee_ShouldReturnList() throws Exception {
+    void deveRetornarMetasDoFuncionario() throws Exception {
+        // Given
         when(quotaService.findByEmployee(1L)).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/quota/findByEmployee/{employeeId}", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findByEmployee/{employeeId}", 1L));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findByEmployee(1L);
     }
 
     @Test
     @DisplayName("Listar metas da empresa")
-    void findAllCompany_ShouldReturnList() throws Exception {
+    void deveRetornarMetasDaEmpresa() throws Exception {
+        // Given
         when(quotaService.findAllCompany()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        mockMvc.perform(get("/api/quota/findAll/company"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/quota/findAll/company"));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findAllCompany();
     }
 }

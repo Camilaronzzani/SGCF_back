@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
@@ -66,114 +67,141 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Listar todos os pagamentos")
-    void findAll_ShouldReturnList() throws Exception {
+    void deveRetornarListaDePagamentos() throws Exception {
+        // Given
         when(paymentService.findAll()).thenReturn(List.of(samplePayment));
 
-        mockMvc.perform(get("/api/Payment/findAll"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findAll"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].totalAccount").value(300.0));
-
         verify(paymentService, times(1)).findAll();
     }
 
     @Test
     @DisplayName("Buscar pagamento pelo id")
-    void findById_ShouldReturnPayment() throws Exception {
+    void deveRetornarPagamentoPeloId() throws Exception {
+        // Given
         when(paymentService.findById(1L)).thenReturn(samplePayment);
 
-        mockMvc.perform(get("/api/Payment/findId/{id}", 1L))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findId/{id}", 1L));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.customer.id").value(1L));
-
         verify(paymentService, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("Salvar pagamento")
-    void save_ShouldReturnCreated() throws Exception {
+    void deveSalvarPagamentoERetornar201() throws Exception {
+        // Given
         doNothing().when(paymentService).save(any(PaymentRequest.class));
 
-        mockMvc.perform(post("/api/Payment/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isCreated());
+        // When
+        ResultActions resposta = mockMvc.perform(post("/api/Payment/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isCreated());
         verify(paymentService, times(1)).save(any(PaymentRequest.class));
     }
 
     @Test
     @DisplayName("Atualizar pagamento")
-    void update_ShouldReturnUpdatedPayment() throws Exception {
+    void deveAtualizarPagamento() throws Exception {
+        // Given
         when(paymentService.update(any(PaymentRequest.class), eq(1L))).thenReturn(samplePayment);
 
-        mockMvc.perform(put("/api/Payment/update/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+        // When
+        ResultActions resposta = mockMvc.perform(put("/api/Payment/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
         verify(paymentService, times(1)).update(any(PaymentRequest.class), eq(1L));
     }
 
     @Test
     @DisplayName("Deletar pagamento")
-    void delete_ShouldReturnNoContent() throws Exception {
+    void deveDeletarPagamentoERetornar204() throws Exception {
+        // Given
         doNothing().when(paymentService).delete(1L);
 
-        mockMvc.perform(delete("/api/Payment/delete/{id}", 1L))
-                .andExpect(status().isNoContent());
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/Payment/delete/{id}", 1L));
 
+        // Then
+        resposta.andExpect(status().isNoContent());
         verify(paymentService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("Listar pagamentos ativos")
-    void findAllActive_ShouldReturnList() throws Exception {
+    void deveRetornarListaDePagamentosAtivos() throws Exception {
+        // Given
         when(paymentService.findAllActive()).thenReturn(List.of(samplePayment));
 
-        mockMvc.perform(get("/api/Payment/findAll/active"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findAll/active"));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findAllActive();
     }
 
     @Test
     @DisplayName("Buscar pagamentos do cliente")
-    void findByCustomer_ShouldReturnList() throws Exception {
+    void deveRetornarPagamentosDoCliente() throws Exception {
+        // Given
         when(paymentService.findByCustomer(1L)).thenReturn(List.of(samplePayment));
 
-        mockMvc.perform(get("/api/Payment/findByCustomer/{customerId}", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findByCustomer/{customerId}", 1L));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findByCustomer(1L);
     }
 
     @Test
     @DisplayName("Buscar pagamentos pelo status")
-    void findByStatus_ShouldReturnList() throws Exception {
+    void deveRetornarPagamentosPeloStatus() throws Exception {
+        // Given
         when(paymentService.findByStatus(Status.Pending)).thenReturn(List.of(samplePayment));
 
-        mockMvc.perform(get("/api/Payment/findByStatus/{status}", Status.Pending))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/findByStatus/{status}", Status.Pending));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findByStatus(Status.Pending);
     }
 
     @Test
     @DisplayName("Buscar cotação do dólar")
-    void getQuotations_ShouldReturnValue() throws Exception {
+    void deveRetornarCotacaoDoDolar() throws Exception {
+        // Given
         when(currencyService.getQuotation("USD")).thenReturn(5.25);
 
-        mockMvc.perform(get("/api/Payment/quotations"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(5.25));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/Payment/quotations"));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(5.25));
         verify(currencyService, times(1)).getQuotation("USD");
     }
 }
