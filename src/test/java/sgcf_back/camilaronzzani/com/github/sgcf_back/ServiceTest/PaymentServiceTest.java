@@ -35,27 +35,40 @@ class PaymentServiceTest {
 
     @Test
     void findAllReturnsPaymentsFromRepository() {
+        // Given
         List<Payment> payments = List.of(new Payment());
         when(paymentRepository.findAll()).thenReturn(payments);
 
-        assertSame(payments, paymentService.findAll());
+        // When
+        List<Payment> result = paymentService.findAll();
+
+        // Then
+        assertSame(payments, result);
     }
 
     @Test
     void findByIdReturnsPaymentWhenItExists() {
+        // Given
         Payment payment = new Payment();
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
 
-        assertSame(payment, paymentService.findById(1L));
+        // When
+        Payment result = paymentService.findById(1L);
+
+        // Then
+        assertSame(payment, result);
     }
 
     @Test
     void findByIdWrapsNotFoundErrorWhenPaymentDoesNotExist() {
+        // Given
         when(paymentRepository.findById(1L)).thenReturn(Optional.empty());
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> paymentService.findById(1L));
 
+        // Then
         assertInstanceOf(ResponseStatusException.class, exception.getCause());
         assertEquals(HttpStatus.NOT_FOUND,
                 ((ResponseStatusException) exception.getCause()).getStatusCode());
@@ -63,12 +76,15 @@ class PaymentServiceTest {
 
     @Test
     void toPaymentMapsRequestAndDefaultsStatusToPending() {
+        // Given
         Customer customer = new Customer();
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
         PaymentRequest request = new PaymentRequest(7L, null, 125.50);
 
+        // When
         Payment payment = paymentService.toPayment(request);
 
+        // Then
         assertSame(customer, payment.getCustomer());
         assertEquals(125.50, payment.getTotalAccount());
         assertEquals(Status.Pending, payment.getStatus());
@@ -77,21 +93,29 @@ class PaymentServiceTest {
 
     @Test
     void toPaymentUsesStatusProvidedInRequest() {
+        // Given
         Customer customer = new Customer();
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
         PaymentRequest request = new PaymentRequest(7L, Status.Confirmed, 125.50);
 
-        assertEquals(Status.Confirmed, paymentService.toPayment(request).getStatus());
+        // When
+        Payment payment = paymentService.toPayment(request);
+
+        // Then
+        assertEquals(Status.Confirmed, payment.getStatus());
     }
 
     @Test
     void savePersistsMappedPayment() {
+        // Given
         Customer customer = new Customer();
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
         PaymentRequest request = new PaymentRequest(7L, Status.Pending, 125.50);
 
+        // When
         paymentService.save(request);
 
+        // Then
         verify(paymentRepository).save(argThat(payment ->
                 payment.getCustomer() == customer
                         && payment.getTotalAccount() == 125.50
@@ -101,14 +125,17 @@ class PaymentServiceTest {
 
     @Test
     void updateChangesPaymentFieldsAndReturnsUpdatedPayment() {
+        // Given
         Payment existing = new Payment();
         Customer customer = new Customer();
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
         PaymentRequest request = new PaymentRequest(7L, Status.Confirmed, 200.0);
 
+        // When
         Payment updated = paymentService.update(request, 1L);
 
+        // Then
         assertSame(existing, updated);
         assertSame(customer, updated.getCustomer());
         assertEquals(200.0, updated.getTotalAccount());
@@ -117,37 +144,55 @@ class PaymentServiceTest {
 
     @Test
     void deleteMarksPaymentInactiveWithoutDeletingIt() {
+        // Given
         Payment payment = new Payment();
         payment.setActive(true);
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
 
+        // When
         paymentService.delete(1L);
 
+        // Then
         assertFalse(payment.isActive());
         verify(paymentRepository, never()).delete(any());
     }
 
     @Test
     void findAllActiveReturnsActivePaymentsFromRepository() {
+        // Given
         List<Payment> payments = List.of(new Payment());
         when(paymentRepository.findByActiveTrue()).thenReturn(payments);
 
-        assertSame(payments, paymentService.findAllActive());
+        // When
+        List<Payment> result = paymentService.findAllActive();
+
+        // Then
+        assertSame(payments, result);
     }
 
     @Test
     void findByCustomerDelegatesToRepository() {
+        // Given
         List<Payment> payments = List.of(new Payment());
         when(paymentRepository.findByCustomerId(7L)).thenReturn(payments);
 
-        assertSame(payments, paymentService.findByCustomer(7L));
+        // When
+        List<Payment> result = paymentService.findByCustomer(7L);
+
+        // Then
+        assertSame(payments, result);
     }
 
     @Test
     void findByStatusDelegatesToRepository() {
+        // Given
         List<Payment> payments = List.of(new Payment());
         when(paymentRepository.findByStatus(Status.Confirmed)).thenReturn(payments);
 
-        assertSame(payments, paymentService.findByStatus(Status.Confirmed));
+        // When
+        List<Payment> result = paymentService.findByStatus(Status.Confirmed);
+
+        // Then
+        assertSame(payments, result);
     }
 }

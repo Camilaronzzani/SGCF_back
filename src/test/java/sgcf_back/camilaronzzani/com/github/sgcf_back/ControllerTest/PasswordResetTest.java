@@ -44,7 +44,7 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Pedir troca de senha")
-    void deveRetornarMensagemAoPedirTrocaDeSenha() throws Exception {
+    void requestPasswordResetReturnsMessage() throws Exception {
         // Given
         PasswordResetRequest request = new PasswordResetRequest("camila@email.com");
         when(passwordResetService.requestPasswordReset(any(PasswordResetRequest.class)))
@@ -63,7 +63,7 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Token válido")
-    void deveRetornarTrueQuandoTokenForValido() throws Exception {
+    void compareTokenReturnsTrueWhenTokenIsValid() throws Exception {
         // Given
         TokenRequest request = new TokenRequest("123456", "camila@email.com");
         when(passwordResetService.compareToken(any(TokenRequest.class)))
@@ -83,7 +83,7 @@ class PasswordResetTest {
 
     @Test
     @DisplayName("Token inválido")
-    void deveRetornarFalseQuandoTokenForInvalido() throws Exception {
+    void compareTokenReturnsFalseWhenTokenIsInvalid() throws Exception {
         // Given
         TokenRequest request = new TokenRequest("000000", "camila@email.com");
         when(passwordResetService.compareToken(any(TokenRequest.class)))

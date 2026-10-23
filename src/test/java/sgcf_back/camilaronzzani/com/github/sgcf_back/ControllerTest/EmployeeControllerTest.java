@@ -78,7 +78,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Listar todos os funcionários")
-    void deveRetornarListaDeFuncionarios() throws Exception {
+    void findAllReturnsListOfEmployees() throws Exception {
         // Given
         when(employeeService.findAll()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);
@@ -96,7 +96,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Desativar funcionário com senha certa")
-    void deveDesativarFuncionarioQuandoSenhaEstiverCerta() throws Exception {
+    void deactivateReturns204WhenPasswordIsCorrect() throws Exception {
         // Given
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "123456");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(true);
@@ -113,7 +113,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Não desativar funcionário com senha errada")
-    void deveRetornar401QuandoSenhaEstiverErrada() throws Exception {
+    void deactivateReturns401WhenPasswordIsWrong() throws Exception {
         // Given
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "wrong");
         when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(false);
@@ -130,7 +130,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Buscar funcionário pelo id")
-    void deveRetornarFuncionarioPeloId() throws Exception {
+    void findByIdReturnsEmployeeWhenItExists() throws Exception {
         // Given
         when(employeeService.findById(1L)).thenReturn(sampleEmployee);
 
@@ -146,7 +146,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Salvar funcionário")
-    void deveSalvarFuncionarioERetornar201() throws Exception {
+    void saveReturns201WhenRequestIsValid() throws Exception {
         // Given
         doNothing().when(employeeService).save(any(EmployeeRequest.class));
 
@@ -162,7 +162,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Atualizar funcionário")
-    void deveAtualizarFuncionario() throws Exception {
+    void updateReturnsUpdatedEmployee() throws Exception {
         // Given
         when(employeeService.update(any(EmployeeRequest.class), eq(1L))).thenReturn(sampleEmployee);
 
@@ -179,7 +179,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Listar funcionários ativos")
-    void deveRetornarListaDeFuncionariosAtivos() throws Exception {
+    void findAllActiveReturnsListOfActiveEmployees() throws Exception {
         // Given
         when(employeeService.findAllActive()).thenReturn(List.of(sampleEmployee));
         when(employeeService.toSummaryDto(sampleEmployee)).thenReturn(sampleDto);

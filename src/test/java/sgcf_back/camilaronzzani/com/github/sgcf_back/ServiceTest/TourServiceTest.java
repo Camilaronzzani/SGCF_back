@@ -35,27 +35,36 @@ class TourServiceTest {
 
     @Test
     void findAllReturnsToursFromRepository() {
+        // Given
         List<Tour> tours = List.of(new Tour());
         when(tourRepository.findAll()).thenReturn(tours);
 
-        assertSame(tours, tourService.findAll());
+        // When
+        List<Tour> result = tourService.findAll();
+
+        // Then
+        assertSame(tours, result);
     }
 
     @Test
     void findByIdReturnsTourWhenItExists() {
+        // Given
         Tour tour = new Tour();
         tour.setId(1L);
         tour.setNameOfTour("Amazon Tour");
         when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
 
+        // When
         Tour result = tourService.findById(1L);
 
+        // Then
         assertSame(tour, result);
         assertEquals("Amazon Tour", result.getNameOfTour());
     }
 
     @Test
     void savePersistsTourFromRequest() {
+        // Given
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.Brazil,
@@ -64,8 +73,10 @@ class TourServiceTest {
                 "Rio de Janeiro, Santos"
         );
 
+        // When
         tourService.save(request);
 
+        // Then
         verify(tourRepository).save(argThat(tour ->
                 tour.getPrice() == 1500.00
                         && tour.getCountryTour() == CountryTour.Brazil
@@ -77,6 +88,7 @@ class TourServiceTest {
 
     @Test
     void updateChangesTourFieldsAndReturnsUpdatedTour() {
+        // Given
         Tour existingTour = new Tour();
         existingTour.setId(1L);
         existingTour.setNameOfTour("Old Tour");
@@ -84,9 +96,7 @@ class TourServiceTest {
         existingTour.setCountryTour(CountryTour.Brazil);
         existingTour.setKmOftour(300L);
         existingTour.setLocations("Old Location");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(existingTour));
-
         TourRequest updateRequest = new TourRequest(
                 2000.00,
                 CountryTour.Argentina,
@@ -95,8 +105,10 @@ class TourServiceTest {
                 "Buenos Aires, Mendoza"
         );
 
+        // When
         Tour updated = tourService.update(updateRequest, 1L);
 
+        // Then
         assertSame(existingTour, updated);
         assertEquals(2000.00, updated.getPrice());
         assertEquals(CountryTour.Argentina, updated.getCountryTour());
@@ -107,43 +119,46 @@ class TourServiceTest {
 
     @Test
     void deleteMarksTourInactiveWithoutDeletingIt() {
+        // Given
         Tour tour = new Tour();
         tour.setId(1L);
         tour.setActive(true);
         tour.setNameOfTour("Tour to Delete");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
 
+        // When
         tourService.delete(1L);
 
+        // Then
         assertFalse(tour.isActive());
         verify(tourRepository, never()).delete(any());
     }
 
     @Test
     void findAllActiveReturnsActiveToursFromRepository() {
+        // Given
         Tour tour1 = new Tour();
         tour1.setActive(true);
         Tour tour2 = new Tour();
         tour2.setActive(true);
         List<Tour> activeTours = List.of(tour1, tour2);
-
         when(tourRepository.findByActiveTrue()).thenReturn(activeTours);
 
+        // When
         List<Tour> result = tourService.findAllActive();
 
+        // Then
         assertSame(activeTours, result);
         assertEquals(2, result.size());
     }
 
     @Test
     void changeDataByTourUpdatesAllFields() {
+        // Given
         Tour existingTour = new Tour();
         existingTour.setId(1L);
         existingTour.setNameOfTour("Old Name");
-
         when(tourRepository.findById(1L)).thenReturn(Optional.of(existingTour));
-
         TourRequest newData = new TourRequest(
                 3000.00,
                 CountryTour.Paraguay,
@@ -152,8 +167,10 @@ class TourServiceTest {
                 "Asuncion, Ciudad del Este"
         );
 
+        // When
         Tour result = tourService.changeDataByTour(1L, newData);
 
+        // Then
         assertSame(existingTour, result);
         assertEquals(3000.00, result.getPrice());
         assertEquals(CountryTour.Paraguay, result.getCountryTour());
@@ -164,11 +181,14 @@ class TourServiceTest {
 
     @Test
     void findByIdWrapsNotFoundErrorWhenTourDoesNotExist() {
+        // Given
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.findById(999L));
 
+        // Then
         assertInstanceOf(ResponseStatusException.class, exception.getCause());
         assertEquals(HttpStatus.NOT_FOUND,
                 ((ResponseStatusException) exception.getCause()).getStatusCode());
@@ -176,8 +196,8 @@ class TourServiceTest {
 
     @Test
     void updateWrapsNotFoundErrorWhenTourDoesNotExist() {
+        // Given
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.Brazil,
@@ -186,9 +206,11 @@ class TourServiceTest {
                 "Rio de Janeiro"
         );
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.update(request, 999L));
 
+        // Then
         assertInstanceOf(ResponseStatusException.class, exception.getCause());
         assertEquals(HttpStatus.NOT_FOUND,
                 ((ResponseStatusException) exception.getCause()).getStatusCode());
@@ -196,11 +218,14 @@ class TourServiceTest {
 
     @Test
     void deleteWrapsNotFoundErrorWhenTourDoesNotExist() {
+        // Given
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.delete(999L));
 
+        // Then
         assertInstanceOf(ResponseStatusException.class, exception.getCause());
         assertEquals(HttpStatus.NOT_FOUND,
                 ((ResponseStatusException) exception.getCause()).getStatusCode());
@@ -208,8 +233,8 @@ class TourServiceTest {
 
     @Test
     void changeDataByTourThrowsNotFoundWhenTourDoesNotExist() {
+        // Given
         when(tourRepository.findById(999L)).thenReturn(Optional.empty());
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.Brazil,
@@ -218,25 +243,29 @@ class TourServiceTest {
                 "Rio de Janeiro"
         );
 
+        // When / Then
         assertThrows(ResponseStatusException.class,
                 () -> tourService.changeDataByTour(999L, request));
     }
 
     @Test
     void findAllWrapsExceptionWhenRepositoryFails() {
+        // Given
         when(tourRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.findAll());
 
+        // Then
         assertEquals("Database error", exception.getCause().getMessage());
     }
 
     @Test
     void saveWrapsExceptionWhenRepositoryFails() {
+        // Given
         when(tourRepository.save(any(Tour.class)))
                 .thenThrow(new RuntimeException("Database error"));
-
         TourRequest request = new TourRequest(
                 1500.00,
                 CountryTour.Brazil,
@@ -245,20 +274,25 @@ class TourServiceTest {
                 "Rio de Janeiro"
         );
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.save(request));
 
+        // Then
         assertEquals("Database error", exception.getCause().getMessage());
     }
 
     @Test
     void findAllActiveWrapsExceptionWhenRepositoryFails() {
+        // Given
         when(tourRepository.findByActiveTrue())
                 .thenThrow(new RuntimeException("Database error"));
 
+        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> tourService.findAllActive());
 
+        // Then
         assertEquals("Database error", exception.getCause().getMessage());
     }
 }

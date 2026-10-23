@@ -67,7 +67,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Listar todos os pagamentos")
-    void deveRetornarListaDePagamentos() throws Exception {
+    void findAllReturnsListOfPayments() throws Exception {
         // Given
         when(paymentService.findAll()).thenReturn(List.of(samplePayment));
 
@@ -84,7 +84,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Buscar pagamento pelo id")
-    void deveRetornarPagamentoPeloId() throws Exception {
+    void findByIdReturnsPaymentWhenItExists() throws Exception {
         // Given
         when(paymentService.findById(1L)).thenReturn(samplePayment);
 
@@ -100,7 +100,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Salvar pagamento")
-    void deveSalvarPagamentoERetornar201() throws Exception {
+    void saveReturns201WhenRequestIsValid() throws Exception {
         // Given
         doNothing().when(paymentService).save(any(PaymentRequest.class));
 
@@ -116,7 +116,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Atualizar pagamento")
-    void deveAtualizarPagamento() throws Exception {
+    void updateReturnsUpdatedPayment() throws Exception {
         // Given
         when(paymentService.update(any(PaymentRequest.class), eq(1L))).thenReturn(samplePayment);
 
@@ -133,7 +133,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Deletar pagamento")
-    void deveDeletarPagamentoERetornar204() throws Exception {
+    void deleteReturns204WhenPaymentIsDeleted() throws Exception {
         // Given
         doNothing().when(paymentService).delete(1L);
 
@@ -147,7 +147,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Listar pagamentos ativos")
-    void deveRetornarListaDePagamentosAtivos() throws Exception {
+    void findAllActiveReturnsListOfActivePayments() throws Exception {
         // Given
         when(paymentService.findAllActive()).thenReturn(List.of(samplePayment));
 
@@ -162,7 +162,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Buscar pagamentos do cliente")
-    void deveRetornarPagamentosDoCliente() throws Exception {
+    void findByCustomerReturnsCustomerPayments() throws Exception {
         // Given
         when(paymentService.findByCustomer(1L)).thenReturn(List.of(samplePayment));
 
@@ -177,7 +177,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Buscar pagamentos pelo status")
-    void deveRetornarPagamentosPeloStatus() throws Exception {
+    void findByStatusReturnsPaymentsWithThatStatus() throws Exception {
         // Given
         when(paymentService.findByStatus(Status.Pending)).thenReturn(List.of(samplePayment));
 
@@ -192,7 +192,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("Buscar cotação do dólar")
-    void deveRetornarCotacaoDoDolar() throws Exception {
+    void getQuotationsReturnsDollarQuotation() throws Exception {
         // Given
         when(currencyService.getQuotation("USD")).thenReturn(5.25);
 

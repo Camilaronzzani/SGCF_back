@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
@@ -64,78 +65,96 @@ class TourControllerTest {
 
     @Test
     @DisplayName("GET /api/tour/findAll - Should return list of tours")
-    void findAll_ShouldReturnList() throws Exception {
+    void findAllReturnsListOfTours() throws Exception {
+        // Given
         when(tourService.findAll()).thenReturn(List.of(sampleTour));
 
-        mockMvc.perform(get("/api/tour/findAll"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/tour/findAll"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].nameOfTour").value("Iguazu Falls Circuit"));
-
         verify(tourService, times(1)).findAll();
     }
 
     @Test
     @DisplayName("GET /api/tour/findId/{id} - Should return tour DTO by ID")
-    void findById_ShouldReturnTourDto() throws Exception {
+    void findByIdReturnsTourWhenItExists() throws Exception {
+        // Given
         when(tourService.findById(1L)).thenReturn(sampleTour);
 
-        mockMvc.perform(get("/api/tour/findId/{id}", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/tour/findId/{id}", 1L));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
         verify(tourService, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("POST /api/tour/save - Should create tour and return 201 Created")
-    void save_ShouldReturnCreated() throws Exception {
+    void saveReturns201WhenRequestIsValid() throws Exception {
+        // Given
         doNothing().when(tourService).save(any(TourRequest.class));
 
-        mockMvc.perform(post("/api/tour/save")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isCreated());
+        // When
+        ResultActions resposta = mockMvc.perform(post("/api/tour/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isCreated());
         verify(tourService, times(1)).save(any(TourRequest.class));
     }
 
     @Test
     @DisplayName("PUT /api/tour/update/{id} - Should update tour and return 204 No Content")
-    void update_ShouldReturnNoContentWithBody() throws Exception {
+    void updateReturns204WithUpdatedTour() throws Exception {
+        // Given
         when(tourService.update(any(TourRequest.class), eq(1L))).thenReturn(sampleTour);
 
-        mockMvc.perform(put("/api/tour/update/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleRequest)))
-                .andExpect(status().isNoContent())
-                .andExpect(jsonPath("$.id").value(1L));
+        // When
+        ResultActions resposta = mockMvc.perform(put("/api/tour/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sampleRequest)));
 
+        // Then
+        resposta.andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.id").value(1L));
         verify(tourService, times(1)).update(any(TourRequest.class), eq(1L));
     }
 
     @Test
     @DisplayName("DELETE /api/tour/delete/{id} - Should delete tour and return 204 No Content")
-    void delete_ShouldReturnNoContent() throws Exception {
+    void deleteReturns204WhenTourIsDeleted() throws Exception {
+        // Given
         doNothing().when(tourService).delete(1L);
 
-        mockMvc.perform(delete("/api/tour/delete/{id}", 1L))
-                .andExpect(status().isNoContent());
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/tour/delete/{id}", 1L));
 
+        // Then
+        resposta.andExpect(status().isNoContent());
         verify(tourService, times(1)).delete(1L);
     }
 
     @Test
     @DisplayName("GET /api/tour/findAll/active - Should return active tours as DTOs")
-    void findAllActive_ShouldReturnList() throws Exception {
+    void findAllActiveReturnsListOfActiveTours() throws Exception {
+        // Given
         when(tourService.findAllActive()).thenReturn(List.of(sampleTour));
 
-        mockMvc.perform(get("/api/tour/findAll/active"))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/tour/findAll/active"));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L));
-
         verify(tourService, times(1)).findAllActive();
     }
 }

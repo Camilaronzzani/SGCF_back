@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
@@ -63,76 +64,92 @@ class SystemLogControllerTest {
 
     @Test
     @DisplayName("GET /api/log/findAll - Without session should return 403 Forbidden")
-    void findAll_WithoutSession_ShouldReturnForbidden() throws Exception {
-        mockMvc.perform(get("/api/log/findAll"))
-                .andExpect(status().isForbidden());
+    void findAllReturns403WhenThereIsNoSession() throws Exception {
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/log/findAll"));
 
+        // Then
+        resposta.andExpect(status().isForbidden());
         verifyNoInteractions(systemLogService);
     }
 
     @Test
     @DisplayName("GET /api/log/findAll - Non-manager session should return 403 Forbidden")
-    void findAll_NonManager_ShouldReturnForbidden() throws Exception {
-        mockMvc.perform(get("/api/log/findAll").session(unauthorizedSession))
-                .andExpect(status().isForbidden());
+    void findAllReturns403WhenUserIsNotManager() throws Exception {
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/log/findAll").session(unauthorizedSession));
 
+        // Then
+        resposta.andExpect(status().isForbidden());
         verifyNoInteractions(systemLogService);
     }
 
 
     @Test
     @DisplayName("GET /api/log/findAll - Manager session should return list of log DTOs")
-    void findAll_ManagerSession_ShouldReturnList() throws Exception {
+    void findAllReturnsListOfLogsWhenUserIsManager() throws Exception {
+        // Given
         when(systemLogService.findAll("ERROR")).thenReturn(List.of(sampleLog));
 
-        mockMvc.perform(get("/api/log/findAll")
-                        .param("level", "ERROR")
-                        .session(managerSession))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/log/findAll")
+                .param("level", "ERROR")
+                .session(managerSession));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].level").value("ERROR"))
                 .andExpect(jsonPath("$[0].message").value("Internal server error occurred"));
-
         verify(systemLogService, times(1)).findAll("ERROR");
     }
 
     @Test
     @DisplayName("GET /api/log/findId/{id} - Manager session should return log DTO by ID")
-    void findById_ManagerSession_ShouldReturnLog() throws Exception {
+    void findByIdReturnsLogWhenUserIsManager() throws Exception {
+        // Given
         when(systemLogService.findById(1L)).thenReturn(sampleLog);
 
-        mockMvc.perform(get("/api/log/findId/{id}", 1L).session(managerSession))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/log/findId/{id}", 1L).session(managerSession));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.level").value("ERROR"));
-
         verify(systemLogService, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("GET /api/log/summary - Manager session should return log counts summary map")
-    void summary_ManagerSession_ShouldReturnMap() throws Exception {
+    void summaryReturnsLogCountsWhenUserIsManager() throws Exception {
+        // Given
         Map<String, Long> mockSummary = Map.of("ERROR", 5L, "INFO", 12L);
         when(systemLogService.summary()).thenReturn(mockSummary);
 
-        mockMvc.perform(get("/api/log/summary").session(managerSession))
-                .andExpect(status().isOk())
+        // When
+        ResultActions resposta = mockMvc.perform(get("/api/log/summary").session(managerSession));
+
+        // Then
+        resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.ERROR").value(5))
                 .andExpect(jsonPath("$.INFO").value(12));
-
         verify(systemLogService, times(1)).summary();
     }
 
     @Test
     @DisplayName("DELETE /api/log/deleteAll - Manager session should delete all logs")
-    void deleteAll_ManagerSession_ShouldReturnOk() throws Exception {
+    void deleteAllReturns200WhenUserIsManager() throws Exception {
+        // Given
         when(systemLogService.deleteAll()).thenReturn("All logs deleted successfully");
 
-        mockMvc.perform(delete("/api/log/deleteAll").session(managerSession))
-                .andExpect(status().isOk())
-                .andExpect(content().string("All logs deleted successfully"));
+        // When
+        ResultActions resposta = mockMvc.perform(delete("/api/log/deleteAll").session(managerSession));
 
+        // Then
+        resposta.andExpect(status().isOk())
+                .andExpect(content().string("All logs deleted successfully"));
         verify(systemLogService, times(1)).deleteAll();
     }
 }

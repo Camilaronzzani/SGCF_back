@@ -69,7 +69,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Listar todas as metas")
-    void deveRetornarListaDeMetas() throws Exception {
+    void findAllReturnsListOfQuotas() throws Exception {
         // Given
         when(quotaService.findAll()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
@@ -87,7 +87,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Buscar meta pelo id")
-    void deveRetornarMetaPeloId() throws Exception {
+    void findByIdReturnsQuotaWhenItExists() throws Exception {
         // Given
         when(quotaService.findById(1L)).thenReturn(sampleQuota);
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
@@ -104,7 +104,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Salvar meta")
-    void deveSalvarMetaERetornar201() throws Exception {
+    void saveReturns201WhenRequestIsValid() throws Exception {
         // Given
         doNothing().when(quotaService).save(any(QuotaRequest.class));
 
@@ -120,7 +120,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Atualizar meta")
-    void deveAtualizarMetaERetornar204() throws Exception {
+    void updateReturns204WhenQuotaIsUpdated() throws Exception {
         // Given
         when(quotaService.update(any(QuotaRequest.class), eq(1L))).thenReturn(sampleQuota);
 
@@ -136,7 +136,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Deletar meta")
-    void deveDeletarMetaERetornar204() throws Exception {
+    void deleteReturns204WhenQuotaIsDeleted() throws Exception {
         // Given
         doNothing().when(quotaService).delete(1L);
 
@@ -150,7 +150,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Listar metas ativas")
-    void deveRetornarListaDeMetasAtivas() throws Exception {
+    void findAllActiveReturnsListOfActiveQuotas() throws Exception {
         // Given
         when(quotaService.findAllActive()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
@@ -166,7 +166,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Buscar metas do funcionário")
-    void deveRetornarMetasDoFuncionario() throws Exception {
+    void findByEmployeeReturnsEmployeeQuotas() throws Exception {
         // Given
         when(quotaService.findByEmployee(1L)).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
@@ -182,7 +182,7 @@ class QuotaControllerTest {
 
     @Test
     @DisplayName("Listar metas da empresa")
-    void deveRetornarMetasDaEmpresa() throws Exception {
+    void findAllCompanyReturnsCompanyQuotas() throws Exception {
         // Given
         when(quotaService.findAllCompany()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);

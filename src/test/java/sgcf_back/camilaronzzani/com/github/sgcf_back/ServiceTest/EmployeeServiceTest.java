@@ -39,85 +39,108 @@ class EmployeeServiceTest {
     private EmployeeService service;
 
     @Test
-    void deveListarTodosOsFuncionarios() {
+    void findAllReturnsAllEmployees() {
+        // Given
         when(employeeRepository.findAll()).thenReturn(List.of(new Employee()));
 
+        // When
         List<Employee> resultado = service.findAll();
 
+        // Then
         assertEquals(1, resultado.size());
     }
 
     @Test
-    void deveBuscarFuncionarioPorId() {
+    void findByIdReturnsEmployeeWhenItExists() {
+        // Given
         Employee e = new Employee();
         e.setName("Joao");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
 
+        // When
         Employee resultado = service.findById(1L);
 
+        // Then
         assertEquals("Joao", resultado.getName());
     }
 
     @Test
-    void deveLancarErroQuandoFuncionarioNaoExiste() {
+    void findByIdThrowsWhenEmployeeDoesNotExist() {
+        // Given
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
+        // When
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(99L));
 
+        // Then
         assertTrue(ex.getCause() instanceof ResponseStatusException);
     }
 
     @Test
-    void deveSalvarFuncionario() {
+    void saveStoresEmployeeInRepository() {
+        // Given
         EmployeeRequest request = mock(EmployeeRequest.class);
 
+        // When
         service.save(request);
 
+        // Then
         verify(employeeRepository).save(any(Employee.class));
     }
 
     @Test
-    void deveAtualizarDadosDoFuncionario() {
+    void updateChangesEmployeeData() {
+        // Given
         Employee e = new Employee();
         e.setName("Antigo");
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
-
         EmployeeRequest request = mock(EmployeeRequest.class);
         when(request.name()).thenReturn("Novo");
 
+        // When
         Employee resultado = service.update(request, 1L);
 
+        // Then
         assertEquals("Novo", resultado.getName());
     }
 
     @Test
-    void deveDesativarFuncionario() {
+    void deleteDeactivatesEmployee() {
+        // Given
         Employee e = new Employee();
         e.setActive(true);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(e));
 
+        // When
         service.delete(1L);
 
+        // Then
         assertFalse(e.isActive());
     }
 
     @Test
-    void deveListarApenasFuncionariosAtivos() {
+    void findAllActiveReturnsOnlyActiveEmployees() {
+        // Given
         when(employeeRepository.findByActiveTrue()).thenReturn(List.of(new Employee()));
 
+        // When
         List<Employee> resultado = service.findAllActive();
 
+        // Then
         assertEquals(1, resultado.size());
     }
 
     @Test
-    void deveMontarDtoResumido() {
+    void toSummaryDtoBuildsDtoUsingReservationTotals() {
+        // Given
         Employee e = new Employee();
         e.setId(1L);
         e.setName("Joao");
 
+        // When
         EmployeDto dto = service.toSummaryDto(e);
 
+        // Then
         assertNotNull(dto);
         verify(reservationRepository).countByEmployeeIdAndActiveTrue(1L);
         verify(reservationRepository).sumValueByEmployeeAndStatus(1L, Status.Confirmed);

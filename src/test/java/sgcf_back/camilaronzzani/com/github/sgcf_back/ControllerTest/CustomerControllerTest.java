@@ -69,7 +69,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Listar todos os clientes")
-    void deveRetornarListaDeClientes() throws Exception {
+    void findAllReturnsListOfCustomers() throws Exception {
         // Given
         when(customerService.findAll()).thenReturn(List.of(sampleCustomer));
 
@@ -86,7 +86,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Buscar cliente pelo id")
-    void deveRetornarClientePeloId() throws Exception {
+    void findByIdReturnsCustomerWhenItExists() throws Exception {
         // Given
         when(customerService.findById(1L)).thenReturn(sampleCustomer);
 
@@ -102,7 +102,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Salvar cliente")
-    void deveSalvarClienteERetornar201() throws Exception {
+    void saveReturns201WhenRequestIsValid() throws Exception {
         // Given
         doNothing().when(customerService).save(any(CustomerRequest.class));
 
@@ -118,7 +118,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Atualizar cliente")
-    void deveAtualizarCliente() throws Exception {
+    void updateReturnsUpdatedCustomer() throws Exception {
         // Given
         when(customerService.update(any(CustomerRequest.class), eq(1L))).thenReturn(sampleCustomer);
 
@@ -135,7 +135,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Deletar cliente")
-    void deveDeletarClienteERetornar204() throws Exception {
+    void deleteReturns204WhenCustomerIsDeleted() throws Exception {
         // Given
         doNothing().when(customerService).delete(1L);
 
@@ -149,7 +149,7 @@ class CustomerControllerTest {
 
     @Test
     @DisplayName("Listar clientes ativos")
-    void deveRetornarListaDeClientesAtivos() throws Exception {
+    void findAllActiveReturnsListOfActiveCustomers() throws Exception {
         // Given
         when(customerService.findAllActive()).thenReturn(List.of(sampleCustomer));
 

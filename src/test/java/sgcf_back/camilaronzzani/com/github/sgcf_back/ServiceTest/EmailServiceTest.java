@@ -35,29 +35,36 @@ class EmailServiceTest {
     }
 
     @Test
-    void deveSubstituirOCodigoNoTemplate() throws Exception {
+    void loadTemplateReplacesCodePlaceholder() throws Exception {
+        // When
         String html = service.loadTemplate("123456");
 
+        // Then
         assertTrue(html.contains("123456"));
         assertFalse(html.contains("{{CODE}}"));
     }
 
     @Test
-    void deveEnviarEmail() throws Exception {
+    void sendEmailSendsMessageWithSubject() throws Exception {
+        // Given
         MimeMessage message = criarMimeMessage();
         when(mailSender.createMimeMessage()).thenReturn(message);
 
+        // When
         service.sendEmail("cliente@teste.com", "123456");
 
+        // Then
         verify(mailSender).send(message);
         assertEquals("Recuperação de Senha", message.getSubject());
     }
 
     @Test
-    void deveLancarErroQuandoEnvioFalha() {
+    void sendEmailThrowsWhenMailSenderFails() {
+        // Given
         when(mailSender.createMimeMessage()).thenReturn(criarMimeMessage());
         doThrow(new MailSendException("falha")).when(mailSender).send(any(MimeMessage.class));
 
+        // When / Then
         assertThrows(RuntimeException.class, () -> service.sendEmail("cliente@teste.com", "123456"));
     }
 }

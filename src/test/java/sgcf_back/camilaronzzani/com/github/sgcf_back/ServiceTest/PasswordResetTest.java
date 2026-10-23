@@ -43,29 +43,35 @@ class PasswordResetTest {
     private PasswordResetService service;
 
     @Test
-    void deveSolicitarRedefinicaoDeSenha() throws Exception {
+    void requestPasswordResetSendsEmailAndSavesToken() throws Exception {
+        // Given
         PasswordResetRequest request = mock(PasswordResetRequest.class);
         when(request.email()).thenReturn("cliente@teste.com");
         when(userRepository.findByEmail("cliente@teste.com")).thenReturn(Optional.of(new User()));
 
+        // When
         String resultado = service.requestPasswordReset(request);
 
+        // Then
         assertTrue(resultado.contains("cliente@teste.com"));
         verify(emailService).sendEmail(anyString(), anyString());
         verify(passwordResetRepository).save(any(PasswordReset.class));
     }
 
     @Test
-    void deveLancarErroQuandoUsuarioNaoExiste() {
+    void requestPasswordResetThrowsWhenUserDoesNotExist() {
+        // Given
         PasswordResetRequest request = mock(PasswordResetRequest.class);
         when(request.email()).thenReturn("cliente@teste.com");
         when(userRepository.findByEmail("cliente@teste.com")).thenReturn(Optional.empty());
 
+        // When / Then
         assertThrows(ResponseStatusException.class, () -> service.requestPasswordReset(request));
     }
 
     @Test
-    void deveValidarTokenCorreto() {
+    void compareTokenReturnsTrueWhenTokenIsCorrect() {
+        // Given
         User user = new User();
         user.setId(1L);
 
@@ -81,13 +87,16 @@ class PasswordResetTest {
         when(passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(1L))
                 .thenReturn(Optional.of(reset));
 
+        // When
         BooleanRequest resultado = service.compareToken(request);
 
+        // Then
         assertTrue(resultado.bool());
     }
 
     @Test
-    void deveRejeitarTokenIncorreto() {
+    void compareTokenReturnsFalseWhenTokenIsWrong() {
+        // Given
         User user = new User();
         user.setId(1L);
 
@@ -103,8 +112,10 @@ class PasswordResetTest {
         when(passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(1L))
                 .thenReturn(Optional.of(reset));
 
+        // When
         BooleanRequest resultado = service.compareToken(request);
 
+        // Then
         assertFalse(resultado.bool());
         assertEquals("Token incorreto", resultado.message());
     }
