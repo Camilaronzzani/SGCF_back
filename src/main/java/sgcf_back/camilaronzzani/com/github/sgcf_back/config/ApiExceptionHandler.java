@@ -16,12 +16,14 @@ import java.util.Map;
 @Slf4j //log
 public class ApiExceptionHandler {
 
+    private static final String MESSAGE = "message";
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException exception) {
         log.error("Request failed: {}", exception.getReason());
 
         Map<String, String> erro = new HashMap<>();
-        erro.put("message", exception.getReason());
+        erro.put(MESSAGE, exception.getReason());
 
         return ResponseEntity.status(exception.getStatusCode()).body(erro);
     }
@@ -44,13 +46,13 @@ public class ApiExceptionHandler {
             causa = causa.getCause();
         }
 
-        if (causa instanceof ResponseStatusException) {
-            return handleResponseStatus((ResponseStatusException) causa);
+        if (causa instanceof ResponseStatusException responseStatusException) {
+            return handleResponseStatus(responseStatusException);
         }
 
         if (exception instanceof ErrorResponse errorResponse) {
             Map<String, String> aviso = new HashMap<>();
-            aviso.put("message", exception.getMessage());
+            aviso.put(MESSAGE, exception.getMessage());
 
             return ResponseEntity.status(errorResponse.getStatusCode()).body(aviso);
         }
@@ -58,7 +60,7 @@ public class ApiExceptionHandler {
         log.error("Unexpected error", exception);
 
         Map<String, String> erro = new HashMap<>();
-        erro.put("message", "erro ao processar a requisicao");
+        erro.put(MESSAGE, "erro ao processar a requisicao");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
     }

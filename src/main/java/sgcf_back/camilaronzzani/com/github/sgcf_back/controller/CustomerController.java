@@ -34,7 +34,7 @@ public class CustomerController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity  salve(@Valid @RequestBody CustomerRequest customerRequest){
+    public ResponseEntity<Void>  salve(@Valid @RequestBody CustomerRequest customerRequest){
             customerService.save(customerRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -46,7 +46,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable long id){
+    public ResponseEntity<Void> delete(@PathVariable long id){
             customerService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

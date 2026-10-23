@@ -47,85 +47,66 @@ class ReservationServiceTest {
 
     @Test
     void findAllReturnsReservationsFromRepository() {
-        // Given
         List<Reservation> reservations = List.of(new Reservation());
         when(reservationRepository.findAll()).thenReturn(reservations);
 
-        // When
         List<Reservation> result = reservationService.findAll();
 
-        // Then
         assertSame(reservations, result);
     }
 
     @Test
     void findByIdReturnsReservationWhenItExists() {
-        // Given
         Reservation reservation = new Reservation();
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-        // When
         Reservation result = reservationService.findById(1L);
 
-        // Then
         assertSame(reservation, result);
     }
 
     @Test
     void findByIdWrapsNotFoundErrorWhenReservationDoesNotExist() {
-        // Given
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> reservationService.findById(1L));
 
-        // Then
         assertWrappedStatus(exception, HttpStatus.NOT_FOUND);
     }
 
     @Test
     void findAllActiveReturnsActiveReservationsFromRepository() {
-        // Given
         List<Reservation> reservations = List.of(new Reservation());
         when(reservationRepository.findByActiveTrue()).thenReturn(reservations);
 
-        // When
         List<Reservation> result = reservationService.findAllActive();
 
-        // Then
         assertSame(reservations, result);
     }
 
     @Test
     void findByCustomerReturnsCustomerReservationsFromRepository() {
-        // Given
         List<Reservation> reservations = List.of(new Reservation());
         when(reservationRepository.findByCustomerId(7L)).thenReturn(reservations);
 
-        // When
         List<Reservation> result = reservationService.findByCustomer(7L);
 
-        // Then
         assertSame(reservations, result);
     }
 
     @Test
     void findByStatusReturnsReservationsWithRequestedStatus() {
-        // Given
         List<Reservation> reservations = List.of(new Reservation());
         when(reservationRepository.findByStatus(Status.Confirmed)).thenReturn(reservations);
 
-        // When
         List<Reservation> result = reservationService.findByStatus(Status.Confirmed);
 
-        // Then
         assertSame(reservations, result);
     }
 
     @Test
     void toReservationMapsRequestAndRelatedEntities() {
-        // Given
         Tour tour = new Tour();
         Customer customer = new Customer();
         Employee employee = new Employee();
@@ -139,10 +120,8 @@ class ReservationServiceTest {
                 LocalDate.of(2026, 11, 10), 1L, 2L, 3L,
                 Status.Confirmed, List.of(4L));
 
-        // When
         Reservation reservation = reservationService.toReservation(request);
 
-        // Then
         assertEquals(request.date(), reservation.getDate());
         assertSame(tour, reservation.getTour());
         assertSame(customer, reservation.getCustomer());
@@ -154,15 +133,12 @@ class ReservationServiceTest {
 
     @Test
     void toReservationDefaultsStatusAndNonPayingCustomers() {
-        // Given
         stubRelatedEntities(1L, 2L, 3L);
         ReservationRequest request = new ReservationRequest(
                 LocalDate.of(2026, 11, 10), 1L, 2L, 3L, null, null);
 
-        // When
         Reservation reservation = reservationService.toReservation(request);
 
-        // Then
         assertEquals(Status.Pending, reservation.getStatus());
         assertNotNull(reservation.getCustomersNotPaying());
         assertTrue(reservation.getCustomersNotPaying().isEmpty());
@@ -171,69 +147,56 @@ class ReservationServiceTest {
 
     @Test
     void toReservationRejectsMissingTourId() {
-        // Given
         ReservationRequest request = new ReservationRequest(
                 LocalDate.now(), null, 2L, 3L, Status.Pending, null);
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
 
-        // Then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verifyNoInteractions(tourRepository, customerRepository, employeeRepository);
     }
 
     @Test
     void toReservationRejectsMissingCustomerId() {
-        // Given
         when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour()));
         ReservationRequest request = new ReservationRequest(
                 LocalDate.now(), 1L, null, 3L, Status.Pending, null);
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
 
-        // Then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verifyNoInteractions(employeeRepository);
     }
 
     @Test
     void toReservationRejectsMissingEmployeeId() {
-        // Given
         when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour()));
         when(customerRepository.findById(2L)).thenReturn(Optional.of(new Customer()));
         ReservationRequest request = new ReservationRequest(
                 LocalDate.now(), 1L, 2L, null, Status.Pending, null);
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
 
-        // Then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
 
     @Test
     void toReservationRejectsUnknownRelatedEntity() {
-        // Given
         when(tourRepository.findById(1L)).thenReturn(Optional.empty());
         ReservationRequest request = new ReservationRequest(
                 LocalDate.now(), 1L, 2L, 3L, Status.Pending, null);
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.toReservation(request));
 
-        // Then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 
     @Test
     void savePersistsPendingReservationWithCalculatedValue() {
-        // Given
         Tour tour = new Tour();
         tour.setPrice(200.0);
         Customer customer = new Customer();
@@ -250,10 +213,8 @@ class ReservationServiceTest {
                 LocalDate.of(2026, 11, 10), 1L, 2L, 3L,
                 Status.Confirmed, List.of(4L));
 
-        // When
         reservationService.save(request);
 
-        // Then
         verify(reservationRepository).saveAndFlush(argThat(reservation ->
                 reservation.getTour() == tour
                         && reservation.getCustomer() == customer
@@ -265,7 +226,6 @@ class ReservationServiceTest {
 
     @Test
     void updateChangesReservationFieldsAndRecalculatesValue() {
-        // Given
         Reservation existing = new Reservation();
         Tour tour = new Tour();
         tour.setPrice(150.0);
@@ -281,10 +241,8 @@ class ReservationServiceTest {
                 LocalDate.of(2026, 12, 1), 1L, 2L, 3L,
                 Status.Confirmed, List.of(4L));
 
-        // When
         Reservation updated = reservationService.update(request, 1L);
 
-        // Then
         assertSame(existing, updated);
         assertEquals(request.date(), updated.getDate());
         assertSame(tour, updated.getTour());
@@ -296,83 +254,66 @@ class ReservationServiceTest {
 
     @Test
     void updateWrapsNotFoundErrorWhenReservationDoesNotExist() {
-        // Given
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
         stubRelatedEntities(1L, 2L, 3L);
         ReservationRequest request = new ReservationRequest(
                 LocalDate.now(), 1L, 2L, 3L, Status.Pending, null);
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> reservationService.update(request, 1L));
 
-        // Then
         assertWrappedStatus(exception, HttpStatus.NOT_FOUND);
     }
 
     @Test
     void updateStatusChangesReservationStatus() {
-        // Given
         Reservation reservation = new Reservation();
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-        // When
         Reservation updated = reservationService.updateStatus(1L, Status.Confirmed);
 
-        // Then
         assertSame(reservation, updated);
         assertEquals(Status.Confirmed, updated.getStatus());
     }
 
     @Test
     void updateStatusRejectsNullStatus() {
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.updateStatus(1L, null));
 
-        // Then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verifyNoInteractions(reservationRepository);
     }
 
     @Test
     void updateStatusRejectsUnknownReservation() {
-        // Given
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> reservationService.updateStatus(1L, Status.Confirmed));
 
-        // Then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 
     @Test
     void deleteMarksReservationInactiveWithoutDeletingIt() {
-        // Given
         Reservation reservation = new Reservation();
         reservation.setActive(true);
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-        // When
         reservationService.delete(1L);
 
-        // Then
         assertFalse(reservation.isActive());
         verify(reservationRepository, never()).delete(any());
     }
 
     @Test
     void deleteWrapsNotFoundErrorWhenReservationDoesNotExist() {
-        // Given
         when(reservationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> reservationService.delete(1L));
 
-        // Then
         assertWrappedStatus(exception, HttpStatus.NOT_FOUND);
     }
 

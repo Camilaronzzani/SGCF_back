@@ -65,10 +65,8 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("GET /api/log/findAll - Without session should return 403 Forbidden")
     void findAllReturns403WhenThereIsNoSession() throws Exception {
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/log/findAll"));
 
-        // Then
         resposta.andExpect(status().isForbidden());
         verifyNoInteractions(systemLogService);
     }
@@ -76,10 +74,8 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("GET /api/log/findAll - Non-manager session should return 403 Forbidden")
     void findAllReturns403WhenUserIsNotManager() throws Exception {
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/log/findAll").session(unauthorizedSession));
 
-        // Then
         resposta.andExpect(status().isForbidden());
         verifyNoInteractions(systemLogService);
     }
@@ -88,15 +84,12 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("GET /api/log/findAll - Manager session should return list of log DTOs")
     void findAllReturnsListOfLogsWhenUserIsManager() throws Exception {
-        // Given
         when(systemLogService.findAll("ERROR")).thenReturn(List.of(sampleLog));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/log/findAll")
                 .param("level", "ERROR")
                 .session(managerSession));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -108,13 +101,10 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("GET /api/log/findId/{id} - Manager session should return log DTO by ID")
     void findByIdReturnsLogWhenUserIsManager() throws Exception {
-        // Given
         when(systemLogService.findById(1L)).thenReturn(sampleLog);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/log/findId/{id}", 1L).session(managerSession));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.level").value("ERROR"));
@@ -124,14 +114,11 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("GET /api/log/summary - Manager session should return log counts summary map")
     void summaryReturnsLogCountsWhenUserIsManager() throws Exception {
-        // Given
         Map<String, Long> mockSummary = Map.of("ERROR", 5L, "INFO", 12L);
         when(systemLogService.summary()).thenReturn(mockSummary);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/log/summary").session(managerSession));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.ERROR").value(5))
                 .andExpect(jsonPath("$.INFO").value(12));
@@ -141,13 +128,10 @@ class SystemLogControllerTest {
     @Test
     @DisplayName("DELETE /api/log/deleteAll - Manager session should delete all logs")
     void deleteAllReturns200WhenUserIsManager() throws Exception {
-        // Given
         when(systemLogService.deleteAll()).thenReturn("All logs deleted successfully");
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/log/deleteAll").session(managerSession));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(content().string("All logs deleted successfully"));
         verify(systemLogService, times(1)).deleteAll();

@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ReservationRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
@@ -25,6 +26,8 @@ import java.util.List;
 @Slf4j
 @Service
 public class ReservationService {
+
+    private static final String RESERVATION_NOT_FOUND = "reservation not found";
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -41,21 +44,21 @@ public class ReservationService {
 
         } catch (RuntimeException e) {
             log.error("Error in ReservationService.findAll", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
     public Reservation findById(long id) {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, RESERVATION_NOT_FOUND));
 
             log.info("Reservations {} found successful ", id);
             return reservation;
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findById" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -71,7 +74,7 @@ public class ReservationService {
 
         } catch (Exception e) {
             log.error("Error in ReservationService.save" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -79,7 +82,7 @@ public class ReservationService {
     public Reservation changeDataByReservation(long id, ReservationRequest reservationRequesteservation) {
         Reservation newReservation = toReservation(reservationRequesteservation);
         Reservation reservationOld = reservationRepository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, RESERVATION_NOT_FOUND));
 
         reservationOld.setDate(newReservation.getDate());
         reservationOld.setTour(newReservation.getTour());
@@ -103,7 +106,7 @@ public class ReservationService {
             return reservation;
         } catch (Exception e) {
             log.error("Error in ReservationService.update" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -114,7 +117,7 @@ public class ReservationService {
         }
 
         Reservation reservation = reservationRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, RESERVATION_NOT_FOUND));
         reservation.setStatus(status);
         return reservation;
     }
@@ -123,14 +126,14 @@ public class ReservationService {
     public void delete(long id) {
         try {
             Reservation reservation = reservationRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "reservation not found"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, RESERVATION_NOT_FOUND));
             reservation.setActive(false);
 
             log.info("Reservation {} deactivate successfully", id);
 
         } catch (Exception e) {
             log.error("Error in ReservationService.update" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -140,7 +143,7 @@ public class ReservationService {
             return reservationRepository.findByActiveTrue();
         } catch (Exception e) {
             log.error("Error in ReservationService.findAllActive" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -151,7 +154,7 @@ public class ReservationService {
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findByCustomer" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -162,7 +165,7 @@ public class ReservationService {
 
         } catch (Exception e) {
             log.error("Error in ReservationService.findByStatus" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 

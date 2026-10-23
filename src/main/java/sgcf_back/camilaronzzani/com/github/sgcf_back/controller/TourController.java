@@ -32,7 +32,7 @@ public class TourController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@Valid @RequestBody TourRequest tourRequest){
+    public ResponseEntity<Void> save(@Valid @RequestBody TourRequest tourRequest){
             tourService.save(tourRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -44,7 +44,7 @@ public class TourController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable long id){
+    public ResponseEntity<Void> delete(@PathVariable long id){
             tourService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

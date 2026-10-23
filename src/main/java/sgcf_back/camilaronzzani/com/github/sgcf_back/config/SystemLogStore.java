@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.config;
 
+import lombok.extern.slf4j.Slf4j;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.SystemLogRepository;
 import jakarta.annotation.PostConstruct;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 public class SystemLogStore {
 
@@ -20,10 +22,14 @@ public class SystemLogStore {
 
     @PostConstruct
     public void init() {
+        setRepository(systemLogRepository);
+    }
+
+    private static void setRepository(SystemLogRepository systemLogRepository) {
         repository = systemLogRepository;
     }
 
-    public static void record(String level, String loggerName, String message,
+    public static void saveLog(String level, String loggerName, String message,
                               String exceptionType, String stackTrace) {
         if (repository == null || salvando) {
             return;
@@ -42,7 +48,7 @@ public class SystemLogStore {
 
             repository.save(systemLog);
         } catch (Exception e) {
-            System.out.println("Nao foi possivel gravar o log no banco");
+            log.warn("Nao foi possivel gravar o log no banco");
         } finally {
             salvando = false;
         }

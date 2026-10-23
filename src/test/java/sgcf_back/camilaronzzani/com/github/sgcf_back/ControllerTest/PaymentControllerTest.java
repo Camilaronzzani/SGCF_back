@@ -68,13 +68,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Listar todos os pagamentos")
     void findAllReturnsListOfPayments() throws Exception {
-        // Given
         when(paymentService.findAll()).thenReturn(List.of(samplePayment));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/findAll"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -85,13 +82,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Buscar pagamento pelo id")
     void findByIdReturnsPaymentWhenItExists() throws Exception {
-        // Given
         when(paymentService.findById(1L)).thenReturn(samplePayment);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/findId/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.customer.id").value(1L));
@@ -101,15 +95,12 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Salvar pagamento")
     void saveReturns201WhenRequestIsValid() throws Exception {
-        // Given
         doNothing().when(paymentService).save(any(PaymentRequest.class));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/Payment/save")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isCreated());
         verify(paymentService, times(1)).save(any(PaymentRequest.class));
     }
@@ -117,15 +108,12 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Atualizar pagamento")
     void updateReturnsUpdatedPayment() throws Exception {
-        // Given
         when(paymentService.update(any(PaymentRequest.class), eq(1L))).thenReturn(samplePayment);
 
-        // When
         ResultActions resposta = mockMvc.perform(put("/api/Payment/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
         verify(paymentService, times(1)).update(any(PaymentRequest.class), eq(1L));
@@ -134,13 +122,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Deletar pagamento")
     void deleteReturns204WhenPaymentIsDeleted() throws Exception {
-        // Given
         doNothing().when(paymentService).delete(1L);
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/Payment/delete/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isNoContent());
         verify(paymentService, times(1)).delete(1L);
     }
@@ -148,13 +133,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Listar pagamentos ativos")
     void findAllActiveReturnsListOfActivePayments() throws Exception {
-        // Given
         when(paymentService.findAllActive()).thenReturn(List.of(samplePayment));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/findAll/active"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findAllActive();
@@ -163,13 +145,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Buscar pagamentos do cliente")
     void findByCustomerReturnsCustomerPayments() throws Exception {
-        // Given
         when(paymentService.findByCustomer(1L)).thenReturn(List.of(samplePayment));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/findByCustomer/{customerId}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findByCustomer(1L);
@@ -178,13 +157,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Buscar pagamentos pelo status")
     void findByStatusReturnsPaymentsWithThatStatus() throws Exception {
-        // Given
         when(paymentService.findByStatus(Status.Pending)).thenReturn(List.of(samplePayment));
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/findByStatus/{status}", Status.Pending));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(paymentService, times(1)).findByStatus(Status.Pending);
@@ -193,13 +169,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Buscar cotação do dólar")
     void getQuotationsReturnsDollarQuotation() throws Exception {
-        // Given
         when(currencyService.getQuotation("USD")).thenReturn(5.25);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/Payment/quotations"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(5.25));
         verify(currencyService, times(1)).getQuotation("USD");

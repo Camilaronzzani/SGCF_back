@@ -37,7 +37,7 @@ public class PaymentController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@Valid @RequestBody PaymentRequest paymentRequest) {
+    public ResponseEntity<Void> save(@Valid @RequestBody PaymentRequest paymentRequest) {
             paymentService.save(paymentRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -49,7 +49,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
             paymentService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

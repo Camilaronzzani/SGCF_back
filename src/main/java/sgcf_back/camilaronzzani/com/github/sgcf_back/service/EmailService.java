@@ -1,4 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
+import java.io.IOException;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ public class EmailService {
     }
 
 
-    public void sendEmail(String to, String code) throws Exception {
+    public void sendEmail(String to, String code) {
         try {
             String html = loadTemplate(code);
 
@@ -35,11 +37,11 @@ public class EmailService {
             log.info("Email sent successfully");
         } catch (Exception e) {
             log.error("Error in EmailService.sendEmail");
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
 
     }
-    public String loadTemplate(String code) throws Exception {
+    public String loadTemplate(String code) throws IOException {
 
         InputStream input = getClass()
                 .getClassLoader()

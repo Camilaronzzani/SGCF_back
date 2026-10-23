@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PasswordResetRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.TokenRequest;
@@ -65,7 +66,7 @@ public class PasswordResetService {
 
         } catch (Exception e) {
             log.error("Erro in PasswordResetService.toPasswordReset" , e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -89,8 +90,7 @@ public class PasswordResetService {
             boolean  boo= (passwordReset.getToken().equals(tokenRequest.token().trim()) && passwordReset.getExpiration().isAfter(LocalDateTime.now()));
             log.info("Validação do token para {}: {}", tokenRequest.email(), boo);
 
-            BooleanRequest booleanRequest = new BooleanRequest(boo, message);
-            return  booleanRequest;
+            return new BooleanRequest(boo, message);
 
         } catch (Exception e) {
             log.error("Erro in PasswordResetService.compareToken" , e);

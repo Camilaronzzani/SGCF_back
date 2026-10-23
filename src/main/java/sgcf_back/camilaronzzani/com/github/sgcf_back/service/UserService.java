@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
@@ -21,6 +22,9 @@ import static sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.reque
 @Slf4j
 @Service
 public class UserService {
+
+    private static final String USER_NOT_FOUND = "user not found";
+    private static final String USER_NO_FIND = "user no find";
     @Autowired
     private UserRepository userRepository;
 
@@ -38,20 +42,20 @@ public class UserService {
 
         } catch (RuntimeException e) {
             log.error("Error in UserService.findAll", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
     public User findById(long id) {
         try {
             User user = userRepository.findById(id).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NO_FIND));
 
             log.info("User {} found successfully" , id);
             return user;
         } catch (Exception e) {
             log.error("Error in UserService.findById", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -82,7 +86,7 @@ public class UserService {
             throw e;
         } catch (Exception e) {
             log.error("Error in UserService.save", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -91,7 +95,7 @@ public class UserService {
     public User changeDataByUser(long id, UserRequest newUser) {
 
         User userOld = userRepository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
 
         userOld.setUserName(newUser.userName());
         userOld.setUserPassword(passwordEncoder.encode(newUser.userPassword()));
@@ -110,7 +114,7 @@ public class UserService {
             return user;
         } catch (Exception e) {
             log.error("Error in UserService.update", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -118,13 +122,13 @@ public class UserService {
     public void delete(long id) {
         try {
             User user = userRepository.findById(id).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NO_FIND));
             user.setActive(false);
 
             log.info("User {} deactivated successfully", user.getUserName());
         } catch (Exception e) {
             log.error("Error in UserService.delete", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -135,7 +139,7 @@ public class UserService {
 
         } catch (Exception e) {
             log.error("Error in UserService.findAllActive", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -144,10 +148,10 @@ public class UserService {
             log.info("Fetch user for user name");
 
             return userRepository.findByUserName(userName).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
         } catch (Exception e) {
             log.error("Error in UserService.findByUserName", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -159,7 +163,7 @@ public class UserService {
 
 
             User user = userRepository.findByEmail(changePasswordRequest.email()).orElseThrow(()
-                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user no find"));
+                    -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NO_FIND));
 
             if (passwordEncoder.matches(user.getUserPassword(), changePasswordRequest.password())){
                 boo = false;
@@ -176,21 +180,20 @@ public class UserService {
         } catch (Exception e) {
             log.error("Error in UserService.changePassword", e);
 
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
-    public Boolean authenticate(AuthenticateRequest authenticateRequest) {
+    public boolean authenticate(AuthenticateRequest authenticateRequest) {
         try {
 
             User user = userRepository.findByEmail(authenticateRequest.email()).orElseThrow(()
-                    ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+                    ->new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
             log.info("authenticating user");
-            boolean boo = passwordEncoder.matches(authenticateRequest.password(), user.getUserPassword());
-            return boo;
+            return passwordEncoder.matches(authenticateRequest.password(), user.getUserPassword());
         } catch (Exception e) {
             log.error("Error in UserService.authenticate", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
@@ -198,10 +201,10 @@ public class UserService {
         try {
             log.info("Fetching user");
             return userRepository.findByEmail(email).orElseThrow(()
-                    ->new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+                    ->new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
         } catch (Exception e) {
             log.error("Error in UserService.findByEmail", e);
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 }

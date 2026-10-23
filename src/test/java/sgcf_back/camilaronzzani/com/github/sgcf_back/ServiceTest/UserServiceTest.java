@@ -44,14 +44,11 @@ class UserServiceTest {
 
     @Test
     void findAllReturnsUsersFromRepository() {
-        // Given
         List<User> users = List.of(new User(), new User());
         when(userRepository.findAll()).thenReturn(users);
 
-        // When
         List<User> result = userService.findAll();
 
-        // Then
         assertSame(users, result);
         assertEquals(2, result.size());
         verify(userRepository).findAll();
@@ -59,13 +56,10 @@ class UserServiceTest {
 
     @Test
     void findAllThrowsRuntimeExceptionWhenRepositoryFails() {
-        // Given
         when(userRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
-        // When
         assertThrows(RuntimeException.class, () -> userService.findAll());
 
-        // Then
         verify(userRepository).findAll();
     }
 
@@ -73,16 +67,13 @@ class UserServiceTest {
 
     @Test
     void findByIdReturnsUserWhenItExists() {
-        // Given
         User user = new User();
         user.setId(1L);
         user.setUserName("testuser");
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        // When
         User result = userService.findById(1L);
 
-        // Then
         assertSame(user, result);
         assertEquals("testuser", result.getUserName());
         verify(userRepository).findById(1L);
@@ -90,14 +81,11 @@ class UserServiceTest {
 
     @Test
     void findByIdThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class, 
             () -> userService.findById(1L));
 
-        // Then
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         ResponseStatusException rse = (ResponseStatusException) exception.getCause();
@@ -109,7 +97,6 @@ class UserServiceTest {
 
     @Test
     void savePersistsManagerUserWithoutEmployee() {
-        // Given
         UserRequest request = new UserRequest(
             "manager1",
             "password123",
@@ -119,10 +106,8 @@ class UserServiceTest {
         );
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-        // When
         userService.save(request);
 
-        // Then
         verify(passwordEncoder).encode("password123");
         verify(userRepository).save(argThat(user ->
             user.getUserName().equals("manager1") &&
@@ -136,7 +121,6 @@ class UserServiceTest {
 
     @Test
     void savePersistsEmployeeUserWithValidEmployee() {
-        // Given
         Employee employee = new Employee();
         employee.setId(1L);
         employee.setName("John Doe");
@@ -153,10 +137,8 @@ class UserServiceTest {
         when(userRepository.findByEmployeeId(1L)).thenReturn(Optional.empty());
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-        // When
         userService.save(request);
 
-        // Then
         verify(employeeRepository).findById(1L);
         verify(userRepository).findByEmployeeId(1L);
         verify(passwordEncoder).encode("password123");
@@ -170,7 +152,6 @@ class UserServiceTest {
 
     @Test
     void saveThrowsBadRequestWhenEmployeeUserHasNoEmployeeId() {
-        // Given
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
@@ -179,11 +160,9 @@ class UserServiceTest {
             null
         );
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
             () -> userService.save(request));
 
-        // Then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("employeeId is required for employee accounts", exception.getReason());
         verify(userRepository, never()).save(any());
@@ -191,7 +170,6 @@ class UserServiceTest {
 
     @Test
     void saveThrowsNotFoundWhenEmployeeDoesNotExist() {
-        // Given
         UserRequest request = new UserRequest(
             "employee1",
             "password123",
@@ -202,11 +180,9 @@ class UserServiceTest {
 
         when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
             () -> userService.save(request));
 
-        // Then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("employee no find", exception.getReason());
         verify(employeeRepository).findById(999L);
@@ -215,7 +191,6 @@ class UserServiceTest {
 
     @Test
     void saveThrowsConflictWhenEmployeeAlreadyHasAccount() {
-        // Given
         Employee employee = new Employee();
         employee.setId(1L);
 
@@ -233,11 +208,9 @@ class UserServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(userRepository.findByEmployeeId(1L)).thenReturn(Optional.of(existingUser));
 
-        // When
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
             () -> userService.save(request));
 
-        // Then
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
         assertEquals("employee already has an account", exception.getReason());
         verify(employeeRepository).findById(1L);
@@ -249,7 +222,6 @@ class UserServiceTest {
 
     @Test
     void updateChangesUserFieldsAndReturnsUpdatedUser() {
-        // Given
         User existingUser = new User();
         existingUser.setId(1L);
         existingUser.setUserName("oldname");
@@ -268,10 +240,8 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.encode("newpassword")).thenReturn("encodedNewPassword");
 
-        // When
         User result = userService.update(request, 1L);
 
-        // Then
         assertEquals("newname", result.getUserName());
         assertEquals("encodedNewPassword", result.getUserPassword());
         assertEquals(Permission.Manager, result.getPermission());
@@ -282,7 +252,6 @@ class UserServiceTest {
 
     @Test
     void updateThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         UserRequest request = new UserRequest(
             "newname",
             "newpassword",
@@ -293,10 +262,8 @@ class UserServiceTest {
 
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // When
         assertThrows(RuntimeException.class, () -> userService.update(request, 999L));
 
-        // Then
         verify(userRepository).findById(999L);
         verify(passwordEncoder, never()).encode(anyString());
     }
@@ -305,7 +272,6 @@ class UserServiceTest {
 
     @Test
     void deleteDeactivatesUserWhenItExists() {
-        // Given
         User user = new User();
         user.setId(1L);
         user.setUserName("testuser");
@@ -313,23 +279,18 @@ class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        // When
         userService.delete(1L);
 
-        // Then
         assertFalse(user.isActive());
         verify(userRepository).findById(1L);
     }
 
     @Test
     void deleteThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // When
         assertThrows(RuntimeException.class, () -> userService.delete(999L));
 
-        // Then
         verify(userRepository).findById(999L);
     }
 
@@ -337,7 +298,6 @@ class UserServiceTest {
 
     @Test
     void findAllActiveReturnsOnlyActiveUsers() {
-        // Given
         User user1 = new User();
         user1.setActive(true);
         User user2 = new User();
@@ -346,10 +306,8 @@ class UserServiceTest {
         List<User> activeUsers = List.of(user1, user2);
         when(userRepository.findByActiveTrue()).thenReturn(activeUsers);
 
-        // When
         List<User> result = userService.findAllActive();
 
-        // Then
         assertSame(activeUsers, result);
         assertEquals(2, result.size());
         verify(userRepository).findByActiveTrue();
@@ -357,13 +315,10 @@ class UserServiceTest {
 
     @Test
     void findAllActiveThrowsRuntimeExceptionWhenRepositoryFails() {
-        // Given
         when(userRepository.findByActiveTrue()).thenThrow(new RuntimeException("Database error"));
 
-        // When
         assertThrows(RuntimeException.class, () -> userService.findAllActive());
 
-        // Then
         verify(userRepository).findByActiveTrue();
     }
 
@@ -371,17 +326,14 @@ class UserServiceTest {
 
     @Test
     void findByUserNameReturnsUserWhenItExists() {
-        // Given
         User user = new User();
         user.setId(1L);
         user.setUserName("testuser");
 
         when(userRepository.findByUserName("testuser")).thenReturn(Optional.of(user));
 
-        // When
         User result = userService.findByUserName("testuser");
 
-        // Then
         assertSame(user, result);
         assertEquals("testuser", result.getUserName());
         verify(userRepository).findByUserName("testuser");
@@ -389,14 +341,11 @@ class UserServiceTest {
 
     @Test
     void findByUserNameThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         when(userRepository.findByUserName("nonexistent")).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> userService.findByUserName("nonexistent"));
 
-        // Then
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         verify(userRepository).findByUserName("nonexistent");
@@ -406,17 +355,14 @@ class UserServiceTest {
 
     @Test
     void findByEmailReturnsUserWhenItExists() {
-        // Given
         User user = new User();
         user.setId(1L);
         user.setEmail("test@example.com");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
 
-        // When
         User result = userService.findByEmail("test@example.com");
 
-        // Then
         assertSame(user, result);
         assertEquals("test@example.com", result.getEmail());
         verify(userRepository).findByEmail("test@example.com");
@@ -424,14 +370,11 @@ class UserServiceTest {
 
     @Test
     void findByEmailThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> userService.findByEmail("nonexistent@example.com"));
 
-        // Then
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         verify(userRepository).findByEmail("nonexistent@example.com");
@@ -441,7 +384,6 @@ class UserServiceTest {
 
     @Test
     void authenticateReturnsTrueWhenPasswordMatches() {
-        // Given
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedPassword");
@@ -451,10 +393,8 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("password123", "encodedPassword")).thenReturn(true);
 
-        // When
         Boolean result = userService.authenticate(request);
 
-        // Then
         assertTrue(result);
         verify(userRepository).findByEmail("test@example.com");
         verify(passwordEncoder).matches("password123", "encodedPassword");
@@ -462,7 +402,6 @@ class UserServiceTest {
 
     @Test
     void authenticateReturnsFalseWhenPasswordDoesNotMatch() {
-        // Given
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedPassword");
@@ -472,10 +411,8 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrongpassword", "encodedPassword")).thenReturn(false);
 
-        // When
         Boolean result = userService.authenticate(request);
 
-        // Then
         assertFalse(result);
         verify(userRepository).findByEmail("test@example.com");
         verify(passwordEncoder).matches("wrongpassword", "encodedPassword");
@@ -483,16 +420,13 @@ class UserServiceTest {
 
     @Test
     void authenticateThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         AuthenticateRequest request = new AuthenticateRequest("nonexistent@example.com", "password123");
 
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> userService.authenticate(request));
 
-        // Then
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         verify(userRepository).findByEmail("nonexistent@example.com");
@@ -503,7 +437,6 @@ class UserServiceTest {
 
     @Test
     void changePasswordUpdatesPasswordWhenOldPasswordDoesNotMatch() {
-        // Given
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedOldPassword");
@@ -514,10 +447,8 @@ class UserServiceTest {
         when(passwordEncoder.matches("encodedOldPassword", "newPassword123")).thenReturn(false);
         when(passwordEncoder.encode("newPassword123")).thenReturn("encodedNewPassword");
 
-        // When
         BooleanRequest result = userService.changePassword(request);
 
-        // Then
         assertTrue(result.bool());
         assertEquals("Senha redefinida com sucesso", result.message());
         assertEquals("encodedNewPassword", user.getUserPassword());
@@ -528,7 +459,6 @@ class UserServiceTest {
 
     @Test
     void changePasswordFailsWhenOldPasswordMatchesNewPassword() {
-        // Given
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedPassword");
@@ -538,10 +468,8 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("encodedPassword", "samePassword")).thenReturn(true);
 
-        // When
         BooleanRequest result = userService.changePassword(request);
 
-        // Then
         assertFalse(result.bool());
         assertEquals("erro com a senha", result.message());
         assertEquals("encodedPassword", user.getUserPassword());
@@ -552,16 +480,13 @@ class UserServiceTest {
 
     @Test
     void changePasswordThrowsRuntimeExceptionWhenUserNotFound() {
-        // Given
         ChangePasswordRequest request = new ChangePasswordRequest("nonexistent@example.com", "newPassword");
 
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        // When
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> userService.changePassword(request));
 
-        // Then
         assertNotNull(exception.getCause());
         assertTrue(exception.getCause() instanceof ResponseStatusException);
         verify(userRepository).findByEmail("nonexistent@example.com");

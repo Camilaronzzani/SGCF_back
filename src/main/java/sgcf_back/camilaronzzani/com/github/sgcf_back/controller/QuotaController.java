@@ -36,19 +36,19 @@ public class QuotaController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@Valid @RequestBody QuotaRequest quotaRequest) {
+    public ResponseEntity<Void> save(@Valid @RequestBody QuotaRequest quotaRequest) {
             quotaService.save(quotaRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
-            QuotaDto quotaDto = quotaService.toDto(quotaService.update(quotaRequest, id));
+    public ResponseEntity<Void> update(@Valid @RequestBody QuotaRequest quotaRequest, @PathVariable long id) {
+            quotaService.update(quotaRequest, id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
             quotaService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

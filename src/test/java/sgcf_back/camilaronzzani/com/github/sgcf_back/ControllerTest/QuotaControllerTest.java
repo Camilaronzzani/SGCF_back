@@ -70,14 +70,11 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Listar todas as metas")
     void findAllReturnsListOfQuotas() throws Exception {
-        // Given
         when(quotaService.findAll()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/quota/findAll"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -88,14 +85,11 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Buscar meta pelo id")
     void findByIdReturnsQuotaWhenItExists() throws Exception {
-        // Given
         when(quotaService.findById(1L)).thenReturn(sampleQuota);
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/quota/findId/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.achievedValue").value(500.0));
@@ -105,15 +99,12 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Salvar meta")
     void saveReturns201WhenRequestIsValid() throws Exception {
-        // Given
         doNothing().when(quotaService).save(any(QuotaRequest.class));
 
-        // When
         ResultActions resposta = mockMvc.perform(post("/api/quota/save")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isCreated());
         verify(quotaService, times(1)).save(any(QuotaRequest.class));
     }
@@ -121,15 +112,12 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Atualizar meta")
     void updateReturns204WhenQuotaIsUpdated() throws Exception {
-        // Given
         when(quotaService.update(any(QuotaRequest.class), eq(1L))).thenReturn(sampleQuota);
 
-        // When
         ResultActions resposta = mockMvc.perform(put("/api/quota/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sampleRequest)));
 
-        // Then
         resposta.andExpect(status().isNoContent());
         verify(quotaService, times(1)).update(any(QuotaRequest.class), eq(1L));
     }
@@ -137,13 +125,10 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Deletar meta")
     void deleteReturns204WhenQuotaIsDeleted() throws Exception {
-        // Given
         doNothing().when(quotaService).delete(1L);
 
-        // When
         ResultActions resposta = mockMvc.perform(delete("/api/quota/delete/{id}", 1L));
 
-        // Then
         resposta.andExpect(status().isNoContent());
         verify(quotaService, times(1)).delete(1L);
     }
@@ -151,14 +136,11 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Listar metas ativas")
     void findAllActiveReturnsListOfActiveQuotas() throws Exception {
-        // Given
         when(quotaService.findAllActive()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/quota/findAll/active"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findAllActive();
@@ -167,14 +149,11 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Buscar metas do funcionário")
     void findByEmployeeReturnsEmployeeQuotas() throws Exception {
-        // Given
         when(quotaService.findByEmployee(1L)).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/quota/findByEmployee/{employeeId}", 1L));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findByEmployee(1L);
@@ -183,14 +162,11 @@ class QuotaControllerTest {
     @Test
     @DisplayName("Listar metas da empresa")
     void findAllCompanyReturnsCompanyQuotas() throws Exception {
-        // Given
         when(quotaService.findAllCompany()).thenReturn(List.of(sampleQuota));
         when(quotaService.toDto(sampleQuota)).thenReturn(sampleDto);
 
-        // When
         ResultActions resposta = mockMvc.perform(get("/api/quota/findAll/company"));
 
-        // Then
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(quotaService, times(1)).findAllCompany();
