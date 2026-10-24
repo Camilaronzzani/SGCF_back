@@ -1,6 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.SystemLogRepository;
@@ -15,8 +17,16 @@ public class SystemLogStore {
 
     private static boolean salvando = false;
 
-    public SystemLogStore(SystemLogRepository systemLogRepository) {
-        SystemLogStore.repository = systemLogRepository;
+    @Autowired
+    private SystemLogRepository systemLogRepository;
+
+    @PostConstruct
+    public void init() {
+        setRepository(systemLogRepository);
+    }
+
+    private static void setRepository(SystemLogRepository systemLogRepository) {
+        repository = systemLogRepository;
     }
 
     public static void writeLog(String level, String loggerName, String message,
