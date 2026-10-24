@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.entityTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Reservation;
 import org.junit.jupiter.api.Test;
