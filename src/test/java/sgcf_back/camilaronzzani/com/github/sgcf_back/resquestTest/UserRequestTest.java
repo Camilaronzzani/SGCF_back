@@ -1,10 +1,11 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.resquestTest;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.UserRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
 

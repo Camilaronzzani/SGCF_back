@@ -1,5 +1,6 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.CurrencyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

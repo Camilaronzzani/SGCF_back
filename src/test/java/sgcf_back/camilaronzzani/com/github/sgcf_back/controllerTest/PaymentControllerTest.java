@@ -223,7 +223,7 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Não salvar pagamento com valor negativo")
     void saveReturns400WhenValueIsNegative() throws Exception {
-        PaymentRequest invalidRequest = new PaymentRequest(1L, Status.Pending, -10.0);
+        PaymentRequest invalidRequest = new PaymentRequest(1L, Status.PENDING, -10.0);
 
         ResultActions resposta = mockMvc.perform(post("/api/Payment/save")
                 .contentType(MediaType.APPLICATION_JSON)

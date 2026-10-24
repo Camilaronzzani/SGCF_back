@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -74,7 +74,7 @@ class ReservationControllerTest {
         sampleReservation.setCustomer(sampleCustomer);
         sampleReservation.setEmployee(sampleEmployee);
         sampleReservation.setValue(150.0);
-        sampleReservation.setStatus(Status.Pending);
+        sampleReservation.setStatus(Status.PENDING);
         sampleReservation.setCustomersNotPaying(new ArrayList<>());
         sampleReservation.setActive(true);
 
@@ -83,7 +83,7 @@ class ReservationControllerTest {
                 1L,
                 1L,
                 1L,
-                Status.Pending,
+                Status.PENDING,
                 List.of(2L, 3L)
         );
     }
@@ -146,9 +146,9 @@ class ReservationControllerTest {
     @DisplayName("PATCH /api/reservation/updateStatus/{id} - Should update status")
     void updateStatusReturnsReservationWithNewStatus() throws Exception {
         Map<String, Status> statusMap = new HashMap<>();
-        statusMap.put("status", Status.Pending);
+        statusMap.put("status", Status.PENDING);
 
-        when(reservationService.updateStatus(1L, Status.Pending)).thenReturn(sampleReservation);
+        when(reservationService.updateStatus(1L, Status.PENDING)).thenReturn(sampleReservation);
 
         ResultActions resposta = mockMvc.perform(patch("/api/reservation/updateStatus/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -156,7 +156,7 @@ class ReservationControllerTest {
 
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
-        verify(reservationService, times(1)).updateStatus(1L, Status.Pending);
+        verify(reservationService, times(1)).updateStatus(1L, Status.PENDING);
     }
 
     @Test
@@ -198,13 +198,13 @@ class ReservationControllerTest {
     @Test
     @DisplayName("GET /api/reservation/findByStatus/{status} - Should return reservations filtered by status")
     void findByStatusReturnsReservationsWithThatStatus() throws Exception {
-        when(reservationService.findByStatus(Status.Pending)).thenReturn(List.of(sampleReservation));
+        when(reservationService.findByStatus(Status.PENDING)).thenReturn(List.of(sampleReservation));
 
-        ResultActions resposta = mockMvc.perform(get("/api/reservation/findByStatus/{status}", Status.Pending));
+        ResultActions resposta = mockMvc.perform(get("/api/reservation/findByStatus/{status}", Status.PENDING));
 
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
-        verify(reservationService, times(1)).findByStatus(Status.Pending);
+        verify(reservationService, times(1)).findByStatus(Status.PENDING);
     }
 
     @Test
@@ -221,7 +221,7 @@ class ReservationControllerTest {
     @Test
     @DisplayName("Não salvar reserva com data no passado")
     void saveReturns400WhenDateIsInThePast() throws Exception {
-        ReservationRequest invalidRequest = new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, 1L, Status.Pending, List.of());
+        ReservationRequest invalidRequest = new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L, 1L, Status.PENDING, List.of());
 
         ResultActions resposta = mockMvc.perform(post("/api/reservation/save")
                 .contentType(MediaType.APPLICATION_JSON)

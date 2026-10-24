@@ -1,5 +1,6 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.entityTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 

@@ -1,6 +1,7 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto;
+package sgcf_back.camilaronzzani.com.github.sgcf_back;
 
 import org.junit.jupiter.api.Test;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthenticatedUserDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;

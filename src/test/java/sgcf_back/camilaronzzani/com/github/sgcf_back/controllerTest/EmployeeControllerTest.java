@@ -190,7 +190,7 @@ class EmployeeControllerTest {
     @Test
     @DisplayName("Não salvar funcionário com nome vazio")
     void saveReturns400WhenNameIsBlank() throws Exception {
-        EmployeeRequest invalidRequest = new EmployeeRequest("52998224725", "", List.of(Language.Portuguese), null);
+        EmployeeRequest invalidRequest = new EmployeeRequest("52998224725", "", List.of(Language.PORTUGUESE), null);
 
         ResultActions resposta = mockMvc.perform(post("/api/employee/save")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -63,14 +63,14 @@ class UserControllerTest {
         sampleUser.setUserName("johndoe");
         sampleUser.setUserPassword("password123");
         sampleUser.setEmail("john@example.com");
-        sampleUser.setPermission(Permission.Manager);
+        sampleUser.setPermission(Permission.MANAGER);
         sampleUser.setEmployee(sampleEmployee);
         sampleUser.setActive(true);
 
         sampleUserRequest = new UserRequest(
                 "johndoe",
                 "password123",
-                Permission.Manager,
+                Permission.MANAGER,
                 "john@example.com",
                 1L
         );
@@ -200,7 +200,7 @@ class UserControllerTest {
         resposta.andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
         assertEquals(1L, session.getAttribute("userId"));
-        assertEquals(Permission.Manager, session.getAttribute("permission"));
+        assertEquals(Permission.MANAGER, session.getAttribute("permission"));
         assertEquals(1L, session.getAttribute("employeeId"));
     }
 
@@ -238,7 +238,7 @@ class UserControllerTest {
     @DisplayName("POST /api/user/is-manager - User without Manager permission returns 401 Unauthorized")
     void isManagerReturns401WhenUserIsNotManager() throws Exception {
         PasswordResetRequest resetRequest = new PasswordResetRequest("john@example.com");
-        sampleUser.setPermission(Permission.Employee);
+        sampleUser.setPermission(Permission.EMPLOYEE);
 
         when(userService.findByEmail("john@example.com")).thenReturn(sampleUser);
 
@@ -263,7 +263,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Não salvar usuário com email inválido")
     void saveReturns400WhenEmailIsInvalid() throws Exception {
-        UserRequest invalidRequest = new UserRequest("johndoe", "password123", Permission.Manager, "email-errado", 1L);
+        UserRequest invalidRequest = new UserRequest("johndoe", "password123", Permission.MANAGER, "email-errado", 1L);
 
         ResultActions resposta = mockMvc.perform(post("/api/user/save")
                 .contentType(MediaType.APPLICATION_JSON)

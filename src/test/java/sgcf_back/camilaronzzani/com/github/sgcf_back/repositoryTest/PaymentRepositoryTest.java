@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.RepositoryTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.repositoryTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Payment;
@@ -52,9 +52,9 @@ class PaymentRepositoryTest {
     @Test
     @DisplayName("Buscar pagamentos do cliente")
     void findByCustomerIdReturnsOnlyPaymentsOfThatCustomer() {
-        newPayment(camila, Status.Pending, true);
-        newPayment(camila, Status.Confirmed, true);
-        newPayment(alex, Status.Pending, true);
+        newPayment(camila, Status.PENDING, true);
+        newPayment(camila, Status.CONFIRMED, true);
+        newPayment(alex, Status.PENDING, true);
 
         List<Payment> result = paymentRepository.findByCustomerId(camila.getId());
 
@@ -65,20 +65,20 @@ class PaymentRepositoryTest {
     @Test
     @DisplayName("Buscar pagamentos pelo status")
     void findByStatusReturnsOnlyPaymentsWithThatStatus() {
-        newPayment(camila, Status.Pending, true);
-        newPayment(alex, Status.Confirmed, true);
+        newPayment(camila, Status.PENDING, true);
+        newPayment(alex, Status.CONFIRMED, true);
 
-        List<Payment> result = paymentRepository.findByStatus(Status.Confirmed);
+        List<Payment> result = paymentRepository.findByStatus(Status.CONFIRMED);
 
         assertEquals(1, result.size());
-        assertEquals(Status.Confirmed, result.get(0).getStatus());
+        assertEquals(Status.CONFIRMED, result.get(0).getStatus());
     }
 
     @Test
     @DisplayName("Buscar só os pagamentos ativos")
     void findByActiveTrueReturnsOnlyActivePayments() {
-        newPayment(camila, Status.Pending, true);
-        newPayment(alex, Status.Pending, false);
+        newPayment(camila, Status.PENDING, true);
+        newPayment(alex, Status.PENDING, false);
 
         List<Payment> result = paymentRepository.findByActiveTrue();
 
@@ -95,6 +95,6 @@ class PaymentRepositoryTest {
 
         Payment saved = paymentRepository.saveAndFlush(payment);
 
-        assertEquals(Status.Pending, saved.getStatus());
+        assertEquals(Status.PENDING, saved.getStatus());
     }
 }

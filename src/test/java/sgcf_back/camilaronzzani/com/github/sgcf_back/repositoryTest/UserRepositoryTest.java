@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.RepositoryTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.repositoryTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
@@ -30,7 +30,7 @@ class UserRepositoryTest {
         User user = new User();
         user.setUserName("camila");
         user.setUserPassword("123456");
-        user.setPermission(Permission.Manager);
+        user.setPermission(Permission.MANAGER);
         user.setEmail("camila@email.com");
         user.setActive(true);
         entityManager.persist(user);
@@ -59,6 +59,6 @@ class UserRepositoryTest {
         Optional<User> result = userRepository.findByUserName("camila");
 
         assertTrue(result.isPresent());
-        assertEquals(Permission.Manager, result.get().getPermission());
+        assertEquals(Permission.MANAGER, result.get().getPermission());
     }
 }

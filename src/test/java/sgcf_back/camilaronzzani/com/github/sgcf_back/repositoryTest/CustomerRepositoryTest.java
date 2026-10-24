@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.RepositoryTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.repositoryTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.CustomerRepository;

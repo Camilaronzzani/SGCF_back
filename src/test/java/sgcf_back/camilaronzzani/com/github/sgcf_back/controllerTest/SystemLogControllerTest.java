@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.ControllerTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +51,11 @@ class SystemLogControllerTest {
 
         managerSession = new MockHttpSession();
         managerSession.setAttribute("userId", 1L);
-        managerSession.setAttribute("permission", Permission.Manager);
+        managerSession.setAttribute("permission", Permission.MANAGER);
 
         unauthorizedSession = new MockHttpSession();
         unauthorizedSession.setAttribute("userId", 2L);
-        unauthorizedSession.setAttribute("permission", Permission.Employee);
+        unauthorizedSession.setAttribute("permission", Permission.EMPLOYEE);
     }
 
 

@@ -1,5 +1,7 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.EmailService;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.service.PasswordResetService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

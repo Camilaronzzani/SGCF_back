@@ -163,7 +163,7 @@ class CustomerControllerTest {
     @Test
     @DisplayName("Não salvar cliente com email inválido")
     void saveReturns400WhenEmailIsInvalid() throws Exception {
-        CustomerRequest invalidRequest = new CustomerRequest(null, "52998224725", "Camila", List.of(Language.Portuguese), CountryCustomer.Brazil, "email-errado");
+        CustomerRequest invalidRequest = new CustomerRequest(null, "52998224725", "Camila", List.of(Language.PORTUGUESE), CountryCustomer.BRAZIL, "email-errado");
 
         ResultActions resposta = mockMvc.perform(post("/api/customer/save")
                 .contentType(MediaType.APPLICATION_JSON)

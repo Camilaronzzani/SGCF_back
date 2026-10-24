@@ -1,5 +1,6 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.entityTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Reservation;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
@@ -15,17 +16,17 @@ class ReservationTest {
 
         ReflectionTestUtils.invokeMethod(reservation, "prePersist");
 
-        assertEquals(Status.Pending, reservation.getStatus());
+        assertEquals(Status.PENDING, reservation.getStatus());
     }
 
     @Test
     void prePersistKeepsExistingStatus() {
         Reservation reservation = new Reservation();
-        reservation.setStatus(Status.Confirmed);
+        reservation.setStatus(Status.CONFIRMED);
 
         ReflectionTestUtils.invokeMethod(reservation, "prePersist");
 
-        assertEquals(Status.Confirmed, reservation.getStatus());
+        assertEquals(Status.CONFIRMED, reservation.getStatus());
     }
 
     @Test

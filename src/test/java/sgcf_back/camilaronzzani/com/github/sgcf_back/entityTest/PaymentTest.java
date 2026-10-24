@@ -1,5 +1,6 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.entityTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Payment;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
@@ -14,16 +15,16 @@ class PaymentTest {
 
         ReflectionTestUtils.invokeMethod(payment, "prePersist");
 
-        assertEquals(Status.Pending, payment.getStatus());
+        assertEquals(Status.PENDING, payment.getStatus());
     }
 
     @Test
     void prePersistKeepsExistingStatus() {
         Payment payment = new Payment();
-        payment.setStatus(Status.Confirmed);
+        payment.setStatus(Status.CONFIRMED);
 
         ReflectionTestUtils.invokeMethod(payment, "prePersist");
 
-        assertEquals(Status.Confirmed, payment.getStatus());
+        assertEquals(Status.CONFIRMED, payment.getStatus());
     }
 }
