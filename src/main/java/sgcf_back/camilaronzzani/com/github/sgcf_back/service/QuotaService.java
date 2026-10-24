@@ -176,10 +176,10 @@ public class QuotaService {
 
         double achievedValue = quota.getEmployee() == null
                 ? reservationRepository.sumValueByStatusAndDateBetween(
-                        Status.Confirmed, quota.getStartDate(), achievedUntil)
+                        Status.CONFIRMED, quota.getStartDate(), achievedUntil)
 
                 : reservationRepository.sumValueByEmployeeAndStatusAndDateBetween(
-                        quota.getEmployee().getId(), Status.Confirmed, quota.getStartDate(), achievedUntil);
+                        quota.getEmployee().getId(), Status.CONFIRMED, quota.getStartDate(), achievedUntil);
 
         return QuotaDto.toDto(quota, achievedValue);
     }

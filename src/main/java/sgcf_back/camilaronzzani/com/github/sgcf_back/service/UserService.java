@@ -60,7 +60,7 @@ public class UserService {
     }
 
     public void save(UserRequest userRequest) {
-            if (userRequest.permission() == sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission.Employee
+            if (userRequest.permission() == sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission.EMPLOYEE
                     && userRequest.employeeId() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "employeeId is required for employee accounts");
             }

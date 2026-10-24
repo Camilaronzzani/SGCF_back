@@ -43,7 +43,7 @@ public class EmployeeService {
             Employee employee = employeeRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
 
-            log.info("Employee {} found successfully" , employee.getName());
+            log.info("EMPLOYEE {} found successfully" , employee.getName());
             return employee;
         } catch (Exception e) {
 
@@ -57,7 +57,7 @@ public class EmployeeService {
             Employee employee = toEmployee(employeeRequest);
             employeeRepository.save(employee);
 
-            log.info("Employee {} saved successfully" , employee.getName());
+            log.info("EMPLOYEE {} saved successfully" , employee.getName());
 
         } catch (Exception e) {
             log.error("Error in employeeService.findById" , e );
@@ -69,7 +69,7 @@ public class EmployeeService {
     public Employee changeDataByEmpoloyee(long id, EmployeeRequest newEmployee){
 
         Employee employeeOld = employeeRepository.findById(id).orElseThrow(()
-                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
+                -> new ResponseStatusException(HttpStatus.NOT_FOUND, "EMPLOYEE not found"));
 
         employeeOld.setCpf(newEmployee.cpf());
         employeeOld.setName(newEmployee.name());
@@ -85,7 +85,7 @@ public class EmployeeService {
         try {
             Employee employee = changeDataByEmpoloyee(id , employeeRequest);
 
-            log.info("Employee {} updated successfully" , employee.getName());
+            log.info("EMPLOYEE {} updated successfully" , employee.getName());
             return employee;
 
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public class EmployeeService {
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, "employee no find"));
             employee.setActive(false);
 
-            log.info("Employee {} deactivated successfully" , employee.getName());
+            log.info("EMPLOYEE {} deactivated successfully" , employee.getName());
 
         } catch (Exception e) {
             log.error("Error in employeeService.delete" , e );
@@ -111,7 +111,7 @@ public class EmployeeService {
 
     public List<Employee> findAllActive() {
         try {
-            log.info("Employee list found successfully");
+            log.info("EMPLOYEE list found successfully");
             return employeeRepository.findByActiveTrue();
 
         } catch (Exception e) {
@@ -123,6 +123,6 @@ public class EmployeeService {
     public EmployeDto toSummaryDto(Employee employee) {
         return new EmployeDto(employee.getId(), employee.getCpf(), employee.getName(), employee.getLanguagesSpoken(),
                 employee.getDayOfBirth(), employee.isActive(), reservationRepository.countByEmployeeIdAndActiveTrue(employee.getId()),
-                reservationRepository.sumValueByEmployeeAndStatus(employee.getId(), Status.Confirmed));
+                reservationRepository.sumValueByEmployeeAndStatus(employee.getId(), Status.CONFIRMED));
     }
 }

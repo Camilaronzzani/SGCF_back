@@ -94,7 +94,7 @@ public class UserController {
     @PostMapping("is-manager")
     public ResponseEntity<UserDto> isManager(@Valid @RequestBody PasswordResetRequest email){
         User user = userService.findByEmail(email.email());
-        if (user.getPermission() == Permission.Manager){
+        if (user.getPermission() == Permission.MANAGER){
             return ResponseEntity.ok(UserDto.toDto(user));
         }
         return new ResponseEntity<>(UserDto.toDto(user), HttpStatus.UNAUTHORIZED);

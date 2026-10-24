@@ -1,16 +1,15 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.config;
 
 import lombok.extern.slf4j.Slf4j;
-import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
-import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.SystemLogRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.SystemLog;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.SystemLogRepository;
 
 import java.time.LocalDateTime;
 
-@Slf4j
 @Component
+@Slf4j
 public class SystemLogStore {
 
     private static SystemLogRepository repository;
@@ -18,19 +17,16 @@ public class SystemLogStore {
     private static boolean salvando = false;
 
     @Autowired
-    private SystemLogRepository systemLogRepository;
-
-    @PostConstruct
-    public void init() {
-        setRepository(systemLogRepository);
+    private SystemLogStore(SystemLogRepository systemLogRepository) {
+        initRepository(systemLogRepository);
     }
 
-    private static void setRepository(SystemLogRepository systemLogRepository) {
+    private static synchronized void initRepository(SystemLogRepository systemLogRepository) {
         repository = systemLogRepository;
     }
 
-    public static void saveLog(String level, String loggerName, String message,
-                              String exceptionType, String stackTrace) {
+    public static void writeLog(String level, String loggerName, String message,
+                                String exceptionType, String stackTrace) {
         if (repository == null || salvando) {
             return;
         }
@@ -48,7 +44,7 @@ public class SystemLogStore {
 
             repository.save(systemLog);
         } catch (Exception e) {
-            log.warn("Nao foi possivel gravar o log no banco");
+            log.error("Nao foi possivel gravar o log no banco", e);
         } finally {
             salvando = false;
         }

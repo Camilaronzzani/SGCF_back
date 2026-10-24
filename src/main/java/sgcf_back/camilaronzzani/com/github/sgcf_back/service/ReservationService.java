@@ -66,7 +66,7 @@ public class ReservationService {
     public void save(ReservationRequest reservationRequest) {
         try {
             Reservation reservation = toReservation(reservationRequest);
-            reservation.setStatus(Status.Pending);
+            reservation.setStatus(Status.PENDING);
 
             calculatePrice(reservation);
             Reservation savedReservation = reservationRepository.saveAndFlush(reservation);
@@ -205,7 +205,7 @@ public class ReservationService {
         reservation.setCustomer(findCustomer(reservationRequest.customerId()));
         reservation.setEmployee(findEmployee(reservationRequest.employeeId()));
         reservation.setStatus(reservationRequest.status() == null
-                ? Status.Pending
+                ? Status.PENDING
                 : reservationRequest.status());
         reservation.setCustomersNotPaying(reservationRequest.customerNotPaying() == null
                 ? new ArrayList<>()
