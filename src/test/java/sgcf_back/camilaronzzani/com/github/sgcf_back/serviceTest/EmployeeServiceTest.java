@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
+import org.springframework.http.HttpStatus;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Language;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.EmployeeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,14 +17,11 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.EmployeeRepository;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.ReservationRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -38,6 +38,15 @@ class EmployeeServiceTest {
 
     @InjectMocks
     private EmployeeService service;
+
+    private EmployeeRequest createValidRequest() {
+        return new EmployeeRequest(
+                "12345678909",
+                "João Silva",
+                List.of(Language.PORTUGUESE),
+                LocalDate.of(1990, 1, 1)
+        );
+    }
 
     @Test
     void findAllReturnsAllEmployees() {
@@ -65,7 +74,7 @@ class EmployeeServiceTest {
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(99L));
 
-        assertTrue(ex.getCause() instanceof ResponseStatusException);
+        assertInstanceOf(ResponseStatusException.class, ex.getCause());
     }
 
     @Test
@@ -121,5 +130,77 @@ class EmployeeServiceTest {
         assertNotNull(dto);
         verify(reservationRepository).countByEmployeeIdAndActiveTrue(1L);
         verify(reservationRepository).sumValueByEmployeeAndStatus(1L, Status.CONFIRMED);
+    }
+
+    @Test
+    void findAllThrowsServiceExceptionWhenRepositoryFails() {
+        when(employeeRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findAll());
+    }
+
+    @Test
+    void findByIdThrowsServiceExceptionWhenEmployeeNotFound() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.findById(1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void findByIdThrowsServiceExceptionWhenRepositoryFails() {
+        when(employeeRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findById(1L));
+    }
+
+    @Test
+    void saveThrowsServiceExceptionWhenRepositoryFails() {
+        EmployeeRequest request = createValidRequest();
+        when(employeeRepository.save(any(Employee.class))).thenThrow(new RuntimeException("Save error"));
+
+        assertThrows(ServiceException.class, () -> service.save(request));
+    }
+
+    @Test
+    void updateThrowsServiceExceptionWhenEmployeeNotFound() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+        EmployeeRequest request = createValidRequest();
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.update(request, 1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void updateThrowsServiceExceptionWhenRepositoryFails() {
+        when(employeeRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+        EmployeeRequest request = createValidRequest();
+
+        assertThrows(ServiceException.class, () -> service.update(request, 1L));
+    }
+
+    @Test
+    void deleteThrowsServiceExceptionWhenEmployeeNotFound() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.delete(1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void deleteThrowsServiceExceptionWhenRepositoryFails() {
+        when(employeeRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.delete(1L));
+    }
+
+    @Test
+    void findAllActiveThrowsServiceExceptionWhenRepositoryFails() {
+        when(employeeRepository.findByActiveTrue()).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findAllActive());
     }
 }

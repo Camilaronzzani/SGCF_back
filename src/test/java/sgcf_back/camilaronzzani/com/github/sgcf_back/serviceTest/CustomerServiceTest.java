@@ -1,5 +1,9 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.serviceTest;
 
+import org.springframework.http.HttpStatus;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.CountryCustomer;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Language;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.CustomerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +16,8 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Customer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.CustomerRepository;
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,7 +59,7 @@ class CustomerServiceTest {
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(99L));
 
-        assertTrue(ex.getCause() instanceof ResponseStatusException);
+        assertInstanceOf(ResponseStatusException.class, ex.getCause());
     }
 
     @Test
@@ -102,4 +104,94 @@ class CustomerServiceTest {
         assertEquals(1, resultado.size());
     }
 
+    @Test
+    void findAllThrowsServiceExceptionWhenRepositoryFails() {
+        when(customerRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findAll());
+    }
+
+    @Test
+    void findByIdThrowsServiceExceptionWhenCustomerNotFound() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.findById(1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void findByIdThrowsServiceExceptionWhenRepositoryFails() {
+        when(customerRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findById(1L));
+    }
+
+    @Test
+    void saveThrowsServiceExceptionWhenRepositoryFails() {
+        CustomerRequest request = new CustomerRequest(
+                "00000000000191",
+                "00000000000",
+                "Maria",
+                List.of(Language.PORTUGUESE),
+                CountryCustomer.BRAZIL,
+                "maria@email.com"
+        );        when(customerRepository.save(any())).thenThrow(new RuntimeException("Save error"));
+
+        assertThrows(ServiceException.class, () -> service.save(request));
+    }
+
+    @Test
+    void updateThrowsServiceExceptionWhenCustomerNotFound() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
+        CustomerRequest request = new CustomerRequest(
+                "00000000000191",
+                "00000000000",
+                "Maria",
+                List.of(Language.PORTUGUESE),
+                CountryCustomer.BRAZIL,
+                "maria@email.com"
+        );
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.update(request, 1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void updateThrowsServiceExceptionWhenRepositoryFails() {
+        when(customerRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+        CustomerRequest request = new CustomerRequest(
+                "00000000000191",
+                "00000000000",
+                "Maria",
+                List.of(Language.PORTUGUESE),
+                CountryCustomer.BRAZIL,
+                "maria@email.com"
+        );
+
+        assertThrows(ServiceException.class, () -> service.update(request, 1L));
+    }
+
+    @Test
+    void deleteThrowsServiceExceptionWhenCustomerNotFound() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> service.delete(1L));
+        assertInstanceOf(ResponseStatusException.class, exception.getCause());
+        assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) exception.getCause()).getStatusCode());
+    }
+
+    @Test
+    void deleteThrowsServiceExceptionWhenRepositoryFails() {
+        when(customerRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.delete(1L));
+    }
+
+    @Test
+    void findAllActiveThrowsServiceExceptionWhenRepositoryFails() {
+        when(customerRepository.findByActiveTrue()).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(ServiceException.class, () -> service.findAllActive());
+    }
 }
