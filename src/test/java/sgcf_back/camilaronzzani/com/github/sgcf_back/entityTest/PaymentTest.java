@@ -1,4 +1,4 @@
-package sgcf_back.camilaronzzani.com.github.sgcf_back.entityTest;
+package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Payment;
 import org.junit.jupiter.api.Test;
