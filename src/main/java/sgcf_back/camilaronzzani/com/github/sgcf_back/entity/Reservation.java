@@ -1,6 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class Reservation {
     @Column(name = "status", nullable = false)
     private Status status;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "reservations_customer",
@@ -51,7 +53,7 @@ public class Reservation {
     )
     private List<Customer> customersNotPaying;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 
     @PrePersist

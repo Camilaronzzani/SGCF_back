@@ -2,6 +2,7 @@ package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.CountryCustomer;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Language;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,10 +45,11 @@ public class Customer {
     @Column(name = "user_email", nullable = false, length = 100, unique = true)
     private String email;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer")
     private List<Reservation> reservations;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 
     @PrePersist

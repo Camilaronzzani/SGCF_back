@@ -28,7 +28,7 @@ public class Payment {
     @Column(name = "total_account")
     private double totalAccount;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 
     @PrePersist

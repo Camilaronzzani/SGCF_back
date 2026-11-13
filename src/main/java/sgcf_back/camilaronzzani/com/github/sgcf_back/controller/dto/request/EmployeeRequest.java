@@ -11,7 +11,7 @@ import java.util.List;
 
 public record EmployeeRequest (
 
-    @CPF(message = "the cnpj must be 11 characters")
+    @CPF(message = "o CPF deve ter 11 dígitos válidos")
     @Pattern(regexp = "^\\d{11}$")
      String cpf,
 

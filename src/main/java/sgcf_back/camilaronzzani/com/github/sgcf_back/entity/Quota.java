@@ -31,6 +31,6 @@ public class Quota {
     @JoinColumn(name = "fk_employee_id")
     private Employee employee;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 }

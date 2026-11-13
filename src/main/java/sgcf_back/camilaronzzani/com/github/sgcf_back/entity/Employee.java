@@ -38,7 +38,7 @@ public class Employee {
     @Column(name = "day_of_birth")
     private LocalDate dayOfBirth;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active;
 
     @PrePersist

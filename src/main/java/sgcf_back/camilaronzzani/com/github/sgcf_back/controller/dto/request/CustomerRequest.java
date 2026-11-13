@@ -12,11 +12,11 @@ import java.util.List;
 
 public record CustomerRequest (
 
-    @CNPJ( message = "the cnpj must be 14 characters")
+    @CNPJ( message = "o CNPJ deve ter 14 dígitos válidos")
     @Pattern(regexp = "^\\d{14}$")
      String cnpj,
 
-    @CPF(message = "the cnpj must be 11 characters")
+    @CPF(message = "o CPF deve ter 11 dígitos válidos")
     @Pattern(regexp = "^\\d{11}$")
      String cpf,
 

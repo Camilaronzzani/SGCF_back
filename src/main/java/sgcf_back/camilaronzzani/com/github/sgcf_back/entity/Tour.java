@@ -33,7 +33,7 @@ public class Tour {
     @Column(name = "locations")
     private  String locations;
 
-    @Column(name = "Active")
+    @Column(name = "active")
     private boolean active ;
 
 }
