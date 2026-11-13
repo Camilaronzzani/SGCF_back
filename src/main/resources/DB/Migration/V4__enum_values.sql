@@ -8,11 +8,11 @@ alter table "tour" add constraint "tour_country_of_tour_check"
 
 alter table "payment" drop constraint "payment_status_check";
 alter table "payment" add constraint "payment_status_check"
-    check ("status" in ('PENDING', 'CANCELATED', 'CONFIRMED'));
+    check ("status" in ('PENDING', 'CANCELLED', 'CONFIRMED'));
 
 alter table "reservation" drop constraint "reservation_status_check";
 alter table "reservation" add constraint "reservation_status_check"
-    check ("status" in ('PENDING', 'CANCELATED', 'CONFIRMED'));
+    check ("status" in ('PENDING', 'CANCELLED', 'CONFIRMED'));
 
 alter table "user" drop constraint "user_permission_check";
 alter table "user" add constraint "user_permission_check"
