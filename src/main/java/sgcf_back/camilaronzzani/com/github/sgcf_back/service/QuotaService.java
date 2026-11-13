@@ -62,11 +62,24 @@ public class QuotaService {
     public void save(QuotaRequest quotaRequest) {
         try {
             Quota quota = toEmployeeQuota(quotaRequest);
+            
+            if (quota.getEmployee() != null) {
+                List<Quota> existingQuotas = quotaRepository.findByEmployeeId(quota.getEmployee().getId());
+                boolean hasActiveQuota = existingQuotas.stream()
+                        .anyMatch(Quota::isActive);
+                
+                if (hasActiveQuota) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        "Este funcionário já possui uma meta ativa");
+                }
+            }
 
             quotaRepository.save(quota);
 
             log.info("Quota {} saved successfully" , quota.getId());
 
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error in QuotaService.save ", e);
             throw new ServiceException(e);
