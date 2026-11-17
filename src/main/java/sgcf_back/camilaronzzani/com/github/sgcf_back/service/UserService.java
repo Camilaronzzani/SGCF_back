@@ -80,7 +80,7 @@ public class UserService {
             user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
             userRepository.save(user);
 
-            log.info("User {} saved successfully", user.getUserName());
+            log.info("User {} saved successfully", user.getUsername());
 
         } catch (ResponseStatusException e) {
             throw e;
@@ -110,7 +110,7 @@ public class UserService {
         try {
             User user = changeDataByUser(id, userRequest);
 
-            log.info("User {} updated successfully", user.getUserName());
+            log.info("User {} updated successfully", user.getUsername());
             return user;
         } catch (Exception e) {
             log.error("Error in UserService.update", e);
@@ -125,7 +125,7 @@ public class UserService {
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NO_FIND));
             user.setActive(false);
 
-            log.info("User {} deactivated successfully", user.getUserName());
+            log.info("User {} deactivated successfully", user.getUsername());
         } catch (Exception e) {
             log.error("Error in UserService.delete", e);
             throw new ServiceException(e);

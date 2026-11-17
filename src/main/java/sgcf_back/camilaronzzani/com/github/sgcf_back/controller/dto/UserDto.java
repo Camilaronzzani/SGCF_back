@@ -7,7 +7,7 @@ public record UserDto(Long id, String userName, Permission permission, String em
     public static UserDto toDto(User user) {
         return new UserDto(
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getPermission(),
                 user.getEmail(),
                 user.getEmployee() == null ? null : user.getEmployee().getId()
