@@ -13,7 +13,7 @@ public record AuthenticatedUserDto(
     public static AuthenticatedUserDto toDto(User user) {
         return new AuthenticatedUserDto(
                 user.getId(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getPermission(),
                 user.getEmail(),
                 user.getEmployee() == null ? null : user.getEmployee().getId()

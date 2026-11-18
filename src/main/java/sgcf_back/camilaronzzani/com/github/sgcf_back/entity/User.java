@@ -1,5 +1,9 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.entity;
 
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,13 +11,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "`user`")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
@@ -37,4 +45,23 @@ public class User {
 
     @Column(name = "active")
     private boolean active ;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        ArrayList<SimpleGrantedAuthority> grantAutority = new ArrayList<>();
+        grantAutority.add(new SimpleGrantedAuthority(permission.toString()));
+        return grantAutority;
+    }
+
+    @Override
+    public @Nullable String getPassword() {
+        return userPassword;
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
+
+
 }
