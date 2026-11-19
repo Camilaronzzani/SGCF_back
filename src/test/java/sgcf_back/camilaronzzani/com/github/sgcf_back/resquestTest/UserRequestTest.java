@@ -34,7 +34,7 @@ class UserRequestTest {
 
         User user = UserRequest.toUser(request);
 
-        assertEquals("maria", user.getUserName());
+        assertEquals("maria", user.getUsername());
         assertEquals("senha123", user.getUserPassword());
         assertEquals(request.permission(), user.getPermission());
         assertEquals("maria@teste.com", user.getEmail());

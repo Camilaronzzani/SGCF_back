@@ -75,7 +75,7 @@ class UserServiceTest {
         User result = userService.findById(1L);
 
         assertSame(user, result);
-        assertEquals("testuser", result.getUserName());
+        assertEquals("testuser", result.getUsername());
         verify(userRepository).findById(1L);
     }
 
@@ -110,7 +110,7 @@ class UserServiceTest {
 
         verify(passwordEncoder).encode("password123");
         verify(userRepository).save(argThat(user ->
-            user.getUserName().equals("manager1") &&
+            user.getUsername().equals("manager1") &&
             user.getUserPassword().equals("encodedPassword") &&
             user.getPermission() == Permission.MANAGER &&
             user.getEmail().equals("manager@example.com") &&
@@ -143,7 +143,7 @@ class UserServiceTest {
         verify(userRepository).findByEmployeeId(1L);
         verify(passwordEncoder).encode("password123");
         verify(userRepository).save(argThat(user ->
-            user.getUserName().equals("employee1") &&
+            user.getUsername().equals("employee1") &&
             user.getUserPassword().equals("encodedPassword") &&
             user.getPermission() == Permission.EMPLOYEE &&
             user.getEmployee() == employee
@@ -242,7 +242,7 @@ class UserServiceTest {
 
         User result = userService.update(request, 1L);
 
-        assertEquals("newname", result.getUserName());
+        assertEquals("newname", result.getUsername());
         assertEquals("encodedNewPassword", result.getUserPassword());
         assertEquals(Permission.MANAGER, result.getPermission());
         assertEquals("new@example.com", result.getEmail());
@@ -335,7 +335,7 @@ class UserServiceTest {
         User result = userService.findByUserName("testuser");
 
         assertSame(user, result);
-        assertEquals("testuser", result.getUserName());
+        assertEquals("testuser", result.getUsername());
         verify(userRepository).findByUserName("testuser");
     }
 

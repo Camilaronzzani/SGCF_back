@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +18,7 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
@@ -50,6 +52,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String getToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
+        log.info(authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }
