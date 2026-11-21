@@ -1,6 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
-import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;

@@ -1,6 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
-import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.CustomerController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.CustomerService;

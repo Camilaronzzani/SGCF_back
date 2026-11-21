@@ -75,20 +75,14 @@ public class UserController {
             return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.OK);
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest,
-                                                     HttpSession session) {
-        boolean isAuthenticated = userService.authenticate(authenticateRequest);
+    public ResponseEntity<String> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest) {
+        try {
 
-        if (!isAuthenticated) {
-            return new ResponseEntity<>(new AuthResponse(false), HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.ok(userService.authenticate(authenticateRequest));
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
-        User user = userService.findByEmail(authenticateRequest.email());
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("permission", user.getPermission());
-        session.setAttribute("employeeId", user.getEmployee() == null ? null : user.getEmployee().getId());
-
-        return ResponseEntity.ok(new AuthResponse(true));
     }
 
     @PostMapping("is-manager")

@@ -1,6 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.EmployeDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.DeactivationRequest;
@@ -20,8 +21,9 @@ import java.util.List;
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
+
     @Autowired
-    private UserService userService;
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<EmployeDto>> findAll(){
@@ -34,7 +36,8 @@ public class EmployeeController {
 
     @DeleteMapping("/deactivate/{id}")
     public ResponseEntity<Void> deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
-            if (!userService.authenticate(new AuthenticateRequest(request.email(), request.password()))) {
+
+            if (!passwordEncoder.matches(request.email(), request.password())) {
                 return ResponseEntity.status(401).build();
             }
             employeeService.delete(id);

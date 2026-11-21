@@ -3,7 +3,7 @@ package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.mockito.ArgumentCaptor;
-import sgcf_back.camilaronzzani.com.github.sgcf_back.config.SecurityConfig;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;

@@ -1,5 +1,6 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.service;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
@@ -33,6 +34,9 @@ public class UserService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private JwtService jwtService;
 
 
     public List<User> findAll() {
@@ -184,13 +188,23 @@ public class UserService {
         }
     }
 
-    public boolean authenticate(AuthenticateRequest authenticateRequest) {
+    public String authenticate(AuthenticateRequest authenticateRequest){
         try {
 
             User user = userRepository.findByEmail(authenticateRequest.email()).orElseThrow(()
                     ->new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
+
             log.info("authenticating user");
-            return passwordEncoder.matches(authenticateRequest.password(), user.getUserPassword());
+
+            boolean auth = passwordEncoder.matches(authenticateRequest.password(), user.getUserPassword());
+
+            if (!auth){
+                 throw new RuntimeException();
+            }
+            String token = jwtService.createToken(user);
+            log.info(token);
+            return token;
+
         } catch (Exception e) {
             log.error("Error in UserService.authenticate", e);
             throw new ServiceException(e);

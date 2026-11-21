@@ -24,11 +24,11 @@ public class JwtService {
         this.issuer = issuer;
     }
 
-    public String gerarToken(User usuario) {
+    public String createToken(User usuario) {
         try {
             return JWT.create()
                     .withIssuer(issuer)
-                    .withSubject(usuario.getUsername())
+                    .withSubject(usuario.getEmail())
                     .withClaim("id", usuario.getId())
                     .withClaim("Permission", usuario.getPermission().toString())
                     .withExpiresAt(Instant.now().plus(30, ChronoUnit.MINUTES))
