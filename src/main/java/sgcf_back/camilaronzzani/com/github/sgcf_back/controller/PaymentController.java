@@ -1,5 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.PaymentDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PaymentRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
@@ -22,6 +24,7 @@ public class PaymentController {
     @Autowired
     private CurrencyService currencyService;
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll")
     public ResponseEntity<List<PaymentDto>> findAll() {
             List<PaymentDto> paymentDtos = paymentService.findAll().
@@ -31,23 +34,27 @@ public class PaymentController {
             return ResponseEntity.ok(paymentDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findId/{id}")
     public ResponseEntity<PaymentDto> findById(@PathVariable long id) {
             return ResponseEntity.ok(PaymentDto.toDto(paymentService.findById(id)));
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PostMapping("/save")
     public ResponseEntity<Void> save(@Valid @RequestBody PaymentRequest paymentRequest) {
             paymentService.save(paymentRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PutMapping("/update/{id}")
     public ResponseEntity<PaymentDto> update(@Valid @RequestBody PaymentRequest paymentRequest, @PathVariable long id) {
             PaymentDto paymentDto = PaymentDto.toDto(paymentService.update(paymentRequest, id));
             return ResponseEntity.ok(paymentDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
             paymentService.delete(id);
@@ -55,6 +62,7 @@ public class PaymentController {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll/active")
     public ResponseEntity<List<PaymentDto>> findAllActive() {
             List<PaymentDto> paymentDtos = paymentService.findAllActive()
@@ -64,6 +72,7 @@ public class PaymentController {
             return ResponseEntity.ok(paymentDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<PaymentDto>> findByCustomer(@PathVariable long customerId) {
             List<PaymentDto> paymentDtos = paymentService.findByCustomer(customerId)
@@ -73,6 +82,7 @@ public class PaymentController {
             return ResponseEntity.ok(paymentDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<PaymentDto>> findByStatus(@PathVariable Status status) {
             List<PaymentDto> paymentDtos = paymentService.findByStatus(status)
@@ -82,6 +92,7 @@ public class PaymentController {
             return ResponseEntity.ok(paymentDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/quotations")
     public ResponseEntity<Double> getQuotations(){
         return new ResponseEntity<>(currencyService.getQuotation("USD"), HttpStatus.OK);

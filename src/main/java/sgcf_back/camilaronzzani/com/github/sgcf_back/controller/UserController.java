@@ -1,5 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthResponse;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
@@ -25,6 +27,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
             List<UserDto> userDtos = userService.findAll()
@@ -34,29 +37,34 @@ public class UserController {
             return ResponseEntity.ok(userDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findId/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable long id) {
             return ResponseEntity.ok(UserDto.toDto(userService.findById(id)));
     }
 
+    @PreAuthorize("hasAuthority('MANAGER')")
     @PostMapping("/save")
     public ResponseEntity<String> save(@Valid @RequestBody UserRequest userRequest) {
             userService.save(userRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PutMapping("/update/{id}")
     public ResponseEntity<UserDto> update(@Valid @RequestBody UserRequest userRequest, @PathVariable long id) {
             UserDto userDto = UserDto.toDto(userService.update(userRequest, id));
             return ResponseEntity.ok(userDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
             userService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll/active")
     public ResponseEntity<List<UserDto>> findAllActive() {
             List<UserDto> userDtos = userService.findAllActive()
@@ -66,10 +74,12 @@ public class UserController {
             return ResponseEntity.ok(userDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findByUserName/{userName}")
     public ResponseEntity<UserDto> findByUserName(@PathVariable String userName) {
             return ResponseEntity.ok(UserDto.toDto(userService.findByUserName(userName)));
     }
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PatchMapping("/change")
     public ResponseEntity<BooleanRequest> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
             return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.OK);
@@ -85,6 +95,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PostMapping("is-manager")
     public ResponseEntity<UserDto> isManager(@Valid @RequestBody PasswordResetRequest email){
         User user = userService.findByEmail(email.email());

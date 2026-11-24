@@ -1,5 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.EmployeDto;
@@ -25,6 +27,7 @@ public class EmployeeController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll")
     public ResponseEntity<List<EmployeDto>> findAll(){
             List<EmployeDto> employeDtos = employeeService.findAll()
@@ -34,6 +37,7 @@ public class EmployeeController {
             return ResponseEntity.ok(employeDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @DeleteMapping("/deactivate/{id}")
     public ResponseEntity<Void> deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
 
@@ -45,23 +49,27 @@ public class EmployeeController {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findId/{id}")
     public ResponseEntity<EmployeDto> findById(@PathVariable long id){
             return ResponseEntity.ok(EmployeDto.toDto(employeeService.findById(id)));
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PostMapping("/save")
     public ResponseEntity<Void> salve(@Valid @RequestBody EmployeeRequest employeeRequest){
             employeeService.save(employeeRequest);
             return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PutMapping("/update/{id}")
     public ResponseEntity<EmployeDto> update(@Valid @RequestBody EmployeeRequest employeeRequest, @PathVariable long id){
             EmployeDto employeDto = EmployeDto.toDto(employeeService.update(employeeRequest , id));
             return ResponseEntity.ok(employeDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll/active")
     public ResponseEntity<List<EmployeDto>> findAllActive (){
             List<EmployeDto> employeDtos = employeeService.findAllActive()

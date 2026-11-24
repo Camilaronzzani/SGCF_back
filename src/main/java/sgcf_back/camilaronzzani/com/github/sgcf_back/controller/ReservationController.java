@@ -1,5 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ReservationRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.ReservationDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Status;
@@ -19,6 +21,7 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll")
     public ResponseEntity<List<ReservationDto>> findAll() {
             List<ReservationDto> reservationDtos = reservationService.findAll()
@@ -28,11 +31,13 @@ public class ReservationController {
             return ResponseEntity.ok(reservationDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findId/{id}")
     public ResponseEntity<ReservationDto> findById(@PathVariable long id) {
             return ResponseEntity.ok(ReservationDto.toDto(reservationService.findById(id)));
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PostMapping("/save")
     public ResponseEntity<Void> save(@Valid @RequestBody ReservationRequest reservationRequest) {
             reservationService.save(reservationRequest);
@@ -40,12 +45,14 @@ public class ReservationController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ReservationDto> update(@Valid @RequestBody ReservationRequest reservationRequest, @PathVariable long id) {
             ReservationDto reservationDto = ReservationDto.toDto(reservationService.update(reservationRequest, id));
             return ResponseEntity.ok(reservationDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PatchMapping("/updateStatus/{id}")
     public ResponseEntity<ReservationDto> updateStatus(@PathVariable long id, @RequestBody Map<String, Status> request) {
         ReservationDto reservationDto = ReservationDto.toDto(
@@ -53,6 +60,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationDto);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
             reservationService.delete(id);
@@ -60,6 +68,7 @@ public class ReservationController {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll/active")
     public ResponseEntity<List<ReservationDto>> findAllActive() {
             List<ReservationDto> reservationDtos = reservationService.findAllActive()
@@ -69,6 +78,7 @@ public class ReservationController {
             return ResponseEntity.ok(reservationDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findByCustomer/{customerId}")
     public ResponseEntity<List<ReservationDto>> findByCustomer(@PathVariable long customerId) {
             List<ReservationDto> reservationDtos = reservationService.findByCustomer(customerId)
@@ -78,6 +88,7 @@ public class ReservationController {
             return ResponseEntity.ok(reservationDtos);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findByStatus/{status}")
     public ResponseEntity<List<ReservationDto>> findByStatus(@PathVariable Status status) {
             List<ReservationDto> reservationDtos = reservationService.findByStatus(status)

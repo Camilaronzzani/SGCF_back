@@ -3,6 +3,8 @@ package sgcf_back.camilaronzzani.com.github.sgcf_back.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +28,26 @@ public class ApiExceptionHandler {
         erro.put(MESSAGE, exception.getReason());
 
         return ResponseEntity.status(exception.getStatusCode()).body(erro);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException exception) {
+        log.warn("Access denied: {}", exception.getMessage());
+
+        Map<String, String> erro = new HashMap<>();
+        erro.put(MESSAGE, "acesso permitido apenas para gerentes");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleNotReadable(HttpMessageNotReadableException exception) {
+        log.error("Invalid request body: {}", exception.getMessage());
+
+        Map<String, String> erro = new HashMap<>();
+        erro.put(MESSAGE, "corpo da requisicao invalido ou com campos obrigatorios ausentes");
+
+        return ResponseEntity.badRequest().body(erro);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

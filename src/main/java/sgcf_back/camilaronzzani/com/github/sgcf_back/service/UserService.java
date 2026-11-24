@@ -70,6 +70,13 @@ public class UserService {
             }
 
         try {
+            if (userRepository.findByEmail(userRequest.email()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "email already registered");
+            }
+            if (userRepository.findByUserName(userRequest.userName()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "userName already registered");
+            }
+
             User user = toUser(userRequest);
                 Employee employee = userRequest.employeeId() == null
                         ? null
