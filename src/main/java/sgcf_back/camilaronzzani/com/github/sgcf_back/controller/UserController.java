@@ -79,11 +79,12 @@ public class UserController {
     public ResponseEntity<UserDto> findByUserName(@PathVariable String userName) {
             return ResponseEntity.ok(UserDto.toDto(userService.findByUserName(userName)));
     }
-    @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
+    @PreAuthorize("permitAll()")
     @PatchMapping("/change")
     public ResponseEntity<BooleanRequest> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
             return new ResponseEntity<>(userService.changePassword(changePasswordRequest),HttpStatus.OK);
     }
+    @PreAuthorize("permitAll()")
     @PostMapping("/authenticate")
     public ResponseEntity<String> authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest) {
         try {

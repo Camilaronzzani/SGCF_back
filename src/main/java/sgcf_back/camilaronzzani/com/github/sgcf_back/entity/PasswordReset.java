@@ -26,6 +26,9 @@ public class PasswordReset {
     @Column(nullable = false)
     private boolean used;
 
+    @Column(nullable = false)
+    private boolean verified;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -17,6 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.PasswordReset;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.PasswordResetRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import static sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.UserRequest.toUser;
 
@@ -37,6 +41,9 @@ public class UserService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private PasswordResetRepository passwordResetRepository;
 
 
     public List<User> findAll() {
@@ -176,11 +183,22 @@ public class UserService {
             User user = userRepository.findByEmail(changePasswordRequest.email()).orElseThrow(()
                     -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NO_FIND));
 
-            if (passwordEncoder.matches(user.getUserPassword(), changePasswordRequest.password())){
+            PasswordReset passwordReset = passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(user.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "codigo nao validado"));
+
+            if (!passwordReset.isVerified()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "codigo nao validado");
+            }
+            if (passwordReset.getExpiration().isBefore(LocalDateTime.now())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "codigo expirado");
+            }
+
+            if (passwordEncoder.matches(changePasswordRequest.password(), user.getUserPassword())){
                 boo = false;
-                message = "erro com a senha";
+                message = "a nova senha deve ser diferente da atual";
             }else {
                 user.setUserPassword(passwordEncoder.encode(changePasswordRequest.password()));
+                passwordReset.setUsed(true);
                 boo = true;
                message = "Senha redefinida com sucesso";
             }

@@ -1,5 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PasswordResetRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.TokenRequest;
@@ -15,12 +17,14 @@ public class PasswordResetController {
     @Autowired
     private PasswordResetService passwordResetService;
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/request")
     public ResponseEntity<String> requestPasswordReset(@Valid @RequestBody PasswordResetRequest passwordResetRequest){
             String mensagem = passwordResetService.requestPasswordReset(passwordResetRequest);
             String jsonResponse = "{\"message\": \"" + mensagem + "\"}";
             return ResponseEntity.ok(jsonResponse);
     }
+    @PreAuthorize("permitAll()")
     @PostMapping("/compareToken")
     public ResponseEntity<BooleanRequest> compareToken(@Valid @RequestBody TokenRequest tokenRequest){
             return ResponseEntity.ok(passwordResetService.compareToken(tokenRequest));

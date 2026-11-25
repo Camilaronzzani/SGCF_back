@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/user/authenticate", "/api/user/authenticate/").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/password/reset/request", "/api/password/reset/compareToken").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/user/change").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )

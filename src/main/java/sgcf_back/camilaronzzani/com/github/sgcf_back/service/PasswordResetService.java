@@ -90,6 +90,11 @@ public class PasswordResetService {
             boolean  boo= (passwordReset.getToken().equals(tokenRequest.token().trim()) && passwordReset.getExpiration().isAfter(LocalDateTime.now()));
             log.info("Validação do token para {}: {}", tokenRequest.email(), boo);
 
+            if (boo) {
+                passwordReset.setVerified(true);
+                passwordResetRepository.save(passwordReset);
+            }
+
             return new BooleanRequest(boo, message);
 
         } catch (Exception e) {
