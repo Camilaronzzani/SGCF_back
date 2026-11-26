@@ -7,6 +7,7 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.Chan
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.PasswordResetRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.UserRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.UserDto;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.UserService;
@@ -24,6 +25,9 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
@@ -80,7 +84,7 @@ public class UserController {
         boolean isAuthenticated = userService.authenticate(authenticateRequest);
 
         if (!isAuthenticated) {
-            return new ResponseEntity<>(new AuthResponse(false), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new AuthResponse(false, null), HttpStatus.UNAUTHORIZED);
         }
 
         User user = userService.findByEmail(authenticateRequest.email());
@@ -88,7 +92,7 @@ public class UserController {
         session.setAttribute("permission", user.getPermission());
         session.setAttribute("employeeId", user.getEmployee() == null ? null : user.getEmployee().getId());
 
-        return ResponseEntity.ok(new AuthResponse(true));
+        return ResponseEntity.ok(new AuthResponse(true, jwtService.gerarToken(user)));
     }
 
     @PostMapping("is-manager")
