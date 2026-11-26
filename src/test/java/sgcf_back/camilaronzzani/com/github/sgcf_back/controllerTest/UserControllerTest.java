@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.mockito.ArgumentCaptor;
@@ -38,7 +41,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class UserControllerTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -184,24 +194,18 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/user/authenticate - Successful authentication populates session")
-    void authenticateReturns200AndFillsSessionWhenCredentialsAreValid() throws Exception {
+    @DisplayName("POST /api/user/authenticate - Successful authentication returns the token")
+    void authenticateReturns200AndTokenWhenCredentialsAreValid() throws Exception {
         AuthenticateRequest authReq = new AuthenticateRequest("john@example.com", "password123");
-        MockHttpSession session = new MockHttpSession();
 
-        when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(true);
-        when(userService.findByEmail("john@example.com")).thenReturn(sampleUser);
+        when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn("token-jwt");
 
         ResultActions resposta = mockMvc.perform(post("/api/user/authenticate")
-                .session(session)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(authReq)));
 
         resposta.andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-        assertEquals(1L, session.getAttribute("userId"));
-        assertEquals(Permission.MANAGER, session.getAttribute("permission"));
-        assertEquals(1L, session.getAttribute("employeeId"));
+                .andExpect(content().string("token-jwt"));
     }
 
     @Test
@@ -209,14 +213,13 @@ class UserControllerTest {
     void authenticateReturns401WhenCredentialsAreInvalid() throws Exception {
         AuthenticateRequest authReq = new AuthenticateRequest("john@example.com", "wrongpass");
 
-        when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(false);
+        when(userService.authenticate(any(AuthenticateRequest.class))).thenThrow(new RuntimeException("senha errada"));
 
         ResultActions resposta = mockMvc.perform(post("/api/user/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(authReq)));
 
-        resposta.andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.success").value(false));
+        resposta.andExpect(status().isUnauthorized());
     }
 
     @Test

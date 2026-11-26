@@ -8,6 +8,7 @@ import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.EmployeDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.DeactivationRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.EmployeeRequest;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.EmployeeService;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.UserService;
 import jakarta.validation.Valid;
@@ -27,6 +28,9 @@ public class EmployeeController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserService userService;
+
     @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @GetMapping("/findAll")
     public ResponseEntity<List<EmployeDto>> findAll(){
@@ -41,7 +45,8 @@ public class EmployeeController {
     @DeleteMapping("/deactivate/{id}")
     public ResponseEntity<Void> deactivate(@PathVariable long id,@Valid @RequestBody DeactivationRequest request) {
 
-            if (!passwordEncoder.matches(request.email(), request.password())) {
+            User user = userService.findByEmail(request.email());
+            if (!passwordEncoder.matches(request.password(), user.getUserPassword())) {
                 return ResponseEntity.status(401).build();
             }
             employeeService.delete(id);

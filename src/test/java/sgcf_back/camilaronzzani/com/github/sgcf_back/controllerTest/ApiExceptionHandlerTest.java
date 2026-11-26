@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.CustomerController;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.exception.ServiceException;
@@ -23,7 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CustomerController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class ApiExceptionHandlerTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;

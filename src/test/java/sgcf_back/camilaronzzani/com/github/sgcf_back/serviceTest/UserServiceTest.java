@@ -8,17 +8,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.UserRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.Employee;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.PasswordReset;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.enums.Permission;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.EmployeeRepository;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.PasswordResetRepository;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +40,12 @@ class UserServiceTest {
 
     @Mock
     private EmployeeRepository employeeRepository;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private PasswordResetRepository passwordResetRepository;
 
     @InjectMocks
     private UserService userService;
@@ -383,7 +393,7 @@ class UserServiceTest {
     // ===== authenticate Tests =====
 
     @Test
-    void authenticateReturnsTrueWhenPasswordMatches() {
+    void authenticateReturnsTokenWhenPasswordMatches() {
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedPassword");
@@ -392,16 +402,17 @@ class UserServiceTest {
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("password123", "encodedPassword")).thenReturn(true);
+        when(jwtService.createToken(user)).thenReturn("token-jwt");
 
-        Boolean result = userService.authenticate(request);
+        String result = userService.authenticate(request);
 
-        assertTrue(result);
+        assertEquals("token-jwt", result);
         verify(userRepository).findByEmail("test@example.com");
         verify(passwordEncoder).matches("password123", "encodedPassword");
     }
 
     @Test
-    void authenticateReturnsFalseWhenPasswordDoesNotMatch() {
+    void authenticateThrowsExceptionWhenPasswordDoesNotMatch() {
         User user = new User();
         user.setEmail("test@example.com");
         user.setUserPassword("encodedPassword");
@@ -411,9 +422,8 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrongpassword", "encodedPassword")).thenReturn(false);
 
-        Boolean result = userService.authenticate(request);
-
-        assertFalse(result);
+        assertThrows(RuntimeException.class, () -> userService.authenticate(request));
+        verify(jwtService, never()).createToken(any());
         verify(userRepository).findByEmail("test@example.com");
         verify(passwordEncoder).matches("wrongpassword", "encodedPassword");
     }
@@ -443,8 +453,13 @@ class UserServiceTest {
 
         ChangePasswordRequest request = new ChangePasswordRequest("test@example.com", "newPassword123");
 
+        PasswordReset reset = new PasswordReset();
+        reset.setVerified(true);
+        reset.setExpiration(LocalDateTime.now().plusMinutes(5));
+
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("encodedOldPassword", "newPassword123")).thenReturn(false);
+        when(passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(any())).thenReturn(Optional.of(reset));
+        when(passwordEncoder.matches("newPassword123", "encodedOldPassword")).thenReturn(false);
         when(passwordEncoder.encode("newPassword123")).thenReturn("encodedNewPassword");
 
         BooleanRequest result = userService.changePassword(request);
@@ -452,9 +467,28 @@ class UserServiceTest {
         assertTrue(result.bool());
         assertEquals("Senha redefinida com sucesso", result.message());
         assertEquals("encodedNewPassword", user.getUserPassword());
-        verify(userRepository).findByEmail("test@example.com");
-        verify(passwordEncoder).matches("encodedOldPassword", "newPassword123");
+        assertTrue(reset.isUsed());
         verify(passwordEncoder).encode("newPassword123");
+    }
+
+    @Test
+    void changePasswordThrowsExceptionWhenCodeWasNotValidated() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setUserPassword("encodedOldPassword");
+
+        ChangePasswordRequest request = new ChangePasswordRequest("test@example.com", "newPassword123");
+
+        PasswordReset reset = new PasswordReset();
+        reset.setVerified(false);
+        reset.setExpiration(LocalDateTime.now().plusMinutes(5));
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(any())).thenReturn(Optional.of(reset));
+
+        assertThrows(RuntimeException.class, () -> userService.changePassword(request));
+        assertEquals("encodedOldPassword", user.getUserPassword());
+        verify(passwordEncoder, never()).encode(anyString());
     }
 
     @Test
@@ -465,16 +499,19 @@ class UserServiceTest {
 
         ChangePasswordRequest request = new ChangePasswordRequest("test@example.com", "samePassword");
 
+        PasswordReset reset = new PasswordReset();
+        reset.setVerified(true);
+        reset.setExpiration(LocalDateTime.now().plusMinutes(5));
+
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("encodedPassword", "samePassword")).thenReturn(true);
+        when(passwordResetRepository.findFirstByUserIdAndUsedFalseOrderByExpirationDesc(any())).thenReturn(Optional.of(reset));
+        when(passwordEncoder.matches("samePassword", "encodedPassword")).thenReturn(true);
 
         BooleanRequest result = userService.changePassword(request);
 
         assertFalse(result.bool());
-        assertEquals("erro com a senha", result.message());
+        assertEquals("a nova senha deve ser diferente da atual", result.message());
         assertEquals("encodedPassword", user.getUserPassword());
-        verify(userRepository).findByEmail("test@example.com");
-        verify(passwordEncoder).matches("encodedPassword", "samePassword");
         verify(passwordEncoder, never()).encode(anyString());
     }
 

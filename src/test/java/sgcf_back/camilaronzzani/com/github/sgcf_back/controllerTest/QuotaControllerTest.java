@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.mockito.ArgumentCaptor;
@@ -34,7 +37,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(QuotaController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class QuotaControllerTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;

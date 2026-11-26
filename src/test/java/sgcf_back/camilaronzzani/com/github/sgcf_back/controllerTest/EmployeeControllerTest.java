@@ -1,5 +1,10 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.entity.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.mockito.ArgumentCaptor;
@@ -38,7 +43,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(EmployeeController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class EmployeeControllerTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -96,7 +108,9 @@ class EmployeeControllerTest {
     @DisplayName("Desativar funcionário com senha certa")
     void deactivateReturns204WhenPasswordIsCorrect() throws Exception {
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "123456");
-        when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(true);
+        User user = new User();
+        user.setUserPassword(new BCryptPasswordEncoder().encode("123456"));
+        when(userService.findByEmail("camila@email.com")).thenReturn(user);
 
         ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +124,9 @@ class EmployeeControllerTest {
     @DisplayName("Não desativar funcionário com senha errada")
     void deactivateReturns401WhenPasswordIsWrong() throws Exception {
         DeactivationRequest request = new DeactivationRequest("camila@email.com", "wrong");
-        when(userService.authenticate(any(AuthenticateRequest.class))).thenReturn(false);
+        User user = new User();
+        user.setUserPassword(new BCryptPasswordEncoder().encode("123456"));
+        when(userService.findByEmail("camila@email.com")).thenReturn(user);
 
         ResultActions resposta = mockMvc.perform(delete("/api/employee/deactivate/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)

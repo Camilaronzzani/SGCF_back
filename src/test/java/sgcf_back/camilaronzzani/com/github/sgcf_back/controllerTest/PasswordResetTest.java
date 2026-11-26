@@ -1,5 +1,8 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -25,7 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(PasswordResetController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class PasswordResetTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;

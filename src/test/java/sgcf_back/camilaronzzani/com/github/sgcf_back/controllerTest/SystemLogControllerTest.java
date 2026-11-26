@@ -1,5 +1,9 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 
+import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -26,7 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SystemLogController.class)
 @Import(SecurityConfig.class)
+@WithMockUser(authorities = "MANAGER")
 class SystemLogControllerTest {
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,7 +71,8 @@ class SystemLogControllerTest {
 
 
     @Test
-    @DisplayName("GET /api/log/findAll - Without session should return 403 Forbidden")
+    @WithAnonymousUser
+    @DisplayName("GET /api/log/findAll - Without token should return 403 Forbidden")
     void findAllReturns403WhenThereIsNoSession() throws Exception {
         ResultActions resposta = mockMvc.perform(get("/api/log/findAll"));
 
@@ -69,9 +81,10 @@ class SystemLogControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/log/findAll - Non-manager session should return 403 Forbidden")
+    @WithMockUser(authorities = "EMPLOYEE")
+    @DisplayName("GET /api/log/findAll - Employee should return 403 Forbidden")
     void findAllReturns403WhenUserIsNotManager() throws Exception {
-        ResultActions resposta = mockMvc.perform(get("/api/log/findAll").session(unauthorizedSession));
+        ResultActions resposta = mockMvc.perform(get("/api/log/findAll"));
 
         resposta.andExpect(status().isForbidden());
         verifyNoInteractions(systemLogService);
