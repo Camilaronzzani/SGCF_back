@@ -1,6 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthResponse;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
@@ -98,11 +99,8 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
     @PostMapping("is-manager")
-    public ResponseEntity<UserDto> isManager(@Valid @RequestBody PasswordResetRequest email){
-        User user = userService.findByEmail(email.email());
-        if (user.getPermission() == Permission.MANAGER){
-            return ResponseEntity.ok(UserDto.toDto(user));
-        }
-        return new ResponseEntity<>(UserDto.toDto(user), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<UserDto> isManager(@AuthenticationPrincipal User logged){
+        User user = userService.findByEmail(logged.getEmail());
+        return ResponseEntity.ok(UserDto.toDto(user));
     }
 }

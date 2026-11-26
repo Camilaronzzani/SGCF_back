@@ -3,6 +3,7 @@ package sgcf_back.camilaronzzani.com.github.sgcf_back.controllerTest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.repositories.UserRepository;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.config.security.JwtService;
 import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.mockito.ArgumentCaptor;
@@ -230,26 +231,30 @@ class UserControllerTest {
         when(userService.findByEmail("john@example.com")).thenReturn(sampleUser);
 
         ResultActions resposta = mockMvc.perform(post("/api/user/is-manager")
+                .with(user(sampleUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetRequest)));
 
         resposta.andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName").value("johndoe"));
+                .andExpect(jsonPath("$.userName").value("johndoe"))
+                .andExpect(jsonPath("$.permission").value("MANAGER"));
     }
 
     @Test
-    @DisplayName("POST /api/user/is-manager - User without Manager permission returns 401 Unauthorized")
-    void isManagerReturns401WhenUserIsNotManager() throws Exception {
+    @DisplayName("POST /api/user/is-manager - Employee returns 200 with EMPLOYEE permission")
+    void isManagerReturns200WithEmployeePermissionWhenUserIsEmployee() throws Exception {
         PasswordResetRequest resetRequest = new PasswordResetRequest("john@example.com");
         sampleUser.setPermission(Permission.EMPLOYEE);
 
         when(userService.findByEmail("john@example.com")).thenReturn(sampleUser);
 
         ResultActions resposta = mockMvc.perform(post("/api/user/is-manager")
+                .with(user(sampleUser))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(resetRequest)));
 
-        resposta.andExpect(status().isUnauthorized());
+        resposta.andExpect(status().isOk())
+                .andExpect(jsonPath("$.permission").value("EMPLOYEE"));
     }
 
     @Test
