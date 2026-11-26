@@ -227,7 +227,6 @@ public class UserService {
                  throw new RuntimeException();
             }
             String token = jwtService.createToken(user);
-            log.info(token);
             return token;
 
         } catch (Exception e) {
