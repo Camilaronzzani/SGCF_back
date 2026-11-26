@@ -1,6 +1,7 @@
 package sgcf_back.camilaronzzani.com.github.sgcf_back.controller;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthResponse;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthenticatedUserDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -93,6 +95,11 @@ public class UserController {
         session.setAttribute("employeeId", user.getEmployee() == null ? null : user.getEmployee().getId());
 
         return ResponseEntity.ok(new AuthResponse(true, jwtService.gerarToken(user)));
+    }
+
+    @GetMapping("/me")
+    public AuthenticatedUserDto me(@AuthenticationPrincipal User user) {
+        return AuthenticatedUserDto.toDto(user);
     }
 
     @PostMapping("is-manager")
