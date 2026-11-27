@@ -4,6 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthResponse;
+import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.AuthenticatedUserDto;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.BooleanRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.AuthenticateRequest;
 import sgcf_back.camilaronzzani.com.github.sgcf_back.controller.dto.request.ChangePasswordRequest;
@@ -98,9 +99,13 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyAuthority('MANAGER', 'EMPLOYEE')")
-    @PostMapping("is-manager")
-    public ResponseEntity<UserDto> isManager(@AuthenticationPrincipal User logged){
-        User user = userService.findByEmail(logged.getEmail());
-        return ResponseEntity.ok(UserDto.toDto(user));
+    @GetMapping("/me")
+    public ResponseEntity<AuthenticatedUserDto> me(@AuthenticationPrincipal User user) {
+        try {
+            return ResponseEntity.ok(AuthenticatedUserDto.toDto(user));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

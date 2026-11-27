@@ -226,8 +226,8 @@ public class UserService {
             if (!auth){
                  throw new RuntimeException();
             }
-            String token = jwtService.createToken(user);
-            return token;
+            return jwtService.createToken(user);
+
 
         } catch (Exception e) {
             log.error("Error in UserService.authenticate", e);
